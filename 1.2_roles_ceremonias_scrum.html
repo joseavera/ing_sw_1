@@ -1,0 +1,382 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Roles y ceremonias en Scrum: Sprint Planning y Daily</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  /* Ajustes puntuales para los elementos visuales de esta clase
+     (no modifica base.css; solo complementa lo que ya existe). */
+  .roles-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    margin: 1.25rem 0;
+  }
+  @media (max-width: 750px) { .roles-grid { grid-template-columns: 1fr; } }
+
+  .role-card {
+    background: var(--off-white);
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--guinda);
+    border-radius: var(--radius-lg);
+    padding: 1.2rem 1.3rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .role-card .role-name {
+    font-family: var(--font-ui);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--guinda-dark);
+    display: block;
+    margin-bottom: .4rem;
+  }
+  .role-card .role-analogy {
+    font-family: var(--font-ui);
+    font-size: .78rem;
+    text-transform: uppercase;
+    letter-spacing: .08em;
+    color: var(--guinda-mid);
+    display: block;
+    margin-bottom: .55rem;
+  }
+  .role-card p { font-size: .92rem; line-height: 1.55; color: var(--ink-secondary); margin-bottom: 0; }
+
+  figure svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+  .support-logo { height: 34px; width: auto; opacity: .85; vertical-align: middle; }
+  .callout .support-logo, .concept-box .support-logo { float: right; margin-left: .75rem; }
+
+  .team-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background: var(--guinda-light);
+    border: 1px solid #D8A8BA;
+    border-radius: 999px;
+    padding: .3rem .8rem;
+    font-family: var(--font-ui);
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--guinda-dark);
+    margin: .2rem .4rem .2rem 0;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-wrap">
+    <img src="imagen1.png" alt="Mixtle, mascota del IEDEP">
+  </div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Material de clase — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<section class="class-hero">
+  <span class="class-label">Unidad 1 · Sesión 2</span>
+  <h1>Roles y ceremonias en Scrum: Sprint Planning y Daily</h1>
+  <span class="class-subtitle">Quién hace qué en un equipo ágil, y cómo dos reuniones breves mantienen a todo el equipo sincronizado durante el sprint.</span>
+  <div class="meta-row">
+    <div class="meta-item">Asignatura<span>Ingeniería de Software I</span></div>
+    <div class="meta-item">Tema<span>1.2 Roles y ceremonias en Scrum</span></div>
+    <div class="meta-item">Fecha<span>Sábado 19 de septiembre de 2026</span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <section class="section">
+    <h2 class="section-title">Datos generales</h2>
+    <table>
+      <tbody>
+        <tr><td><strong>Programa educativo</strong></td><td>Licenciatura en Sistemas Computacionales</td></tr>
+        <tr><td><strong>Asignatura</strong></td><td>Ingeniería de Software I</td></tr>
+        <tr><td><strong>Unidad</strong></td><td>1. Metodologías Ágiles y Gestión con ClickUp</td></tr>
+        <tr><td><strong>Tema</strong></td><td>1.2 Roles y ceremonias en Scrum: Sprint Planning y Daily</td></tr>
+        <tr><td><strong>Fecha</strong></td><td>Sábado 19 de septiembre de 2026</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Competencias a desarrollar</h2>
+
+    <div class="competency-card">
+      <span class="comp-num">01</span>
+      <span class="comp-text">
+        <strong>Identificar</strong> los tres roles de Scrum (Product Owner, Scrum Master y Equipo de Desarrollo) y las responsabilidades específicas de cada uno dentro de un proyecto de software.
+      </span>
+    </div>
+
+    <div class="competency-card">
+      <span class="comp-num">02</span>
+      <span class="comp-text">
+        <strong>Diferenciar</strong> el propósito, la duración y la dinámica de la Sprint Planning y de la Daily Scrum dentro del ciclo de un sprint.
+      </span>
+    </div>
+
+    <div class="competency-card">
+      <span class="comp-num">03</span>
+      <span class="comp-text">
+        <strong>Simular</strong>, asumiendo un rol de Scrum, una Sprint Planning y una Daily Scrum, como preparación directa para el trabajo del equipo en ClickUp.
+      </span>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Introducción: un equipo sin director de orquesta... pero con partitura</h2>
+    <p>
+      Piensa en una orquesta. Nadie discute que se necesita a alguien que decida qué pieza tocar y en qué orden (el programa del concierto), a alguien que ayude a que los músicos ensayen bien y resuelvan fricciones, y a los propios músicos, que son quienes realmente producen la música. Nadie más puede tocar el violín por ellos, y el director tampoco decide cómo debe sonar cada nota: solo cuida que el conjunto funcione.
+    </p>
+    <p>
+      Scrum organiza así a un equipo de software: no hay un jefe que reparte órdenes de tarea en tarea, sino tres roles con responsabilidades muy claras que, juntos, hacen posible avanzar rápido sin perder el rumbo.
+    </p>
+    <div class="concept-box">
+      <span class="concept-title">Idea clave</span>
+      <p>
+        En Scrum, la autoridad no está en una sola persona: está repartida entre el <em>qué</em> (Product Owner), el <em>cómo trabajamos</em> (Scrum Master) y el <em>cómo se construye</em> (Equipo de Desarrollo).
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Los tres roles de Scrum</h2>
+    <div class="roles-grid">
+      <div class="role-card">
+        <span class="role-name">Product Owner</span>
+        <span class="role-analogy">El programador del concierto</span>
+        <p>Decide <strong>qué</strong> se construye y en qué orden. Es dueño del backlog del producto, prioriza los elementos según el valor que aportan al cliente y responde las dudas del equipo sobre los requerimientos.</p>
+      </div>
+      <div class="role-card">
+        <span class="role-name">Scrum Master</span>
+        <span class="role-analogy">El facilitador del ensayo</span>
+        <p>Cuida <strong>cómo trabaja</strong> el equipo. Facilita las ceremonias, elimina obstáculos que frenan el avance y protege al equipo de interrupciones, sin asignar tareas ni ser un jefe jerárquico.</p>
+      </div>
+      <div class="role-card">
+        <span class="role-name">Equipo de Desarrollo</span>
+        <span class="role-analogy">Los músicos</span>
+        <p>Decide <strong>cómo se construye</strong> cada elemento. Es autoorganizado y multidisciplinario: estima el esfuerzo, distribuye el trabajo entre sus integrantes y entrega el incremento de software funcionando.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">El ciclo del sprint: dónde ocurren estas dos ceremonias</h2>
+    <figure>
+      <svg viewBox="0 0 680 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="svgTitle2">
+        <title id="svgTitle2">Ciclo de un sprint mostrando la Sprint Planning al inicio y la Daily Scrum repitiéndose cada día</title>
+
+        <rect x="10" y="70" width="150" height="60" rx="10" fill="#490b58"/>
+        <text x="85" y="95" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">SPRINT</text>
+        <text x="85" y="115" text-anchor="middle" font-family="Inter, sans-serif" font-size="13" font-weight="700" fill="#FFFFFF">PLANNING</text>
+
+        <path d="M165 100 L195 100" stroke="#690f30" stroke-width="3" marker-end="url(#arrow2)"/>
+
+        <rect x="200" y="30" width="440" height="150" rx="12" fill="#F5E8EE" stroke="#D8A8BA"/>
+        <text x="420" y="55" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#490b58" letter-spacing="1">SPRINT (1&#8211;2 SEMANAS)</text>
+
+        <g>
+          <circle cx="250" cy="110" r="26" fill="#F6F4F4" stroke="#C8B4BA"/>
+          <text x="250" y="106" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#5C4850">DÍA 1</text>
+          <text x="250" y="118" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#5C4850">Daily</text>
+        </g>
+        <g>
+          <circle cx="330" cy="110" r="26" fill="#F6F4F4" stroke="#C8B4BA"/>
+          <text x="330" y="106" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#5C4850">DÍA 2</text>
+          <text x="330" y="118" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#5C4850">Daily</text>
+        </g>
+        <g>
+          <circle cx="410" cy="110" r="26" fill="#F6F4F4" stroke="#C8B4BA"/>
+          <text x="410" y="106" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#5C4850">DÍA 3</text>
+          <text x="410" y="118" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#5C4850">Daily</text>
+        </g>
+        <text x="470" y="115" text-anchor="middle" font-family="Inter, sans-serif" font-size="16" fill="#8C7880">&#8230;</text>
+        <g>
+          <circle cx="530" cy="110" r="26" fill="#F6F4F4" stroke="#C8B4BA"/>
+          <text x="530" y="106" text-anchor="middle" font-family="Inter, sans-serif" font-size="10" fill="#5C4850">DÍA N</text>
+          <text x="530" y="118" text-anchor="middle" font-family="Inter, sans-serif" font-size="9" fill="#5C4850">Daily</text>
+        </g>
+
+        <path d="M276 110 L304 110" stroke="#C8B4BA" stroke-width="2"/>
+        <path d="M356 110 L384 110" stroke="#C8B4BA" stroke-width="2"/>
+        <path d="M436 110 L454 110" stroke="#C8B4BA" stroke-width="2"/>
+        <path d="M486 110 L504 110" stroke="#C8B4BA" stroke-width="2"/>
+
+        <text x="420" y="160" text-anchor="middle" font-family="Georgia, serif" font-size="11" fill="#5C4850">Cada día, 15 minutos, mismo horario, de pie</text>
+
+        <defs>
+          <marker id="arrow2" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L6,3 z" fill="#690f30"/>
+          </marker>
+        </defs>
+      </svg>
+      <figcaption>La Sprint Planning ocurre una sola vez, al abrir el sprint; la Daily Scrum se repite cada día del sprint.</figcaption>
+    </figure>
+  </section>
+
+  <section class="section">
+    <div class="example-block">
+      <div class="example-header">Sprint Planning: planear antes de cocinar</div>
+      <div class="example-body">
+        <div class="example-statement">
+          Es como planear el menú de la semana antes de ir al supermercado: el Product Owner trae la lista de platillos posibles (el backlog priorizado) y el equipo decide, según el tiempo y los ingredientes con que cuenta (su capacidad), cuáles va a preparar en los próximos días.
+        </div>
+        <ul class="step-list">
+          <li>
+            <span class="step-n">1</span>
+            <span class="step-content"><strong>El Product Owner</strong> presenta los elementos del backlog con mayor prioridad y aclara las dudas sobre lo que el cliente necesita.</span>
+          </li>
+          <li>
+            <span class="step-n">2</span>
+            <span class="step-content"><strong>El Equipo de Desarrollo</strong> analiza cuánto trabajo puede comprometerse a terminar en el sprint, según su capacidad real.</span>
+          </li>
+          <li>
+            <span class="step-n">3</span>
+            <span class="step-content"><strong>El Scrum Master</strong> facilita la conversación para que la reunión no se alargue ni se salga del objetivo: definir el Sprint Backlog.</span>
+          </li>
+        </ul>
+        <div class="result-line">Resultado: un Sprint Backlog claro — la lista de elementos que el equipo se compromete a entregar en este sprint.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="example-block">
+      <div class="example-header">Daily Scrum: el huddle antes del partido</div>
+      <div class="example-body">
+        <div class="example-statement">
+          Es como el breve huddle que hace un equipo deportivo antes de cada jugada: no se analiza toda la estrategia del partido, solo se sincronizan en segundos sobre lo esencial para el siguiente movimiento.
+        </div>
+        <p style="margin-bottom:.9rem; font-size:.97rem; color:var(--ink);">Cada integrante del Equipo de Desarrollo responde, en no más de 15 minutos y de pie, tres preguntas:</p>
+        <ul class="step-list">
+          <li>
+            <span class="step-n">1</span>
+            <span class="step-content">¿Qué hice ayer que ayudó a cumplir el objetivo del sprint?</span>
+          </li>
+          <li>
+            <span class="step-n">2</span>
+            <span class="step-content">¿Qué haré hoy para ayudar a cumplir el objetivo del sprint?</span>
+          </li>
+          <li>
+            <span class="step-n">3</span>
+            <span class="step-content">¿Hay algún obstáculo (impedimento) que me esté deteniendo?</span>
+          </li>
+        </ul>
+        <div class="result-line">Resultado: el equipo se sincroniza a diario y el Scrum Master identifica obstáculos que debe ayudar a resolver.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Sprint Planning vs. Daily Scrum</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Característica</th>
+          <th>Sprint Planning</th>
+          <th>Daily Scrum</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>¿Cuándo ocurre?</td>
+          <td>Una vez, al inicio del sprint</td>
+          <td>Todos los días del sprint</td>
+        </tr>
+        <tr>
+          <td>Duración aproximada</td>
+          <td>1 a 2 horas (según la duración del sprint)</td>
+          <td>15 minutos</td>
+        </tr>
+        <tr>
+          <td>Propósito</td>
+          <td>Definir qué se hará y crear el Sprint Backlog</td>
+          <td>Sincronizar al equipo y detectar obstáculos</td>
+        </tr>
+        <tr>
+          <td>Participantes</td>
+          <td>Product Owner, Scrum Master y Equipo de Desarrollo</td>
+          <td>Principalmente el Equipo de Desarrollo</td>
+        </tr>
+        <tr>
+          <td>Producto de la reunión</td>
+          <td>Sprint Backlog y objetivo del sprint</td>
+          <td>Plan ajustado para las próximas 24 horas</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <div class="callout">
+      <img src="imagen2.png" alt="Mixtle" class="support-logo">
+      <h3 style="color:var(--guinda-dark); margin-bottom:.6rem;">Actividad integradora — Simulacro de Sprint Planning y Daily Scrum</h3>
+      <p>
+        Como somos un equipo de 5 personas, hoy vamos a vivir un sprint completo en miniatura, con cada quien en un rol de Scrum. El proyecto ficticio: una <strong>app de tareas para estudiantes</strong>.
+      </p>
+
+      <p class="mt-1" style="margin-bottom:.5rem;"><strong>Roles para el equipo de 5:</strong></p>
+      <div class="mb-1">
+        <span class="team-badge">1 Product Owner</span>
+        <span class="team-badge">1 Scrum Master</span>
+        <span class="team-badge">3 Equipo de Desarrollo</span>
+      </div>
+
+      <ul class="step-list mt-1">
+        <li>
+          <span class="step-n">1</span>
+          <span class="step-content">
+            <strong>Sprint Planning (15 min):</strong> el Product Owner presenta 6 elementos del backlog (por ejemplo: "registro de usuario", "crear tarea", "marcar tarea como hecha", "recordatorios", "compartir lista", "modo oscuro"). El equipo elige, con ayuda del Scrum Master, los 3 elementos que puede comprometerse a completar en un sprint de una semana y redacta el objetivo del sprint en una frase.
+          </span>
+        </li>
+        <li>
+          <span class="step-n">2</span>
+          <span class="step-content">
+            <strong>Daily Scrum simulada (10 min):</strong> cada integrante del Equipo de Desarrollo responde, en voz alta y en menos de un minuto, las tres preguntas de la Daily (qué avancé, qué haré, qué obstáculo tengo), usando un avance imaginario del "día 3" del sprint.
+          </span>
+        </li>
+        <li>
+          <span class="step-n">3</span>
+          <span class="step-content">
+            <strong>Cierre (5 min):</strong> el Scrum Master anota en una tabla los obstáculos mencionados y propone, con el grupo, una acción concreta para resolver cada uno.
+          </span>
+        </li>
+      </ul>
+
+      <div class="product-badge" style="margin-top:1rem;">
+        <span class="pb-label" style="display:block;font-family:var(--font-ui);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--guinda);font-weight:700;margin-bottom:.3rem;">Entregable de la actividad</span>
+        <span class="pb-text" style="font-size:.93rem;color:var(--ink);">Un documento breve con: el objetivo del sprint, los 3 elementos elegidos del backlog y la tabla de obstáculos con su acción propuesta.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Conclusión</h2>
+    <p>
+      Los roles de Scrum no reparten poder de forma jerárquica, sino por tipo de decisión: el Product Owner decide qué construir, el Equipo de Desarrollo decide cómo construirlo y el Scrum Master cuida que el proceso funcione para todos. La Sprint Planning y la Daily Scrum son las dos primeras piezas de comunicación que sostienen ese trabajo: una traza el rumbo del sprint completo y la otra corrige el curso cada veinticuatro horas. Con estos roles y estas dos ceremonias ya comprendidos, en la siguiente sesión los llevaremos a la práctica dentro de ClickUp, configurando tableros y gestionando tareas reales.
+    </p>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Referencias bibliográficas</h2>
+    <p class="text-sm">
+      European Scrum. (2024). <em>Guía Metodologías Agile 2024</em> (v.1.0). https://www.europeanscrum.org/uploads/2/4/5/1/24513648/gui%CC%81a_metodologi%CC%81as_agile_2024.v1.0_-_europeanscrum.org.pdf
+    </p>
+    <p class="text-sm">
+      Project Management Institute, Agile Alliance. (2017). <em>Guía práctica de ágil</em>. Project Management Institute, Inc.
+    </p>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Unidad 1, Sesión 2 · Sábado 19 de septiembre de 2026</span>
+</footer>
+
+</body>
+</html>

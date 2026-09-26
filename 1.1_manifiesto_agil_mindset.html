@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>El Manifiesto Ágil y la mentalidad ágil</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  /* Ajustes puntuales para los elementos visuales de esta clase
+     (no modifica base.css; solo complementa lo que ya existe). */
+  .values-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin: 1.25rem 0;
+  }
+  @media (max-width: 600px) { .values-grid { grid-template-columns: 1fr; } }
+
+  .value-card {
+    background: var(--off-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 1.1rem 1.3rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .value-card .value-left { color: var(--guinda-dark); font-weight: 600; }
+  .value-card .value-over { color: var(--ink-muted); font-size: .85rem; margin: .2rem 0; }
+  .value-card .value-right { color: var(--ink-secondary); font-size: .92rem; }
+
+  figure svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+  .support-logo {
+    height: 34px;
+    width: auto;
+    opacity: .85;
+    vertical-align: middle;
+  }
+
+  .callout .support-logo { float: right; margin-left: .75rem; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-wrap">
+    <img src="imagen1.png" alt="Mixtle, mascota del IEDEP">
+  </div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Material de clase — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<section class="class-hero">
+  <span class="class-label">Unidad 1 · Sesión 1</span>
+  <h1>El Manifiesto Ágil y la mentalidad ágil</h1>
+  <span class="class-subtitle">De los planes que no cambian a los equipos que se adaptan: el origen de la forma de pensar que hace posible el desarrollo ágil de software.</span>
+  <div class="meta-row">
+    <div class="meta-item">Asignatura<span>Ingeniería de Software I</span></div>
+    <div class="meta-item">Tema<span>1.1 Manifiesto Ágil y mentalidad (Mindset)</span></div>
+    <div class="meta-item">Fecha<span>Domingo 13 de septiembre de 2026</span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <section class="section">
+    <h2 class="section-title">Datos generales</h2>
+    <table>
+      <tbody>
+        <tr><td><strong>Programa educativo</strong></td><td>Licenciatura en Sistemas Computacionales</td></tr>
+        <tr><td><strong>Asignatura</strong></td><td>Ingeniería de Software I</td></tr>
+        <tr><td><strong>Unidad</strong></td><td>1. Metodologías Ágiles y Gestión con Jira</td></tr>
+        <tr><td><strong>Tema</strong></td><td>1.1 Manifiesto Ágil y mentalidad (Mindset)</td></tr>
+        <tr><td><strong>Fecha</strong></td><td>Domingo 13 de septiembre de 2026</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Competencias a desarrollar</h2>
+
+    <div class="competency-card">
+      <span class="comp-num">01</span>
+      <span class="comp-text">
+        <strong>Distinguir</strong> los cuatro valores y los principios fundamentales del Manifiesto Ágil, reconociendo el contexto histórico en el que surgieron, para comprender por qué transformaron la industria del desarrollo de software.
+      </span>
+    </div>
+
+    <div class="competency-card">
+      <span class="comp-num">02</span>
+      <span class="comp-text">
+        <strong>Comparar</strong> la mentalidad (mindset) ágil frente a los enfoques tradicionales de gestión de proyectos, identificando ventajas y contextos de aplicación de cada uno.
+      </span>
+    </div>
+
+    <div class="competency-card">
+      <span class="comp-num">03</span>
+      <span class="comp-text">
+        <strong>Argumentar</strong>, a partir de un caso propio o de su entorno, por qué una mentalidad ágil favorece la planificación de entregas iterativas que aportan valor continuo al cliente.
+      </span>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Introducción: ¿por qué cambiar la forma de pensar?</h2>
+    <p>
+      Imagina que planeas un viaje por carretera con un mapa impreso de hace diez años. El mapa no sabe que ayer cerraron un puente ni que hoy hay una desviación por obras: si lo sigues al pie de la letra, puedes terminar varado. Un GPS moderno, en cambio, recalcula la ruta en cuanto detecta un cambio en el camino y te lleva a tu destino de todas formas, aunque la ruta final no sea la que imaginaste al salir.
+    </p>
+    <p>
+      Durante décadas, muchos proyectos de software se gestionaron como si se siguiera un mapa fijo: se documentaba todo el proyecto al inicio, se firmaba un plan detallado y se avanzaba paso a paso sin apartarse de él, aunque en el camino el cliente descubriera que sus necesidades habían cambiado. El resultado, con frecuencia, era un software terminado a tiempo pero que ya no resolvía el problema real.
+    </p>
+    <div class="concept-box">
+      <span class="concept-title">Idea clave</span>
+      <p>
+        La mentalidad ágil no es una técnica ni una herramienta: es una forma de pensar que acepta el cambio como algo normal y valioso, en lugar de tratarlo como un error de planificación.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">El origen del Manifiesto Ágil</h2>
+    <p>
+      En febrero de 2001, diecisiete desarrolladores de software se reunieron en la estación de esquí de Snowbird, en Utah, Estados Unidos. Todos ellos estaban cansados de los mismos problemas: proyectos que se retrasaban, documentación interminable que nadie leía y clientes insatisfechos con un producto que ya no correspondía a lo que necesitaban. De esa reunión nació el <strong>Manifiesto por el Desarrollo Ágil de Software</strong>, un documento breve que resumió, en unas cuantas líneas, una nueva manera de entender el trabajo en equipo.
+    </p>
+
+    <ul class="step-list">
+      <li>
+        <span class="step-n">1</span>
+        <span class="step-content"><strong>Antes de 2001:</strong> predominaban los modelos en cascada, con fases rígidas y secuenciales (análisis, diseño, codificación, pruebas) que no permitían regresar fácilmente a una etapa anterior.</span>
+      </li>
+      <li>
+        <span class="step-n">2</span>
+        <span class="step-content"><strong>2001, Snowbird (Utah):</strong> diecisiete profesionales, entre ellos creadores de Scrum, Extreme Programming y otros enfoques ligeros, coinciden en que compartían una misma filosofía de fondo.</span>
+      </li>
+      <li>
+        <span class="step-n">3</span>
+        <span class="step-content"><strong>Resultado:</strong> cuatro valores y doce principios que, veinte años después, siguen siendo la base conceptual de Scrum y prácticamente todo marco ágil que usaremos en este curso.</span>
+      </li>
+    </ul>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Los cuatro valores del Manifiesto Ágil</h2>
+    <p>
+      El Manifiesto no rechaza por completo los elementos de la derecha; reconoce que tienen valor, pero establece una prioridad clara cuando hay que elegir:
+    </p>
+
+    <div class="values-grid">
+      <div class="value-card">
+        <div class="value-left">Individuos e interacciones</div>
+        <div class="value-over">sobre</div>
+        <div class="value-right">procesos y herramientas</div>
+      </div>
+      <div class="value-card">
+        <div class="value-left">Software funcionando</div>
+        <div class="value-over">sobre</div>
+        <div class="value-right">documentación extensiva</div>
+      </div>
+      <div class="value-card">
+        <div class="value-left">Colaboración con el cliente</div>
+        <div class="value-over">sobre</div>
+        <div class="value-right">negociación contractual</div>
+      </div>
+      <div class="value-card">
+        <div class="value-left">Respuesta ante el cambio</div>
+        <div class="value-over">sobre</div>
+        <div class="value-right">seguir un plan</div>
+      </div>
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 640 220" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="svgTitle">
+        <title id="svgTitle">Comparación visual entre lo que el Manifiesto Ágil valora más y lo que valora menos</title>
+        <rect x="10" y="20" width="280" height="180" rx="12" fill="#F5E8EE" stroke="#D8A8BA"/>
+        <text x="150" y="55" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#490b58">SE VALORA MÁS</text>
+        <text x="150" y="90"  text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#1A1215">Individuos e interacciones</text>
+        <text x="150" y="115" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#1A1215">Software funcionando</text>
+        <text x="150" y="140" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#1A1215">Colaboración con el cliente</text>
+        <text x="150" y="165" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#1A1215">Respuesta ante el cambio</text>
+
+        <path d="M300 110 L340 110" stroke="#690f30" stroke-width="3" marker-end="url(#arrow)"/>
+        <defs>
+          <marker id="arrow" markerWidth="10" markerHeight="10" refX="6" refY="3" orient="auto" markerUnits="strokeWidth">
+            <path d="M0,0 L0,6 L6,3 z" fill="#690f30"/>
+          </marker>
+        </defs>
+
+        <rect x="350" y="20" width="280" height="180" rx="12" fill="#F6F4F4" stroke="#E2D8DA"/>
+        <text x="490" y="55" text-anchor="middle" font-family="Inter, sans-serif" font-size="14" font-weight="700" fill="#5C4850">SIN DEJAR DE VALORAR</text>
+        <text x="490" y="90"  text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#5C4850">Procesos y herramientas</text>
+        <text x="490" y="115" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#5C4850">Documentación extensiva</text>
+        <text x="490" y="140" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#5C4850">Negociación contractual</text>
+        <text x="490" y="165" text-anchor="middle" font-family="Georgia, serif" font-size="13" fill="#5C4850">Seguir un plan</text>
+      </svg>
+      <figcaption>Los cuatro valores del Manifiesto Ágil: se prioriza lo de la izquierda, sin descartar lo de la derecha.</figcaption>
+    </figure>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Mentalidad tradicional vs. mentalidad ágil</h2>
+    <p>
+      Una buena analogía es pensar en la diferencia entre <strong>construir una casa</strong> y <strong>cocinar un platillo para invitados con gustos distintos</strong>. La construcción de una casa exige planos fijos desde el inicio: cambiar la ubicación de un muro a mitad de obra es costoso y riesgoso. Cocinar, en cambio, permite probar, ajustar la sazón y adaptar la receta según la reacción de los comensales, sin que el resultado deje de ser una comida completa.
+    </p>
+    <table>
+      <thead>
+        <tr>
+          <th>Dimensión</th>
+          <th>Mentalidad tradicional (cascada)</th>
+          <th>Mentalidad ágil</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Planificación</td>
+          <td>Detallada y fija desde el inicio del proyecto</td>
+          <td>General al inicio; se ajusta en cada iteración</td>
+        </tr>
+        <tr>
+          <td>Cambios de requerimientos</td>
+          <td>Se evitan; implican retrasos y costos altos</td>
+          <td>Se esperan y se incorporan como una ventaja</td>
+        </tr>
+        <tr>
+          <td>Entregas al cliente</td>
+          <td>Una sola entrega al final del proyecto</td>
+          <td>Entregas incrementales y frecuentes</td>
+        </tr>
+        <tr>
+          <td>Comunicación</td>
+          <td>Formal, por documentos y reportes</td>
+          <td>Directa, frecuente y cara a cara o síncrona</td>
+        </tr>
+        <tr>
+          <td>Rol del cliente</td>
+          <td>Participa al inicio y al final del proyecto</td>
+          <td>Colabora de forma continua durante todo el proyecto</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <div class="example-block">
+      <div class="example-header">Ejemplo aplicado: un cambio de última hora</div>
+      <div class="example-body">
+        <div class="example-statement">
+          Un equipo desarrolla el módulo de pagos de una tienda en línea. A la mitad del proyecto, el cliente solicita agregar un nuevo método de pago que no estaba contemplado, porque sus propios clientes lo están pidiendo.
+        </div>
+        <ul class="step-list">
+          <li>
+            <span class="step-n">1</span>
+            <span class="step-content"><strong>Con mentalidad tradicional:</strong> el cambio se rechaza o se traslada a un contrato adicional, porque el plan original ya fue aprobado y modificarlo implica retrasar todas las fases siguientes.</span>
+          </li>
+          <li>
+            <span class="step-n">2</span>
+            <span class="step-content"><strong>Con mentalidad ágil:</strong> el equipo revisa el backlog, prioriza el nuevo requerimiento frente a los demás pendientes y lo programa para una próxima iteración corta, sin detener el resto del desarrollo.</span>
+          </li>
+        </ul>
+        <div class="result-line">Resultado: el cambio se convierte en una oportunidad de generar más valor para el cliente, en lugar de un obstáculo para el proyecto.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="callout">
+      <img src="imagen2.png" alt="Mixtle" class="support-logo">
+      <p>
+        <strong>Actividad de inicio — Foro moderado:</strong> antes de la siguiente sesión, participa en el foro compartiendo una experiencia propia (escolar, laboral o personal) en la que un plan fijo tuvo que enfrentarse a un cambio inesperado. Describe qué se hizo y compáralo con cómo lo habría resuelto un equipo con mentalidad ágil.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Conclusión</h2>
+    <p>
+      El Manifiesto Ágil no propone abandonar la planificación, la documentación o los procesos, sino cambiar el lugar que ocupan: dejan de ser el fin del proyecto para convertirse en herramientas al servicio de las personas, del software que realmente funciona y de la satisfacción del cliente. Adoptar una mentalidad ágil significa aceptar que el cambio no es un fracaso de la planeación, sino una fuente de valor cuando el equipo sabe responder a él. Esta forma de pensar es la base sobre la que, en las próximas sesiones, construiremos los roles, las ceremonias de Scrum  que usaremos en jira durante todo el curso.
+    </p>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Referencias bibliográficas</h2>
+    <p class="text-sm">
+      European Scrum. (2024). <em>Guía Metodologías Agile 2024</em> (v.1.0). https://www.europeanscrum.org/uploads/2/4/5/1/24513648/gui%CC%81a_metodologi%CC%81as_agile_2024.v1.0_-_europeanscrum.org.pdf
+    </p>
+    <p class="text-sm">
+      Project Management Institute, Agile Alliance. (2017). <em>Guía práctica de ágil</em>. Project Management Institute, Inc.
+    </p>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Unidad 1, Sesión 1 · Domingo 13 de septiembre de 2026</span>
+</footer>
+
+</body>
+</html>
