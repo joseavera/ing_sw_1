@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gestión de tareas en Jira: estados, prioridades y fechas límite</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  /* Ajustes puntuales para los elementos visuales de esta clase
+     (no modifica base.css; solo complementa lo que ya existe). */
+  figure svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+  .support-logo { height: 34px; width: auto; opacity: .85; vertical-align: middle; }
+  .callout .support-logo, .concept-box .support-logo { float: right; margin-left: .75rem; }
+
+  .priority-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: .7rem;
+    margin: 1.25rem 0;
+  }
+  @media (max-width: 750px) { .priority-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 420px) { .priority-grid { grid-template-columns: 1fr; } }
+
+  .priority-card {
+    background: var(--off-white);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-md);
+    padding: .8rem .9rem;
+    text-align: center;
+  }
+  .priority-card .p-dot {
+    width: 14px; height: 14px; border-radius: 50%;
+    margin: 0 auto .5rem;
+  }
+  .priority-card .p-name { font-family: var(--font-ui); font-weight: 700; font-size: .85rem; color: var(--ink); display: block; margin-bottom: .3rem; }
+  .priority-card .p-desc { font-size: .78rem; color: var(--ink-muted); line-height: 1.4; }
+
+  .team-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background: var(--guinda-light);
+    border: 1px solid #D8A8BA;
+    border-radius: 999px;
+    padding: .3rem .8rem;
+    font-family: var(--font-ui);
+    font-size: .82rem;
+    font-weight: 600;
+    color: var(--guinda-dark);
+    margin: .2rem .4rem .2rem 0;
+  }
+
+  .checklist { list-style: none; padding: 0; margin: 1rem 0; }
+  .checklist li {
+    display: flex;
+    gap: .7rem;
+    align-items: flex-start;
+    padding: .5rem 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: .95rem;
+  }
+  .checklist li:last-child { border-bottom: none; }
+  .checklist li::before {
+    content: "";
+    flex-shrink: 0;
+    width: 16px; height: 16px;
+    border: 2px solid var(--guinda);
+    border-radius: 4px;
+    margin-top: .15rem;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-wrap">
+    <img src="imagen1.png" alt="Mixtle, mascota del IEDEP">
+  </div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Material de clase — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<section class="class-hero">
+  <span class="class-label">Unidad 1 · Sesión 3 · Clase práctica</span>
+  <h1>Gestión de tareas en Jira: estados, prioridades y fechas límite</h1>
+  <span class="class-subtitle">De la planeación en papel al tablero real: montamos en Jira el sprint que ya definimos como equipo.</span>
+  <div class="meta-row">
+    <div class="meta-item">Asignatura<span>Ingeniería de Software I</span></div>
+    <div class="meta-item">Tema<span>1.3 Gestión de tareas en Jira</span></div>
+    <div class="meta-item">Fecha<span>Sábado 26 de septiembre de 2026</span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <section class="section">
+    <h2 class="section-title">Datos generales</h2>
+    <table>
+      <tbody>
+        <tr><td><strong>Programa educativo</strong></td><td>Licenciatura en Sistemas Computacionales</td></tr>
+        <tr><td><strong>Asignatura</strong></td><td>Ingeniería de Software I</td></tr>
+        <tr><td><strong>Unidad</strong></td><td>1. Metodologías Ágiles y Gestión de Tareas</td></tr>
+        <tr><td><strong>Tema</strong></td><td>1.3 Gestión de tareas en Jira: estados, prioridades y fechas límite</td></tr>
+        <tr><td><strong>Fecha</strong></td><td>Sábado 26 de septiembre de 2026</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Competencias a desarrollar</h2>
+
+    <div class="competency-card">
+      <span class="comp-num">01</span>
+      <span class="comp-text">
+        <strong>Identificar</strong> los elementos de un tablero Scrum en Jira (backlog, sprint, tareas y estados) y la función de cada uno dentro de la gestión del proyecto.
+      </span>
+    </div>
+
+    <div class="competency-card">
+      <span class="comp-num">02</span>
+      <span class="comp-text">
+        <strong>Clasificar</strong> las tareas del backlog según su prioridad y asignarles una fecha límite coherente con el objetivo del sprint.
+      </span>
+    </div>
+
+    <div class="competency-card">
+      <span class="comp-num">03</span>
+      <span class="comp-text">
+        <strong>Configurar y actualizar</strong>, de forma práctica, un tablero Scrum en Jira, moviendo tareas a través de sus estados conforme avanza el trabajo del equipo.
+      </span>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Introducción: de la comanda de cocina al tablero digital</h2>
+    <p>
+      La sesión pasada decidimos el "menú de la semana": el objetivo del sprint y las historias de usuario que el equipo se comprometió a entregar. Hoy vamos a montar la cocina. En un restaurante, cada platillo tiene una comanda que indica en qué momento está (pendiente, en preparación, listo para servir), qué tan urgente es (una mesa que lleva esperando más tiempo se atiende primero) y a qué hora debe salir. Un tablero Scrum en Jira funciona exactamente igual, solo que las "comandas" son tareas de software.
+    </p>
+    <div class="concept-box">
+      <span class="concept-title">Idea clave</span>
+      <p>
+        Planificar sin un tablero visible es como cocinar sin comandas: el equipo puede saber qué hay que hacer, pero nadie ve con claridad qué está en proceso, qué es urgente y qué está a punto de vencer.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Los elementos de un tablero Scrum en Jira</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Elemento en Jira</th>
+          <th>Analogía de cocina</th>
+          <th>Qué representa</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Backlog</td>
+          <td>La alacena completa</td>
+          <td>Todas las tareas posibles del producto, priorizadas por el Product Owner</td>
+        </tr>
+        <tr>
+          <td>Sprint</td>
+          <td>El menú ya decidido de la semana</td>
+          <td>El subconjunto de tareas que el equipo se comprometió a entregar</td>
+        </tr>
+        <tr>
+          <td>Issue (tarea/historia)</td>
+          <td>Un platillo individual</td>
+          <td>Cada elemento de trabajo, con responsable, prioridad y fecha límite</td>
+        </tr>
+        <tr>
+          <td>Estado (workflow)</td>
+          <td>Pendiente → en preparación → listo</td>
+          <td>En qué punto del proceso se encuentra la tarea</td>
+        </tr>
+        <tr>
+          <td>Fecha límite (due date)</td>
+          <td>La hora en que debe salir el platillo</td>
+          <td>Cuándo debe estar terminada la tarea</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <figure>
+      <svg viewBox="0 0 700 260" xmlns="http://www.w3.org/2000/svg" role="img" aria-labelledby="svgTitle3">
+        <title id="svgTitle3">Tablero Scrum en Jira con columnas Pendiente, En progreso, En revisión y Hecho</title>
+
+        <rect x="10" y="10" width="165" height="240" rx="10" fill="#F6F4F4" stroke="#E2D8DA"/>
+        <text x="92" y="32" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#5C4850">PENDIENTE</text>
+
+        <rect x="185" y="10" width="165" height="240" rx="10" fill="#F5E8EE" stroke="#D8A8BA"/>
+        <text x="267" y="32" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#490b58">EN PROGRESO</text>
+
+        <rect x="360" y="10" width="165" height="240" rx="10" fill="#F6F4F4" stroke="#E2D8DA"/>
+        <text x="442" y="32" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#5C4850">EN REVISIÓN</text>
+
+        <rect x="535" y="10" width="155" height="240" rx="10" fill="#F5E8EE" stroke="#D8A8BA"/>
+        <text x="612" y="32" text-anchor="middle" font-family="Inter, sans-serif" font-size="12" font-weight="700" fill="#490b58">HECHO</text>
+
+        <!-- tarjeta 1: pendiente, alta prioridad -->
+        <rect x="24" y="50" width="137" height="66" rx="8" fill="#FFFFFF" stroke="#C8B4BA"/>
+        <circle cx="36" cy="63" r="5" fill="#a83246"/>
+        <text x="48" y="67" font-family="Inter, sans-serif" font-size="9" fill="#5C4850">Alta</text>
+        <text x="34" y="88" font-family="Georgia, serif" font-size="10" fill="#1A1215">Recordatorios de</text>
+        <text x="34" y="101" font-family="Georgia, serif" font-size="10" fill="#1A1215">tareas</text>
+
+        <!-- tarjeta 2: en progreso -->
+        <rect x="199" y="50" width="137" height="66" rx="8" fill="#FFFFFF" stroke="#C8B4BA"/>
+        <circle cx="211" cy="63" r="5" fill="#c97a1a"/>
+        <text x="223" y="67" font-family="Inter, sans-serif" font-size="9" fill="#5C4850">Media</text>
+        <text x="209" y="88" font-family="Georgia, serif" font-size="10" fill="#1A1215">Registro de</text>
+        <text x="209" y="101" font-family="Georgia, serif" font-size="10" fill="#1A1215">usuario</text>
+
+        <!-- tarjeta 3: en revisión -->
+        <rect x="374" y="50" width="137" height="66" rx="8" fill="#FFFFFF" stroke="#C8B4BA"/>
+        <circle cx="386" cy="63" r="5" fill="#a83246"/>
+        <text x="398" y="67" font-family="Inter, sans-serif" font-size="9" fill="#5C4850">Alta</text>
+        <text x="384" y="88" font-family="Georgia, serif" font-size="10" fill="#1A1215">Crear tarea</text>
+        <text x="384" y="101" font-family="Inter, sans-serif" font-size="8" fill="#8C7880">Vence: 28 sep.</text>
+
+        <!-- tarjeta 4: hecho -->
+        <rect x="549" y="50" width="127" height="56" rx="8" fill="#FFFFFF" stroke="#C8B4BA"/>
+        <circle cx="561" cy="63" r="5" fill="#4c8c5a"/>
+        <text x="573" y="67" font-family="Inter, sans-serif" font-size="9" fill="#5C4850">Baja</text>
+        <text x="559" y="88" font-family="Georgia, serif" font-size="10" fill="#1A1215">Modo oscuro</text>
+
+        <text x="350" y="235" text-anchor="middle" font-family="Georgia, serif" font-size="10" fill="#8C7880" font-style="italic">Cada tarjeta muestra prioridad (color), nombre y, si aplica, fecha límite</text>
+      </svg>
+      <figcaption>Vista simplificada de un tablero Scrum en Jira durante el sprint.</figcaption>
+    </figure>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Las prioridades en Jira</h2>
+    <p>
+      Jira usa cinco niveles de prioridad. No todas las tareas son igual de urgentes, así como no todas las mesas de un restaurante llevan el mismo tiempo esperando:
+    </p>
+    <div class="priority-grid">
+      <div class="priority-card">
+        <div class="p-dot" style="background:#7a1030;"></div>
+        <span class="p-name">Highest</span>
+        <span class="p-desc">Bloquea el sprint si no se resuelve</span>
+      </div>
+      <div class="priority-card">
+        <div class="p-dot" style="background:#a83246;"></div>
+        <span class="p-name">High</span>
+        <span class="p-desc">Alto impacto en el objetivo del sprint</span>
+      </div>
+      <div class="priority-card">
+        <div class="p-dot" style="background:#c97a1a;"></div>
+        <span class="p-name">Medium</span>
+        <span class="p-desc">Importante, sin urgencia inmediata</span>
+      </div>
+      <div class="priority-card">
+        <div class="p-dot" style="background:#6b8f4e;"></div>
+        <span class="p-name">Low</span>
+        <span class="p-desc">Puede esperar sin afectar el sprint</span>
+      </div>
+      <div class="priority-card">
+        <div class="p-dot" style="background:#4c8c5a;"></div>
+        <span class="p-name">Lowest</span>
+        <span class="p-desc">Deseable, pero prescindible</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="example-block">
+      <div class="example-header">Ejemplo aplicado: priorizar y fechar una tarea</div>
+      <div class="example-body">
+        <div class="example-statement">
+          El equipo debe crear en Jira la tarea "Marcar tarea como hecha" dentro del sprint de una semana que inició el lunes.
+        </div>
+        <ul class="step-list">
+          <li>
+            <span class="step-n">1</span>
+            <span class="step-content"><strong>El Product Owner</strong> decide la prioridad: como es una función central de la app, la marca como <em>High</em>.</span>
+          </li>
+          <li>
+            <span class="step-n">2</span>
+            <span class="step-content"><strong>El Equipo de Desarrollo</strong> estima que necesita dos días y, junto con el Scrum Master, fija la fecha límite el miércoles, dejando margen antes de que termine el sprint.</span>
+          </li>
+          <li>
+            <span class="step-n">3</span>
+            <span class="step-content">Se asigna un responsable dentro del equipo y la tarea queda visible en la columna <em>Pendiente</em> del tablero.</span>
+          </li>
+        </ul>
+        <div class="result-line">Resultado: cualquier integrante del equipo, al ver el tablero, sabe qué hacer, cuándo y con qué urgencia, sin necesidad de preguntar.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="callout">
+      <img src="imagen2.png" alt="Mixtle" class="support-logo">
+      <h3 style="color:var(--guinda-dark); margin-bottom:.6rem;">Trabajo práctico — Montamos el tablero Scrum en Jira</h3>
+      <p>
+        Como equipo de 5, vamos a llevar a Jira el mismo sprint que definimos la sesión pasada para la <strong>app de tareas para estudiantes</strong>. Usaremos las 3 historias de usuario que el equipo eligió en la Sprint Planning (si tu equipo eligió otras, sustitúyelas por las tuyas).
+      </p>
+
+      <div class="mb-1 mt-1">
+        <span class="team-badge">1 Product Owner</span>
+        <span class="team-badge">1 Scrum Master</span>
+        <span class="team-badge">3 Equipo de Desarrollo</span>
+      </div>
+
+      <p style="margin-bottom:.4rem;"><strong>Pasos a seguir:</strong></p>
+      <ul class="checklist">
+        <li><strong>Crear el proyecto.</strong> El Scrum Master abre Jira y crea un proyecto tipo Scrum llamado "App de Tareas para Estudiantes".</li>
+        <li><strong>Cargar el backlog.</strong> El Product Owner da de alta las 3 historias de usuario elegidas (por ejemplo: "Registro de usuario", "Crear tarea", "Marcar tarea como hecha") como tareas en el backlog.</li>
+        <li><strong>Asignar responsable.</strong> Cada uno de los 3 integrantes del Equipo de Desarrollo toma la propiedad de una tarea.</li>
+        <li><strong>Definir prioridad.</strong> El Product Owner asigna a cada tarea su nivel de prioridad (Highest a Lowest), según el valor que aporta al usuario.</li>
+        <li><strong>Fijar fecha límite.</strong> El equipo acuerda, con el Scrum Master, una fecha límite realista para cada tarea dentro de la semana del sprint.</li>
+        <li><strong>Iniciar el sprint.</strong> El Scrum Master inicia el sprint en Jira ("Start Sprint") con el objetivo redactado la sesión pasada.</li>
+        <li><strong>Simular el avance.</strong> Cada responsable mueve su tarea de <em>Pendiente</em> a <em>En progreso</em>, simulando el trabajo del primer día del sprint.</li>
+      </ul>
+
+      <div class="product-badge" style="margin-top:1rem;">
+        <span class="pb-label" style="display:block;font-family:var(--font-ui);font-size:.72rem;text-transform:uppercase;letter-spacing:.1em;color:var(--guinda);font-weight:700;margin-bottom:.3rem;">Entregable de la actividad</span>
+        <span class="pb-text" style="font-size:.93rem;color:var(--ink);">Captura de pantalla del tablero Scrum en Jira mostrando las 3 tareas del sprint, con su responsable, prioridad, fecha límite y estado actualizado.</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Conclusión</h2>
+    <p>
+      Un tablero Scrum bien configurado en Jira no reemplaza las decisiones del equipo: las hace visibles. La prioridad evita que el equipo trabaje en lo urgente del momento en lugar de lo importante para el sprint; la fecha límite convierte un compromiso verbal en un objetivo verificable; y el estado permite que cualquier persona, sin preguntar, sepa en qué punto está cada tarea. Con el tablero ya montado y el sprint iniciado, en las próximas sesiones aprenderemos a leer las métricas de agilidad (Burndown y velocidad del equipo) que este mismo tablero genera automáticamente conforme avancemos.
+    </p>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Referencias bibliográficas</h2>
+    <p class="text-sm">
+      European Scrum. (2024). <em>Guía Metodologías Agile 2024</em> (v.1.0). https://www.europeanscrum.org/uploads/2/4/5/1/24513648/gui%CC%81a_metodologi%CC%81as_agile_2024.v1.0_-_europeanscrum.org.pdf
+    </p>
+    <p class="text-sm">
+      Project Management Institute, Agile Alliance. (2017). <em>Guía práctica de ágil</em>. Project Management Institute, Inc.
+    </p>
+    <p class="text-sm">
+      Atlassian. (2024). <em>Guías de Jira Software: backlog, sprints y tableros Scrum</em>. https://www.atlassian.com/software/jira/guides
+    </p>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Unidad 1, Sesión 3 · Sábado 26 de septiembre de 2026</span>
+</footer>
+
+</body>
+</html>
