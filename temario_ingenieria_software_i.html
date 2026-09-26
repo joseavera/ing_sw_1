@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Temario — Ingeniería de Software I</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  /* Complementos puntuales para el temario (no modifica base.css). */
+  .overview-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1rem;
+    margin: 1.25rem 0;
+  }
+  @media (max-width: 800px) { .overview-grid { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 500px) { .overview-grid { grid-template-columns: 1fr; } }
+
+  .overview-card {
+    background: var(--off-white);
+    border: 1px solid var(--border);
+    border-top: 4px solid var(--guinda);
+    border-radius: var(--radius-lg);
+    padding: 1.1rem 1.2rem;
+    box-shadow: var(--shadow-sm);
+  }
+  .overview-card .ov-num {
+    font-family: var(--font-ui);
+    font-size: .75rem;
+    font-weight: 700;
+    letter-spacing: .1em;
+    color: var(--guinda);
+    display: block;
+    margin-bottom: .4rem;
+  }
+  .overview-card .ov-title {
+    font-family: var(--font-ui);
+    font-size: .95rem;
+    font-weight: 600;
+    color: var(--ink);
+    line-height: 1.4;
+    display: block;
+    margin-bottom: .5rem;
+  }
+  .overview-card .ov-hours {
+    font-family: var(--font-ui);
+    font-size: .78rem;
+    color: var(--ink-muted);
+  }
+
+  details.unit-block {
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    margin-bottom: 1rem;
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  details.unit-block[open] { box-shadow: var(--shadow-md); }
+
+  details.unit-block summary {
+    list-style: none;
+    cursor: pointer;
+    background: var(--guinda);
+    color: var(--white);
+    padding: 1rem 1.4rem;
+    font-family: var(--font-ui);
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+  details.unit-block summary::-webkit-details-marker { display: none; }
+  details.unit-block summary .toggle-icon {
+    font-family: var(--font-ui);
+    font-size: 1.2rem;
+    font-weight: 400;
+    flex-shrink: 0;
+  }
+  details.unit-block[open] summary .toggle-icon { transform: rotate(45deg); }
+
+  details.unit-block .unit-body {
+    background: var(--off-white);
+    padding: 1.4rem 1.6rem;
+  }
+
+  .unit-purpose {
+    font-size: .97rem;
+    line-height: 1.65;
+    color: var(--ink-secondary);
+    margin-bottom: 1.1rem;
+    padding-bottom: 1.1rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .subtema-list {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 1.1rem 0;
+  }
+  .subtema-list li {
+    padding: .55rem 0;
+    border-bottom: 1px dashed var(--border);
+    font-size: .96rem;
+  }
+  .subtema-list li:last-child { border-bottom: none; }
+  .subtema-list li strong { color: var(--guinda-dark); }
+
+  .product-badge {
+    background: var(--guinda-light);
+    border: 1px solid #D8A8BA;
+    border-radius: var(--radius-md);
+    padding: .8rem 1.1rem;
+  }
+  .product-badge .pb-label {
+    font-family: var(--font-ui);
+    font-size: .72rem;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--guinda);
+    font-weight: 700;
+    display: block;
+    margin-bottom: .3rem;
+  }
+  .product-badge .pb-text {
+    font-size: .93rem;
+    color: var(--ink);
+  }
+
+  .tools-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: .6rem 1.5rem;
+    margin: 1rem 0;
+  }
+  @media (max-width: 600px) { .tools-grid { grid-template-columns: 1fr; } }
+  .tools-grid li { list-style: none; padding-left: 1.1rem; position: relative; font-size: .96rem; }
+  .tools-grid li::before {
+    content: "●";
+    color: var(--guinda);
+    position: absolute;
+    left: 0;
+    font-size: .7rem;
+    top: .35rem;
+  }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-wrap">
+    <img src="imagen1.png" alt="Mixtle, mascota del IEDEP">
+  </div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Temario del curso — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<section class="class-hero">
+  <span class="class-label">Cuarto cuatrimestre</span>
+  <h1>Ingeniería de Software I</h1>
+  <span class="class-subtitle">Temario completo del curso: las cuatro unidades, sus temas y lo que construirás en cada una.</span>
+  <div class="meta-row">
+    <div class="meta-item">Programa educativo<span>Lic. en Sistemas Computacionales</span></div>
+    <div class="meta-item">Unidades<span>4</span></div>
+    <div class="meta-item">Horas totales<span>112 (32 conducidas + 80 independientes)</span></div>
+    <div class="meta-item">Créditos<span>7</span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <section class="section">
+    <h2 class="section-title">Propósito general de la asignatura</h2>
+    <div class="concept-box">
+      <p>
+        Evaluar los modelos de desarrollo de software, a través del uso de metodologías ágiles (Scrum/Kanban) gestionadas en ClickUp, con miras a planificar entregas incrementales y medir la productividad del equipo.
+      </p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Cómo está organizado el curso</h2>
+    <p>
+      El curso avanza como un proyecto real de software: primero se organiza el equipo y su forma de trabajar, después se define qué hay que construir, luego se diseña cómo se va a construir y, finalmente, se colabora para construirlo y darle mantenimiento en equipo.
+    </p>
+    <div class="overview-grid">
+      <div class="overview-card">
+        <span class="ov-num">UNIDAD 1</span>
+        <span class="ov-title">Metodologías Ágiles y Gestión con ClickUp</span>
+        <span class="ov-hours">8 h conducidas · 20 h independientes</span>
+      </div>
+      <div class="overview-card">
+        <span class="ov-num">UNIDAD 2</span>
+        <span class="ov-title">Ingeniería de Requerimientos y Documentación</span>
+        <span class="ov-hours">8 h conducidas · 20 h independientes</span>
+      </div>
+      <div class="overview-card">
+        <span class="ov-num">UNIDAD 3</span>
+        <span class="ov-title">Modelado Estructural y de Comportamiento (UML)</span>
+        <span class="ov-hours">8 h conducidas · 20 h independientes</span>
+      </div>
+      <div class="overview-card">
+        <span class="ov-num">UNIDAD 4</span>
+        <span class="ov-title">Flujos de Trabajo Colaborativos con Git y GitHub</span>
+        <span class="ov-hours">8 h conducidas · 20 h independientes</span>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Temario detallado</h2>
+    <p class="text-muted mb-1">Haz clic en cada unidad para ver sus temas, propósito y el producto de aprendizaje que se entrega.</p>
+
+    <details class="unit-block" open>
+      <summary>Unidad 1 — Metodologías Ágiles y Gestión con ClickUp <span class="toggle-icon">+</span></summary>
+      <div class="unit-body">
+        <p class="unit-purpose">
+          Organizar el ciclo de vida del desarrollo mediante la configuración de roles, ceremonias Scrum y tableros Kanban en ClickUp, para asegurar una planificación de entregas iterativas que aporten valor continuo.
+        </p>
+        <ul class="subtema-list">
+          <li><strong>1.1</strong> Manifiesto Ágil y mentalidad (Mindset).</li>
+          <li><strong>1.2</strong> Roles y ceremonias en Scrum: Sprint Planning y Daily.</li>
+          <li><strong>1.3</strong> Gestión de tareas en ClickUp: estados, prioridades y fechas límite.</li>
+          <li><strong>1.4</strong> Métricas de agilidad: diagramas de Burndown y velocidad del equipo.</li>
+        </ul>
+        <div class="product-badge">
+          <span class="pb-label">Producto de aprendizaje</span>
+          <span class="pb-text">Documento estructurado de ClickUp con roles definidos y backlog de producto inicial estructurado.</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="unit-block">
+      <summary>Unidad 2 — Ingeniería de Requerimientos y Documentación <span class="toggle-icon">+</span></summary>
+      <div class="unit-body">
+        <p class="unit-purpose">
+          Estructurar las necesidades del negocio mediante el levantamiento de historias de usuario, criterios de aceptación y priorización MoSCoW, con el fin de definir un alcance técnico ejecutable y sin ambigüedades.
+        </p>
+        <ul class="subtema-list">
+          <li><strong>2.1</strong> Técnicas de recolección: entrevistas y observación directa.</li>
+          <li><strong>2.2</strong> Requisitos funcionales vs. no funcionales (atributos de calidad).</li>
+          <li><strong>2.3</strong> Redacción de historias de usuario y backlog del producto.</li>
+          <li><strong>2.4</strong> Negociación y priorización de requerimientos (método MoSCoW).</li>
+        </ul>
+        <div class="product-badge">
+          <span class="pb-label">Producto de aprendizaje</span>
+          <span class="pb-text">Documentación de requisitos conteniendo historias de usuario validadas y matriz de priorización MoSCoW.</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="unit-block">
+      <summary>Unidad 3 — Modelado Estructural y de Comportamiento (UML) <span class="toggle-icon">+</span></summary>
+      <div class="unit-body">
+        <p class="unit-purpose">
+          Esquematizar la arquitectura lógica y el flujo de procesos del sistema mediante diagramas de clases, secuencia y casos de uso (UML), para estandarizar la comunicación técnica y prever interacciones antes de la construcción.
+        </p>
+        <ul class="subtema-list">
+          <li><strong>3.1</strong> Diagrama de casos de uso: actores y límites del sistema.</li>
+          <li><strong>3.2</strong> Diagrama de clases: atributos, métodos y relaciones (asociación, herencia).</li>
+          <li><strong>3.3</strong> Diagrama de secuencia: flujo de mensajes entre objetos.</li>
+          <li><strong>3.4</strong> Diagrama de actividades: modelado de procesos de negocio.</li>
+        </ul>
+        <div class="product-badge">
+          <span class="pb-label">Producto de aprendizaje</span>
+          <span class="pb-text">Portafolio de diagramas UML representando la arquitectura estática y dinámica de la solución de software.</span>
+        </div>
+      </div>
+    </details>
+
+    <details class="unit-block">
+      <summary>Unidad 4 — Flujos de Trabajo Colaborativos con Git y GitHub <span class="toggle-icon">+</span></summary>
+      <div class="unit-body">
+        <p class="unit-purpose">
+          Sincronizar la evolución del código fuente empleando comandos de Git y estrategias de ramificación profesional, fomentando una cultura de revisión ética y resolución de conflictos para mantener la integridad del proyecto grupal.
+        </p>
+        <ul class="subtema-list">
+          <li><strong>4.1</strong> Configuración de Git: init, add, commit y log.</li>
+          <li><strong>4.2</strong> Estrategias de ramificación (branching): Git Flow y GitHub Flow.</li>
+          <li><strong>4.3</strong> Trabajo remoto: push, pull, fetch y remotes.</li>
+          <li><strong>4.4</strong> Colaboración profesional: pull requests, code reviews y resolución de conflictos.</li>
+        </ul>
+        <div class="product-badge">
+          <span class="pb-label">Producto de aprendizaje</span>
+          <span class="pb-text">Documentación en GitHub evidenciando el historial de versiones, ramas fusionadas y resolución de conflictos.</span>
+        </div>
+      </div>
+    </details>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Criterios de evaluación</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Criterio</th>
+          <th>Unidad</th>
+          <th>Porcentaje</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Proyecto: documento estructurado de ClickUp con roles definidos y backlog de producto inicial</td>
+          <td>1</td>
+          <td>30 %</td>
+        </tr>
+        <tr>
+          <td>Análisis de casos: historias de usuario validadas y matriz de priorización MoSCoW</td>
+          <td>2</td>
+          <td>25 %</td>
+        </tr>
+        <tr>
+          <td>Portafolio de diagramas: archivo UML de la arquitectura estática y dinámica</td>
+          <td>3</td>
+          <td>20 %</td>
+        </tr>
+        <tr>
+          <td>Repositorio: historial de versiones, ramas fusionadas y resolución de conflictos en GitHub</td>
+          <td>4</td>
+          <td>25 %</td>
+        </tr>
+      </tbody>
+    </table>
+    <p class="text-muted text-sm">Las calificaciones de los productos de aprendizaje se promedian para determinar la calificación final del curso.</p>
+  </section>
+
+  <section class="section">
+    <div class="callout note">
+      <img src="imagen2.png" alt="Mixtle" class="support-logo" style="height:34px;float:right;margin-left:.75rem;">
+      <p>
+        <strong>Recursos y herramientas del curso.</strong> A lo largo de las cuatro unidades usaremos las siguientes herramientas y recursos:
+      </p>
+      <ul class="tools-grid mt-1">
+        <li>Repositorios digitales: biblioteca virtual y recursos educativos abiertos</li>
+        <li>Apps educativas gratuitas</li>
+        <li>Sistemas de evaluación: Google Forms</li>
+        <li>Recursos de comunicación: correo electrónico</li>
+        <li>Inteligencia artificial generativa</li>
+        <li>ClickUp, GitHub y herramientas de modelado UML</li>
+      </ul>
+    </div>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Temario del curso · Cuarto cuatrimestre</span>
+</footer>
+
+</body>
+</html>
