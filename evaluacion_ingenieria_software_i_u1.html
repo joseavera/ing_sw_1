@@ -1,0 +1,685 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Evaluación Unidad 1 — Ingeniería de Software I</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  /* Ajustes puntuales de la evaluación (complementan base.css, no lo modifican). */
+
+  /* Protección de contenido: no se puede seleccionar el texto, salvo en el campo de nombre */
+  html, body { -webkit-user-select: none; -ms-user-select: none; user-select: none; -webkit-touch-callout: none; }
+  input[type="text"], input[type="password"] { -webkit-user-select: text; user-select: text; }
+  img { -webkit-user-drag: none; user-drag: none; pointer-events: none; }
+
+  .hidden { display: none !important; }
+
+  /* Marca de agua inclinada con el nombre del alumno */
+  #watermark {
+    position: fixed; inset: 0; overflow: hidden; pointer-events: none; z-index: 40;
+  }
+  #watermark .wm-inner {
+    position: absolute; left: 50%; top: 50%;
+    width: 240vmax; height: 240vmax;
+    transform: translate(-50%, -50%) rotate(-30deg);
+    display: flex; flex-wrap: wrap; align-content: center; justify-content: center;
+    gap: 5.5rem 4.5rem;
+  }
+  #watermark .wm-inner span {
+    font-family: var(--font-ui); font-weight: 700; font-size: 1.9rem; letter-spacing: .04em;
+    color: var(--guinda); opacity: .12; white-space: nowrap;
+  }
+  body.exam-on #watermark .wm-inner span { opacity: .045; }
+
+  /* Pantalla de inicio */
+  .start-card {
+    background: var(--off-white); border: 1px solid var(--border); border-top: 4px solid var(--guinda);
+    border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm);
+    display: grid; grid-template-columns: 150px 1fr; gap: 2rem; align-items: center;
+  }
+  .start-card img.mascot { width: 150px; height: auto; }
+  .start-card h2 { margin-top: 0; }
+  .field { margin: 1.2rem 0 .4rem; }
+  .field label { display: block; font-family: var(--font-ui); font-size: .82rem; font-weight: 600; color: var(--guinda-dark); text-transform: uppercase; letter-spacing: .08em; margin-bottom: .4rem; }
+  .field input {
+    width: 100%; max-width: 440px; padding: .75rem .9rem; font-family: var(--font-ui); font-size: 1rem;
+    border: 1.5px solid var(--border-strong); border-radius: var(--radius-md); background: var(--white); color: var(--ink);
+  }
+  .field input:focus { outline: 3px solid var(--guinda-light); border-color: var(--guinda); }
+  .form-error { font-family: var(--font-ui); font-size: .85rem; color: #9b1c1c; min-height: 1.3em; margin-top: .4rem; }
+  @media (max-width: 650px) { .start-card { grid-template-columns: 1fr; text-align: center; } .start-card img.mascot { margin: 0 auto; width: 110px; } .field input { max-width: 100%; } }
+
+  /* Botones */
+  .btn {
+    font-family: var(--font-ui); font-size: .95rem; font-weight: 600; padding: .75rem 1.6rem;
+    border-radius: var(--radius-md); border: 1.5px solid var(--guinda); cursor: pointer; transition: background .15s, color .15s;
+  }
+  .btn-primary { background: var(--guinda); color: var(--white); }
+  .btn-primary:hover { background: var(--guinda-dark); }
+  .btn-ghost { background: var(--white); color: var(--guinda); }
+  .btn-ghost:hover { background: var(--guinda-light); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .btn-row { display: flex; gap: .8rem; flex-wrap: wrap; align-items: center; }
+
+  /* Barra de estado durante la evaluación */
+  .exam-bar {
+    position: sticky; top: 0; z-index: 60; background: var(--white); border-bottom: 1px solid var(--border);
+    box-shadow: var(--shadow-sm); padding: .7rem 1.2rem; display: flex; align-items: center; gap: 1rem; flex-wrap: wrap;
+    font-family: var(--font-ui);
+  }
+  .exam-bar .who { font-size: .85rem; color: var(--ink-secondary); flex: 1; min-width: 160px; }
+  .exam-bar .who strong { color: var(--guinda-dark); }
+  .chip {
+    font-family: var(--font-ui); font-size: .82rem; font-weight: 600; padding: .35rem .8rem; border-radius: 999px;
+    background: var(--guinda-light); color: var(--guinda-dark); border: 1px solid #D8A8BA; white-space: nowrap;
+  }
+  .chip.timer { font-family: var(--font-mono); font-size: .95rem; }
+  .chip.timer.low { background: #fde8e8; color: #9b1c1c; border-color: #f0b4b4; }
+  .chip.warn { background: #fff4d6; color: #7a5200; border-color: #ecd08a; }
+  .progress-track { height: 5px; background: var(--border); }
+  .progress-fill { height: 100%; background: var(--guinda); width: 0; transition: width .25s; }
+
+  /* Navegador de preguntas */
+  .q-nav { display: flex; gap: .5rem; flex-wrap: wrap; margin: 1.6rem 0 1.2rem; }
+  .q-pill {
+    width: 42px; height: 42px; border-radius: 50%; border: 2px solid var(--border-strong); background: var(--white);
+    font-family: var(--font-ui); font-weight: 700; color: var(--ink-secondary); cursor: pointer; position: relative;
+  }
+  .q-pill.answered { background: var(--guinda-light); border-color: var(--guinda-rule); color: var(--guinda-dark); }
+  .q-pill.current { background: var(--guinda); border-color: var(--guinda); color: var(--white); }
+  .q-pill.flagged::after {
+    content: ""; position: absolute; top: -4px; right: -4px; width: 13px; height: 13px; border-radius: 50%;
+    background: #e0a400; border: 2px solid var(--white);
+  }
+
+  /* Pregunta */
+  .q-card { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.6rem 1.7rem; box-shadow: var(--shadow-sm); }
+  .q-head { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-bottom: .9rem; }
+  .q-num { font-family: var(--font-ui); font-size: .78rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .q-flag { font-family: var(--font-ui); font-size: .82rem; background: none; border: 1px dashed var(--border-strong); border-radius: 999px; padding: .3rem .8rem; cursor: pointer; color: var(--ink-secondary); }
+  .q-flag.on { background: #fff4d6; border-color: #e0a400; color: #7a5200; }
+  .q-scenario { font-size: 1.02rem; line-height: 1.7; color: var(--ink); margin-bottom: .9rem; }
+  .q-ask { font-family: var(--font-ui); font-weight: 700; color: var(--guinda-dark); font-size: 1rem; line-height: 1.5; margin-bottom: 1.1rem; }
+  .q-hint { font-family: var(--font-ui); font-size: .8rem; color: var(--ink-muted); margin: -.5rem 0 1rem; }
+
+  .opt {
+    display: flex; gap: .85rem; align-items: flex-start; background: var(--white); border: 1.5px solid var(--border);
+    border-radius: var(--radius-md); padding: .85rem 1rem; margin-bottom: .6rem; cursor: pointer; transition: border-color .12s, background .12s;
+  }
+  .opt:hover { border-color: var(--guinda-rule); }
+  .opt.sel { border-color: var(--guinda); background: var(--guinda-light); }
+  .opt input { margin-top: .28rem; accent-color: var(--guinda); width: 1.05rem; height: 1.05rem; flex-shrink: 0; }
+  .opt .opt-text { font-size: .97rem; line-height: 1.55; color: var(--ink); }
+  .nav-row { display: flex; justify-content: space-between; gap: .8rem; flex-wrap: wrap; margin-top: 1.4rem; }
+
+  /* Modales */
+  .overlay {
+    position: fixed; inset: 0; background: rgba(26, 18, 21, .55); z-index: 100; display: flex; align-items: center; justify-content: center; padding: 1rem;
+  }
+  .modal { background: var(--white); border-radius: var(--radius-lg); max-width: 480px; width: 100%; padding: 1.7rem; border-top: 5px solid var(--guinda); box-shadow: 0 12px 40px rgba(0,0,0,.28); }
+  .modal h3 { margin-top: 0; }
+  .modal.alert { border-top-color: #c0392b; }
+
+  /* Resultados */
+  .score-wrap { display: grid; grid-template-columns: 210px 1fr; gap: 2rem; align-items: center; }
+  .score-ring {
+    width: 200px; height: 200px; border-radius: 50%; background: var(--guinda); color: var(--white);
+    display: flex; flex-direction: column; align-items: center; justify-content: center; box-shadow: var(--shadow-sm);
+    border: 8px solid var(--guinda-light);
+  }
+  .score-ring .big { font-family: var(--font-display); font-size: 4rem; line-height: 1; font-weight: 700; }
+  .score-ring .of { font-family: var(--font-ui); font-size: .85rem; opacity: .8; letter-spacing: .08em; }
+  .score-name { font-family: var(--font-display); font-size: 2rem; color: var(--guinda-dark); line-height: 1.2; margin-bottom: .2rem; }
+  .score-sub { font-family: var(--font-ui); font-size: .9rem; color: var(--ink-secondary); margin-bottom: 1rem; }
+  .stat-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: .7rem; }
+  .stat { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: .65rem .8rem; font-family: var(--font-ui); }
+  .stat span { display: block; font-size: .7rem; text-transform: uppercase; letter-spacing: .1em; color: var(--ink-muted); }
+  .stat b { font-size: 1.15rem; color: var(--guinda-dark); }
+  .stat.bad b { color: #9b1c1c; }
+  @media (max-width: 650px) { .score-wrap { grid-template-columns: 1fr; justify-items: center; text-align: center; } }
+
+  .rev { border: 1px solid var(--border); border-left: 6px solid var(--border-strong); border-radius: var(--radius-md); padding: 1.1rem 1.3rem; margin-bottom: 1.1rem; background: var(--white); break-inside: avoid; }
+  .rev.ok { border-left-color: #2e7d4f; }
+  .rev.part { border-left-color: #e0a400; }
+  .rev.no { border-left-color: #c0392b; }
+  .rev .rev-title { font-family: var(--font-ui); font-weight: 700; color: var(--guinda-dark); margin-bottom: .4rem; font-size: .95rem; }
+  .rev .badge { font-size: .72rem; padding: .15rem .6rem; border-radius: 999px; margin-left: .5rem; font-weight: 700; }
+  .rev.ok .badge { background: #e3f4ea; color: #1f6a3d; }
+  .rev.part .badge { background: #fff4d6; color: #7a5200; }
+  .rev.no .badge { background: #fde8e8; color: #9b1c1c; }
+  .rev p { font-size: .93rem; line-height: 1.6; margin-bottom: .45rem; color: var(--ink-secondary); }
+  .rev p strong { color: var(--ink); }
+
+  @media print {
+    .no-print, .exam-bar, .site-footer { display: none !important; }
+    body.exam-on .page-wrapper, body.exam-on .class-hero { display: none !important; }
+    .class-hero { padding: 1.2rem 2rem; margin-bottom: 1.2rem; }
+    * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+</style>
+</head>
+<body>
+
+<div id="watermark" class="hidden" aria-hidden="true"><div class="wm-inner" id="wmInner"></div></div>
+
+<header class="site-header no-print">
+  <div class="logo-wrap">
+    <img src="imagen1.png" alt="Mixtle, mascota del IEDEP">
+  </div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Evaluación — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<!-- Barra de estado (solo mientras se responde) -->
+<div id="examBar" class="hidden">
+  <div class="exam-bar">
+    <img src="imagen1.png" alt="" style="height:34px;width:auto;">
+    <div class="who">Sustentante: <strong id="barName"></strong></div>
+    <span class="chip warn hidden" id="barAttempt"></span>
+    <span class="chip warn hidden" id="barInfr"></span>
+    <span class="chip" id="barProg">0 / 5</span>
+    <span class="chip timer" id="barTimer">15:00</span>
+  </div>
+  <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+</div>
+
+<section class="class-hero">
+  <span class="class-label">Unidad 1 · Evaluación de conocimientos</span>
+  <h1>Evaluación de la Unidad 1: Metodologías Ágiles</h1>
+  <span class="class-subtitle">Casos empresariales para aplicar lo que aprendiste sobre el Manifiesto Ágil y los roles y ceremonias de Scrum.</span>
+  <div class="meta-row">
+    <div class="meta-item">Programa educativo<span>Lic. en Sistemas Computacionales</span></div>
+    <div class="meta-item">Asignatura<span>Ingeniería de Software I</span></div>
+    <div class="meta-item">Temas<span>1.1 Manifiesto Ágil · 1.2 Roles y ceremonias en Scrum</span></div>
+    <div class="meta-item">Fecha<span id="heroDate"></span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <!-- ====== PANTALLA 1: identificación ====== -->
+  <section class="section" id="screenStart">
+    <div class="start-card">
+      <img class="mascot" src="imagen2.png" alt="Mixtle, mascota de apoyo del IEDEP">
+      <div>
+        <h2 class="section-title" style="margin-top:0">Antes de comenzar</h2>
+        <p>Esta evaluación consta de <strong>5 reactivos</strong> con situaciones reales de empresas, como las que enfrentarías en un equipo de software. Tienes <strong>15 minutos</strong> para responder.</p>
+        <div class="field">
+          <label for="inName">Nombre completo del alumno</label>
+          <input type="text" id="inName" autocomplete="off" spellcheck="false" placeholder="Nombre y apellidos">
+        </div>
+        <div class="field hidden" id="codeField">
+          <label for="inCode">Clave de acceso</label>
+          <input type="password" id="inCode" autocomplete="off">
+        </div>
+        <div class="form-error" id="startErr"></div>
+        <div class="btn-row"><button class="btn btn-primary" id="btnStart">Comenzar evaluación</button></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== PANTALLA 2: reactivos ====== -->
+  <section class="section hidden" id="screenExam">
+    <div class="q-nav" id="qNav"></div>
+    <div class="q-card" id="qCard"></div>
+    <div class="nav-row">
+      <button class="btn btn-ghost" id="btnPrev">← Anterior</button>
+      <div class="btn-row">
+        <button class="btn btn-ghost" id="btnNext">Siguiente →</button>
+        <button class="btn btn-primary" id="btnFinish">Finalizar evaluación</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====== PANTALLA 3: resultados ====== -->
+  <section class="section hidden" id="screenResult">
+    <h2 class="section-title">Resultado de la evaluación</h2>
+    <div class="score-wrap">
+      <div class="score-ring"><span class="big" id="rScore">0</span><span class="of">DE 10 PUNTOS</span></div>
+      <div>
+        <div class="score-name" id="rName"></div>
+        <div class="score-sub" id="rSub"></div>
+        <div class="stat-grid" id="rStats"></div>
+      </div>
+    </div>
+    <div class="callout note hidden" id="rNotice" style="margin-top:1.5rem"><p id="rNoticeTxt"></p></div>
+
+    <div class="btn-row no-print" style="margin:1.6rem 0 2.2rem">
+      <button class="btn btn-primary" id="btnPdf">Descargar resultados en PDF</button>
+    </div>
+
+    <h2 class="section-title">Revisión de tus respuestas</h2>
+    <p class="text-muted" style="margin-bottom:1.2rem">Cada reactivo muestra tu respuesta, la opción correcta y la explicación, para que puedas reforzar los temas donde tengas dudas.</p>
+    <div id="rReview"></div>
+
+    <div class="concept-box" style="margin-top:2rem">
+      <img src="imagen2.png" alt="" style="float:right;height:70px;width:auto;margin-left:1rem;">
+      <span class="concept-title">Para seguir aprendiendo</span>
+      <p>Si algún reactivo te costó trabajo, repasa el material de la clase 1.1 (Manifiesto Ágil y mentalidad) y de la clase 1.2 (Roles y ceremonias en Scrum). Equivocarse en una evaluación también es parte de aprender.</p>
+    </div>
+  </section>
+
+</div>
+
+<footer class="site-footer no-print">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Unidad 1 · Evaluación</span>
+</footer>
+
+<!-- Modales -->
+<div class="overlay hidden" id="ovConfirm">
+  <div class="modal">
+    <h3>¿Finalizar la evaluación?</h3>
+    <p id="confirmTxt"></p>
+    <div class="btn-row" style="justify-content:flex-end">
+      <button class="btn btn-ghost" id="btnConfirmNo">Seguir respondiendo</button>
+      <button class="btn btn-primary" id="btnConfirmYes">Sí, finalizar</button>
+    </div>
+  </div>
+</div>
+<div class="overlay hidden" id="ovAlert">
+  <div class="modal alert">
+    <h3 id="alertTitle"></h3>
+    <p id="alertTxt"></p>
+    <div class="btn-row" style="justify-content:flex-end"><button class="btn btn-primary" id="btnAlertOk">Entendido</button></div>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+
+  /* ═════════════ CONFIGURACIÓN (ajustable por el docente) ═════════════ */
+  var CFG = {
+    examId: 'isw1-u1-eval-v1',   // cambia este valor para abrir una aplicación nueva
+    minutos: 15,                  // duración total
+    limiteInfracciones: 3,        // al llegar a este número se cierra la evaluación (0 = no cerrar)
+    codigoAcceso: '',             // clave opcional; vacío = sin clave
+    mostrarRetroalimentacion: true
+  };
+
+  /* ═════════════ BANCO DE REACTIVOS ═════════════
+     k = respuesta correcta codificada (no queda legible a simple vista). */
+  var BANK = [
+    {
+      id: 'q1', tema: '1.1 Manifiesto Ágil', multi: false, k: 'SUVERVAtSVNXOmI=',
+      scenario: 'El área de TI de la aseguradora Horizonte Seguros desarrolla un portal para gestionar siniestros. El proyecto se planeó para 12 meses, con fases cerradas (análisis, diseño, desarrollo y pruebas) y un cronograma detallado que la dirección aprobó. En el mes 5, una nueva regulación obliga a la empresa a reportar los siniestros de otra manera. El equipo propone replantear las prioridades de lo que falta por construir, pero la gerencia responde: «El plan ya fue aprobado y no se modifica».',
+      ask: '¿Qué valor del Manifiesto Ágil contradice de forma más directa la postura de la gerencia?',
+      opts: [
+        { id: 'a', t: 'Software funcionando sobre documentación exhaustiva.' },
+        { id: 'b', t: 'Responder ante el cambio sobre seguir un plan.' },
+        { id: 'c', t: 'Individuos e interacciones sobre procesos y herramientas.' },
+        { id: 'd', t: 'Colaboración con el cliente sobre negociación contractual.' }
+      ],
+      why: 'La gerencia está tratando el plan como una regla inamovible, justo lo contrario del cuarto valor ágil: el plan es una guía que se ajusta cuando el contexto cambia (aquí, una nueva regulación). Un equipo ágil replanificaría el backlog y priorizaría lo que ahora es más urgente. Es como usar un GPS: si hay un bloqueo en la ruta, se recalcula; no se insiste en el mapa impreso.'
+    },
+    {
+      id: 'q2', tema: '1.1 Manifiesto Ágil', multi: false, k: 'SUVERVAtSVNXOmI=',
+      scenario: 'La cadena de farmacias Salud Norte libera una nueva versión de su aplicación de pedidos cada cuatro meses, después de una larga fase de pruebas. Los clientes se quejan de que, cuando por fin llega una función nueva, ya no corresponde a lo que necesitaban, y el equipo se entera de los errores hasta el final. La dirección pide mejorar los resultados sin cambiar al equipo ni contratar más personal.',
+      ask: '¿Qué acción está más alineada con los principios del Manifiesto Ágil?',
+      opts: [
+        { id: 'a', t: 'Escribir documentación más detallada antes de cada liberación de cuatro meses para evitar malentendidos.' },
+        { id: 'b', t: 'Entregar incrementos pequeños de software funcionando cada una o dos semanas y recoger la opinión de los usuarios en cada entrega.' },
+        { id: 'c', t: 'Ampliar la fase final de pruebas a dos meses para detectar todos los errores antes de liberar.' },
+        { id: 'd', t: 'Congelar los requisitos desde el inicio del proyecto para que el equipo no pierda tiempo atendiendo cambios.' }
+      ],
+      why: 'Uno de los principios ágiles pide entregar software funcional con frecuencia, en periodos cortos, para aprender de la retroalimentación real del usuario. Entregas quincenales reducen el riesgo de construir algo que ya no se necesita y exponen los errores a tiempo. Piénsalo como cocinar y probar la sazón en cada paso, en lugar de servir el platillo completo y descubrir al final que le falta sal.'
+    },
+    {
+      id: 'q3', tema: '1.2 Roles en Scrum', multi: false, k: 'SUVERVAtSVNXOmI=',
+      scenario: 'En la fintech PagoRápido, el director comercial pide un programa de recompensas y el director de riesgos exige un módulo antifraude; ambos quieren verlo en el próximo sprint. Los desarrolladores no saben cuál construir primero y esperan a que alguien lo resuelva, mientras el tablero del sprint sigue vacío.',
+      ask: 'Según Scrum, ¿quién debe resolver este conflicto y de qué manera?',
+      opts: [
+        { id: 'a', t: 'El Scrum Master decide cuál función tiene mayor valor y se la asigna al equipo.' },
+        { id: 'b', t: 'El Product Owner escucha a ambos directores, valora cuál aporta más al producto y ordena el Product Backlog, siendo la voz única sobre las prioridades.' },
+        { id: 'c', t: 'Los desarrolladores votan según el tiempo que tomaría cada función y construyen la más rápida.' },
+        { id: 'd', t: 'El director de mayor jerarquía le indica directamente al equipo cuál función construir.' }
+      ],
+      why: 'El Product Owner es el responsable de maximizar el valor del producto y de ordenar el Product Backlog; por eso concentra las decisiones de prioridad y negocia con los interesados. El Scrum Master facilita el proceso, pero no decide qué se construye; los desarrolladores deciden cómo hacerlo. Si cada director diera órdenes por su cuenta, el equipo recibiría mensajes contradictorios, como una orquesta con dos directores a la vez.'
+    },
+    {
+      id: 'q4', tema: '1.2 Daily Scrum y Scrum Master', multi: false, k: 'SUVERVAtSVNXOmM=',
+      scenario: 'En una empresa de logística, la Daily Scrum se convirtió en una junta de 50 minutos, sentados, en la que cada desarrollador le informa al gerente de operaciones lo que hizo y el gerente le asigna nuevas tareas. Los desarrolladores casi nunca mencionan lo que los detiene, por temor a ser regañados, y los obstáculos se acumulan.',
+      ask: 'Como Scrum Master del equipo, ¿cuál es la mejor intervención?',
+      opts: [
+        { id: 'a', t: 'Sustituir la Daily por un reporte escrito que cada persona envíe por correo al gerente al terminar el día.' },
+        { id: 'b', t: 'Asignar él mismo las tareas de cada día para que el gerente deje de hacerlo y la reunión sea más corta.' },
+        { id: 'c', t: 'Devolver la Daily al equipo: 15 minutos, de pie, centrada en el objetivo del sprint, el avance y los impedimentos, y explicar al gerente que el equipo se autoorganiza, por lo que no necesita que se le asignen tareas.' },
+        { id: 'd', t: 'Mantener la junta como está, pero pedirle al gerente que anote los obstáculos que escuche para resolverlos por su cuenta.' }
+      ],
+      why: 'La Daily Scrum es un espacio de sincronización para el Equipo de Desarrollo, no un reporte de estatus para la gerencia. Dura un máximo de 15 minutos y busca revisar el avance hacia el objetivo del sprint y detectar impedimentos. El Scrum Master actúa como facilitador y entrenador: protege el espacio del equipo, elimina obstáculos y ayuda a que los desarrolladores decidan cómo organizarse. Es como el huddle de un equipo deportivo: lo hacen los jugadores y dura lo justo para ajustar la jugada.'
+    },
+    {
+      id: 'q5', tema: '1.2 Sprint Planning', multi: true, k: 'SUVERVAtSVNXOmEsZA==',
+      scenario: 'El equipo de desarrollo de la tienda en línea Mercado Andino (cuatro desarrolladores) inicia su Sprint Planning. El Product Owner presenta 12 historias de usuario de máxima prioridad, pero, según el historial de sprints anteriores, el equipo solo puede completar alrededor de la mitad. El Scrum Master observa y facilita la reunión.',
+      ask: 'Seleccione DOS acciones que corresponden a una Sprint Planning bien realizada.',
+      opts: [
+        { id: 'a', t: 'El Product Owner explica y aclara las historias de mayor prioridad, y el Equipo de Desarrollo elige, según su capacidad, cuáles se compromete a completar en el sprint.' },
+        { id: 'b', t: 'El Equipo de Desarrollo acepta las 12 historias para no contradecir al Product Owner y ajusta su ritmo sobre la marcha.' },
+        { id: 'c', t: 'El Scrum Master asigna cada historia a un desarrollador específico para asegurar que nadie se quede sin trabajo.' },
+        { id: 'd', t: 'El equipo define el objetivo del sprint y el Sprint Backlog (las historias seleccionadas y cómo se completarán), de modo que todos sepan qué se entregará al final.' },
+        { id: 'e', t: 'Se pospone la selección de historias hasta la primera Daily Scrum, para ver quién tiene disponibilidad.' }
+      ],
+      why: 'En la Sprint Planning el Product Owner aclara el «qué» y el Equipo de Desarrollo decide cuánto puede comprometerse a hacer según su capacidad; el resultado es un objetivo claro y un Sprint Backlog realista. Aceptar todo por presión (b) rompe la autonomía y la sostenibilidad del equipo, asignar tareas (c) no corresponde al Scrum Master, y posponer la selección (e) deja el sprint sin rumbo. Es como planear las comidas de la semana según el tiempo y los ingredientes que realmente tienes.'
+    }
+  ];
+
+  var TOTAL_PTS = 10, PTS_Q = TOTAL_PTS / BANK.length;
+  var KEY = 'iedep_' + CFG.examId;
+
+  /* ═════════════ UTILIDADES ═════════════ */
+  function $(id) { return document.getElementById(id); }
+  function show(el, on) { el.classList.toggle('hidden', !on); }
+  function pad(n) { return (n < 10 ? '0' : '') + n; }
+  function fmtTime(ms) { var s = Math.max(0, Math.round(ms / 1000)); return pad(Math.floor(s / 60)) + ':' + pad(s % 60); }
+  function mulberry32(a) { return function () { a |= 0; a = a + 0x6D2B79F5 | 0; var t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+  function shuffle(arr, rnd) { var a = arr.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(rnd() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function correctOf(q) { try { return atob(q.k).split(':')[1].split(','); } catch (e) { return []; } }
+  function fmtDate(d) {
+    var dias = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado'];
+    var meses = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
+    return dias[d.getDay()].charAt(0).toUpperCase() + dias[d.getDay()].slice(1) + ' ' + d.getDate() + ' de ' + meses[d.getMonth()] + ' de ' + d.getFullYear();
+  }
+  function fmtClock(ts) { var d = new Date(ts); return pad(d.getHours()) + ':' + pad(d.getMinutes()); }
+  function folio(str) { var h = 2166136261; for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return (h >>> 0).toString(36).toUpperCase().padStart(7, '0'); }
+
+  /* Almacenamiento con respaldo en memoria si el navegador lo bloquea */
+  var memStore = null;
+  function load() { try { var r = localStorage.getItem(KEY); return r ? JSON.parse(r) : null; } catch (e) { return memStore; } }
+  function save() { try { localStorage.setItem(KEY, JSON.stringify(S)); } catch (e) { memStore = JSON.parse(JSON.stringify(S)); } }
+
+  /* ═════════════ ESTADO ═════════════ */
+  var S = null;            // estado persistente
+  var order = [];          // orden individual de reactivos y opciones
+  var timerId = null, away = false;
+
+  function buildOrder(seed) {
+    var rnd = mulberry32(seed);
+    var qs = shuffle(BANK, rnd);
+    return qs.map(function (q) { return { q: q, opts: shuffle(q.opts, rnd) }; });
+  }
+
+  /* ═════════════ MARCA DE AGUA ═════════════ */
+  function buildWatermark(name) {
+    var inner = $('wmInner'); inner.innerHTML = '';
+    for (var i = 0; i < 90; i++) { var s = document.createElement('span'); s.textContent = name; inner.appendChild(s); }
+    show($('watermark'), true);
+  }
+
+  /* ═════════════ INICIO ═════════════ */
+  function init() {
+    $('heroDate').textContent = fmtDate(new Date());
+    if (CFG.codigoAcceso) show($('codeField'), true);
+    bindProtection();
+
+    S = load();
+    if (S && S.started) {
+      if (S.finished) { showResults(true); return; }
+      S.attempts = (S.attempts || 1) + 1;     // recarga detectada = nuevo intento
+      S.reloads = (S.reloads || 0) + 1;
+      save();
+      if (Date.now() >= S.endAt) { finish('tiempo'); return; }
+      beginExam(true);
+      notice('Se detectó que la página se actualizó', 'Tus respuestas y el tiempo restante se conservaron. Esta actualización quedó registrada como el intento n.º ' + S.attempts + '.');
+    }
+  }
+
+  $('btnStart').addEventListener('click', function () {
+    var name = $('inName').value.replace(/\s+/g, ' ').trim();
+    var err = $('startErr'); err.textContent = '';
+    if (name.length < 5 || name.split(' ').length < 2) { err.textContent = 'Escribe tu nombre completo (nombre y apellido).'; return; }
+    if (CFG.codigoAcceso && $('inCode').value !== CFG.codigoAcceso) { err.textContent = 'La clave de acceso no es correcta.'; return; }
+    var now = Date.now();
+    S = {
+      started: true, finished: false, name: name,
+      seed: Math.floor(Math.random() * 2147483646) + 1,
+      startAt: now, endAt: now + CFG.minutos * 60000,
+      answers: {}, flags: {}, cur: 0, attempts: 1, reloads: 0, infractions: 0, log: []
+    };
+    save();
+    beginExam(false);
+  });
+  $('inName').addEventListener('keydown', function (e) { if (e.key === 'Enter') $('btnStart').click(); });
+
+  function beginExam(resumed) {
+    order = buildOrder(S.seed);
+    document.body.classList.add('exam-on');
+    show($('screenStart'), false); show($('screenExam'), true); show($('examBar'), true);
+    $('barName').textContent = S.name;
+    buildWatermark(S.name);
+    renderNav(); renderQuestion(); updateBar();
+    tick(); timerId = setInterval(tick, 500);
+    window.scrollTo(0, 0);
+  }
+
+  /* ═════════════ RENDER DE REACTIVOS ═════════════ */
+  function renderNav() {
+    var nav = $('qNav'); nav.innerHTML = '';
+    order.forEach(function (o, i) {
+      var b = document.createElement('button');
+      b.className = 'q-pill' + (S.answers[o.q.id] && S.answers[o.q.id].length ? ' answered' : '') + (i === S.cur ? ' current' : '') + (S.flags[o.q.id] ? ' flagged' : '');
+      b.textContent = i + 1; b.title = 'Ir a la pregunta ' + (i + 1);
+      b.addEventListener('click', function () { S.cur = i; save(); renderNav(); renderQuestion(); });
+      nav.appendChild(b);
+    });
+  }
+
+  function renderQuestion() {
+    var o = order[S.cur], q = o.q, sel = S.answers[q.id] || [];
+    var html = '<div class="q-head"><span class="q-num">Pregunta ' + (S.cur + 1) + ' de ' + order.length + '</span>' +
+      '<button class="q-flag' + (S.flags[q.id] ? ' on' : '') + '" id="btnFlag">' + (S.flags[q.id] ? '★ Marcada para revisar' : '☆ Marcar para revisar') + '</button></div>' +
+      '<p class="q-scenario"></p><p class="q-ask"></p>' +
+      (q.multi ? '<p class="q-hint">Seleccione exactamente dos respuestas.</p>' : '') +
+      '<div id="optList" role="' + (q.multi ? 'group' : 'radiogroup') + '"></div>';
+    $('qCard').innerHTML = html;
+    $('qCard').querySelector('.q-scenario').textContent = q.scenario;
+    $('qCard').querySelector('.q-ask').textContent = q.ask;
+    var list = $('optList');
+    o.opts.forEach(function (op) {
+      var lab = document.createElement('label');
+      lab.className = 'opt' + (sel.indexOf(op.id) > -1 ? ' sel' : '');
+      var inp = document.createElement('input');
+      inp.type = q.multi ? 'checkbox' : 'radio'; inp.name = 'opt'; inp.value = op.id; inp.checked = sel.indexOf(op.id) > -1;
+      var sp = document.createElement('span'); sp.className = 'opt-text'; sp.textContent = op.t;
+      lab.appendChild(inp); lab.appendChild(sp); list.appendChild(lab);
+      inp.addEventListener('change', function () { pick(q, op.id, inp); });
+    });
+    $('btnFlag').addEventListener('click', function () { S.flags[q.id] = !S.flags[q.id]; save(); renderNav(); renderQuestion(); });
+    $('btnPrev').disabled = S.cur === 0;
+    $('btnNext').disabled = S.cur === order.length - 1;
+  }
+
+  function pick(q, id, inp) {
+    var cur = (S.answers[q.id] || []).slice();
+    if (q.multi) {
+      var i = cur.indexOf(id);
+      if (i > -1) cur.splice(i, 1);
+      else if (cur.length >= 2) { inp.checked = false; return; }
+      else cur.push(id);
+    } else { cur = [id]; }
+    S.answers[q.id] = cur; save();
+    var labs = document.querySelectorAll('#optList .opt');
+    labs.forEach(function (l) { l.classList.toggle('sel', cur.indexOf(l.querySelector('input').value) > -1); });
+    renderNav(); updateBar();
+  }
+
+  function answeredCount() { return BANK.filter(function (q) { var a = S.answers[q.id]; return a && a.length > 0; }).length; }
+  function updateBar() {
+    var n = answeredCount();
+    $('barProg').textContent = n + ' / ' + BANK.length + ' respondidas';
+    $('progFill').style.width = (n / BANK.length * 100) + '%';
+    var at = $('barAttempt'); show(at, S.attempts > 1); at.textContent = 'Intento n.º ' + S.attempts;
+    var inf = $('barInfr'); show(inf, S.infractions > 0); inf.textContent = 'Infracciones: ' + S.infractions;
+  }
+
+  $('btnPrev').addEventListener('click', function () { if (S.cur > 0) { S.cur--; save(); renderNav(); renderQuestion(); } });
+  $('btnNext').addEventListener('click', function () { if (S.cur < order.length - 1) { S.cur++; save(); renderNav(); renderQuestion(); } });
+
+  /* ═════════════ TEMPORIZADOR ═════════════ */
+  function tick() {
+    if (!S || S.finished) return;
+    var left = S.endAt - Date.now();
+    var t = $('barTimer'); t.textContent = fmtTime(left); t.classList.toggle('low', left <= 120000);
+    if (left <= 0) finish('tiempo');
+  }
+
+  /* ═════════════ FINALIZAR ═════════════ */
+  $('btnFinish').addEventListener('click', function () {
+    var n = answeredCount(), faltan = BANK.length - n, marc = Object.keys(S.flags).filter(function (k) { return S.flags[k]; }).length;
+    var txt = 'Has respondido ' + n + ' de ' + BANK.length + ' preguntas.';
+    if (faltan > 0) txt += ' Te faltan ' + faltan + ' por responder.';
+    if (marc > 0) txt += ' Tienes ' + marc + ' marcada(s) para revisar.';
+    txt += ' Una vez finalizada, no podrás modificar tus respuestas.';
+    $('confirmTxt').textContent = txt; show($('ovConfirm'), true);
+  });
+  $('btnConfirmNo').addEventListener('click', function () { show($('ovConfirm'), false); });
+  $('btnConfirmYes').addEventListener('click', function () { show($('ovConfirm'), false); finish('manual'); });
+
+  function score() {
+    var pts = 0, detail = [];
+    BANK.forEach(function (q) {
+      var c = correctOf(q), a = S.answers[q.id] || [], p = 0;
+      if (q.multi) {
+        var ok = a.filter(function (x) { return c.indexOf(x) > -1; }).length, bad = a.length - ok;
+        p = Math.max(0, ok - bad) * (PTS_Q / c.length);
+      } else { p = (a.length === 1 && a[0] === c[0]) ? PTS_Q : 0; }
+      pts += p; detail.push({ id: q.id, p: p });
+    });
+    return { pts: Math.round(pts * 10) / 10, detail: detail };
+  }
+
+  function finish(reason) {
+    if (S.finished) return;
+    S.finished = true; S.finishedAt = Date.now(); S.reason = reason;
+    var r = score(); S.result = r; save();
+    clearInterval(timerId);
+    showResults(false);
+  }
+
+  /* ═════════════ RESULTADOS ═════════════ */
+  function showResults(fromLoad) {
+    order = buildOrder(S.seed);
+    document.body.classList.remove('exam-on');
+    show($('screenStart'), false); show($('screenExam'), false); show($('examBar'), false); show($('screenResult'), true);
+    buildWatermark(S.name);
+    var r = S.result || score();
+    var fullOk = r.detail.filter(function (d) { return d.p >= PTS_Q - 0.001; }).length;
+    var used = Math.min(S.finishedAt, S.endAt) - S.startAt;
+    $('rScore').textContent = (Math.round(r.pts * 10) % 10 === 0) ? String(Math.round(r.pts)) : r.pts.toFixed(1);
+    $('rName').textContent = S.name;
+    $('rSub').textContent = 'Evaluación de la Unidad 1 · Ingeniería de Software I · ' + fmtDate(new Date(S.finishedAt));
+    var fol = folio(S.name + '|' + r.pts + '|' + S.seed + '|' + S.finishedAt);
+    var stats = [
+      ['Respuestas correctas', fullOk + ' de ' + BANK.length, false],
+      ['Intentos (actualizaciones)', String(S.attempts), S.attempts > 1],
+      ['Infracciones', String(S.infractions), S.infractions > 0],
+      ['Tiempo utilizado', fmtTime(used), false],
+      ['Folio', fol, false]
+    ];
+    $('rStats').innerHTML = '';
+    stats.forEach(function (s) {
+      var d = document.createElement('div'); d.className = 'stat' + (s[2] ? ' bad' : '');
+      var sp = document.createElement('span'); sp.textContent = s[0];
+      var b = document.createElement('b'); b.textContent = s[1];
+      d.appendChild(sp); d.appendChild(b); $('rStats').appendChild(d);
+    });
+    var msg = '';
+    if (S.reason === 'infracciones') msg = 'La evaluación se cerró automáticamente al registrarse ' + S.infractions + ' salidas de la ventana. Las preguntas sin responder cuentan como incorrectas.';
+    else if (S.reason === 'tiempo') msg = 'La evaluación se cerró automáticamente porque terminó el tiempo disponible. Las preguntas sin responder cuentan como incorrectas.';
+    show($('rNotice'), !!msg); $('rNoticeTxt').textContent = msg;
+
+    var rev = $('rReview'); rev.innerHTML = '';
+    if (!CFG.mostrarRetroalimentacion) { rev.textContent = 'La retroalimentación será compartida por tu docente.'; }
+    else order.forEach(function (o, i) {
+      var q = o.q, c = correctOf(q), a = S.answers[q.id] || [];
+      var d = r.detail.filter(function (x) { return x.id === q.id; })[0];
+      var cls = d.p >= PTS_Q - 0.001 ? 'ok' : (d.p > 0 ? 'part' : 'no');
+      var lbl = cls === 'ok' ? 'Correcta' : (cls === 'part' ? 'Parcial' : 'Incorrecta');
+      var txtOf = function (ids) { return ids.length ? ids.map(function (id) { return q.opts.filter(function (x) { return x.id === id; })[0].t; }).join(' | ') : 'Sin responder'; };
+      var box = document.createElement('div'); box.className = 'rev ' + cls;
+      var t = document.createElement('div'); t.className = 'rev-title'; t.textContent = 'Pregunta ' + (i + 1) + ' · ' + q.tema;
+      var bd = document.createElement('span'); bd.className = 'badge'; bd.textContent = lbl; t.appendChild(bd);
+      box.appendChild(t);
+      [['Tu respuesta: ', txtOf(a)], ['Respuesta correcta: ', txtOf(c)], ['Explicación: ', q.why]].forEach(function (pr) {
+        var p = document.createElement('p'); var st = document.createElement('strong'); st.textContent = pr[0];
+        p.appendChild(st); p.appendChild(document.createTextNode(pr[1])); box.appendChild(p);
+      });
+      rev.appendChild(box);
+    });
+    window.scrollTo(0, 0);
+  }
+
+  $('btnPdf').addEventListener('click', function () {
+    var prev = document.title;
+    document.title = 'Evaluacion_IngSoftware_I_' + S.name.replace(/\s+/g, '_');
+    window.print();
+    setTimeout(function () { document.title = prev; }, 800);
+  });
+
+  /* ═════════════ AVISOS ═════════════ */
+  function notice(title, txt) {
+    $('alertTitle').textContent = title; $('alertTxt').textContent = txt; show($('ovAlert'), true);
+  }
+  $('btnAlertOk').addEventListener('click', function () { show($('ovAlert'), false); });
+
+  /* ═════════════ PROTECCIÓN DEL CONTENIDO E INFRACCIONES ═════════════ */
+  function examActive() { return S && S.started && !S.finished; }
+
+  function bindProtection() {
+    ['copy', 'cut', 'paste', 'dragstart', 'drop'].forEach(function (ev) {
+      document.addEventListener(ev, function (e) {
+        e.preventDefault();
+        if (e.clipboardData) { try { e.clipboardData.setData('text/plain', ''); } catch (x) {} }
+      }, true);
+    });
+    document.addEventListener('contextmenu', function (e) { e.preventDefault(); }, true);
+    document.addEventListener('selectstart', function (e) {
+      var t = e.target && e.target.nodeType === 3 ? e.target.parentNode : e.target;
+      if (t && t.tagName && /^(INPUT|TEXTAREA)$/.test(t.tagName)) return;
+      e.preventDefault();
+    }, true);
+    document.addEventListener('keydown', function (e) {
+      var k = (e.key || '').toLowerCase(), ctrl = e.ctrlKey || e.metaKey;
+      var block = false;
+      if (ctrl && ['c', 'x', 'v', 'a', 's', 'u'].indexOf(k) > -1) block = true;
+      if (ctrl && k === 'p' && examActive()) block = true;
+      if (k === 'f12' || (ctrl && e.shiftKey && ['i', 'j', 'c'].indexOf(k) > -1)) block = true;
+      if (block) { e.preventDefault(); e.stopPropagation(); }
+    }, true);
+    document.addEventListener('keyup', function (e) {
+      if (e.key === 'PrintScreen' && examActive()) { try { navigator.clipboard.writeText(''); } catch (x) {} }
+    });
+
+    /* Salidas de la ventana: se cuenta una infracción por cada salida, aunque disparen varios eventos */
+    document.addEventListener('visibilitychange', function () { document.hidden ? leave() : back(); });
+    window.addEventListener('blur', leave);
+    window.addEventListener('focus', back);
+  }
+
+  function leave() {
+    if (!examActive() || away) return;
+    away = true;
+    S.infractions++; S.log.push(Date.now()); save();
+    document.body.classList.add('away');
+    $('screenExam').style.filter = 'blur(10px)';
+    updateBar();
+    if (CFG.limiteInfracciones > 0 && S.infractions >= CFG.limiteInfracciones) { away = false; $('screenExam').style.filter = ''; finish('infracciones'); }
+  }
+  function back() {
+    if (!away) return;
+    away = false;
+    $('screenExam').style.filter = '';
+    if (examActive()) {
+      var rest = CFG.limiteInfracciones > 0 ? ' Con ' + CFG.limiteInfracciones + ' salidas la evaluación se cierra automáticamente.' : '';
+      notice('Saliste de la ventana de la evaluación', 'Se registró una infracción. Total acumulado: ' + S.infractions + '.' + rest);
+    }
+  }
+
+  init();
+})();
+</script>
+</body>
+</html>
