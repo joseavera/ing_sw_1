@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Repaso previo a la evaluación — Unidad 1</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .values-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .9rem; margin: 1.2rem 0; }
+  @media (max-width: 650px) { .values-grid { grid-template-columns: 1fr; } }
+  .value-card { background: var(--off-white); border: 1px solid var(--border); border-top: 4px solid var(--guinda); border-radius: var(--radius-lg); padding: 1rem 1.2rem; box-shadow: var(--shadow-sm); }
+  .value-card .vn { font-family: var(--font-ui); font-size: .72rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .value-card .vt { font-family: var(--font-ui); font-size: .98rem; margin: .3rem 0 .35rem; color: var(--ink); }
+  .value-card .vt b { color: var(--guinda-dark); }
+  .value-card .vt s { color: var(--ink-muted); text-decoration-thickness: 1px; }
+  .value-card p { font-size: .88rem; line-height: 1.5; color: var(--ink-secondary); margin: 0; }
+
+  .roles-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; margin: 1.2rem 0; }
+  @media (max-width: 750px) { .roles-grid { grid-template-columns: 1fr; } }
+  .role-card { background: var(--off-white); border: 1px solid var(--border); border-top: 4px solid var(--guinda); border-radius: var(--radius-lg); padding: 1.1rem 1.2rem; box-shadow: var(--shadow-sm); }
+  .role-card .role-name { font-family: var(--font-ui); font-weight: 700; color: var(--guinda-dark); display: block; margin-bottom: .2rem; }
+  .role-card .role-analogy { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .08em; color: var(--guinda-mid); display: block; margin-bottom: .5rem; }
+  .role-card p { font-size: .9rem; line-height: 1.5; color: var(--ink-secondary); margin: 0; }
+
+  .flash { background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-md); margin-bottom: .6rem; }
+  .flash summary { cursor: pointer; padding: .85rem 1.1rem; font-family: var(--font-ui); font-weight: 600; color: var(--guinda-dark); font-size: .95rem; list-style: none; }
+  .flash summary::-webkit-details-marker { display: none; }
+  .flash summary::before { content: "?"; display: inline-flex; align-items: center; justify-content: center; width: 1.5rem; height: 1.5rem; border-radius: 50%; background: var(--guinda); color: var(--white); font-size: .85rem; margin-right: .7rem; }
+  .flash[open] { border-color: var(--guinda); }
+  .flash[open] summary { border-bottom: 1px dashed var(--border-strong); }
+  .flash .ans { padding: .85rem 1.1rem 1rem 3.4rem; font-size: .94rem; line-height: 1.6; color: var(--ink-secondary); }
+
+  .support-logo { height: 70px; width: auto; float: right; margin-left: 1rem; }
+  .tips { display: grid; grid-template-columns: repeat(2, 1fr); gap: .9rem; margin: 1rem 0; }
+  @media (max-width: 650px) { .tips { grid-template-columns: 1fr; } }
+  .tip { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: var(--radius-md); padding: .9rem 1.1rem; font-size: .92rem; line-height: 1.55; }
+  .tip strong { color: var(--guinda-dark); font-family: var(--font-ui); display: block; margin-bottom: .2rem; font-size: .88rem; }
+  figure svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-wrap"><img src="imagen1.png" alt="Mixtle, mascota del IEDEP"></div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Repaso — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<section class="class-hero">
+  <span class="class-label">Unidad 1 · Repaso previo a la evaluación</span>
+  <h1>Repaso: Manifiesto Ágil y Roles y Ceremonias de Scrum</h1>
+  <span class="class-subtitle">Una guía de una sola lectura con lo esencial de las clases 1.1 y 1.2 para llegar con seguridad a la evaluación.</span>
+  <div class="meta-row">
+    <div class="meta-item">Asignatura<span>Ingeniería de Software I</span></div>
+    <div class="meta-item">Temas<span>1.1 Manifiesto Ágil · 1.2 Roles y ceremonias</span></div>
+    <div class="meta-item">Fecha<span>Sábado 3 de octubre de 2026</span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <section class="section">
+    <h2 class="section-title">Datos generales</h2>
+    <table>
+      <tbody>
+        <tr><td><strong>Programa educativo</strong></td><td>Licenciatura en Sistemas Computacionales</td></tr>
+        <tr><td><strong>Asignatura</strong></td><td>Ingeniería de Software I</td></tr>
+        <tr><td><strong>Unidad</strong></td><td>1. Metodologías Ágiles y Gestión de Tareas</td></tr>
+        <tr><td><strong>Tema</strong></td><td>Repaso de 1.1 Manifiesto Ágil y mentalidad, y 1.2 Roles y ceremonias en Scrum (Sprint Planning y Daily)</td></tr>
+        <tr><td><strong>Fecha</strong></td><td>Sábado 3 de octubre de 2026</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Competencias a desarrollar</h2>
+    <div class="competency-card"><span class="comp-num">01</span><span class="comp-text"><strong>Aplicar</strong> los valores y principios del Manifiesto Ágil para analizar situaciones reales de una empresa de software.</span></div>
+    <div class="competency-card"><span class="comp-num">02</span><span class="comp-text"><strong>Distinguir</strong> las responsabilidades del Product Owner, el Scrum Master y el Equipo de Desarrollo, así como el propósito de la Sprint Planning y de la Daily Scrum.</span></div>
+    <div class="competency-card"><span class="comp-num">03</span><span class="comp-text"><strong>Argumentar</strong> qué decisión es la más adecuada en un caso empresarial, justificándola con los conceptos de Scrum.</span></div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Cómo leer los casos de la evaluación</h2>
+    <p>Las preguntas presentan una empresa con un problema. No basta con memorizar definiciones: hay que <strong>reconocer qué concepto está en juego</strong>. Una buena estrategia es hacerte cuatro preguntas, como un detective que resuelve un caso:</p>
+    <div class="tips">
+      <div class="tip"><strong>1. ¿Qué se está haciendo mal?</strong>Identifica el síntoma: un plan rígido, entregas demasiado espaciadas, un rol que invade a otro, una reunión desvirtuada.</div>
+      <div class="tip"><strong>2. ¿A quién le corresponde?</strong>Decide qué rol (Product Owner, Scrum Master o Equipo de Desarrollo) tiene la responsabilidad.</div>
+      <div class="tip"><strong>3. ¿Qué valor o principio lo respalda?</strong>Relaciona la solución con el Manifiesto Ágil o con el propósito de la ceremonia.</div>
+      <div class="tip"><strong>4. ¿Las demás opciones suenan bien, pero fallan?</strong>Las opciones incorrectas suelen ser «razonables» en un modelo tradicional, pero contradicen la idea ágil.</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Clase 1.1 · El Manifiesto Ágil en una página</h2>
+    <p>En 2001, un grupo de profesionales publicó cuatro valores. Se leen así: <em>«aunque lo de la derecha tiene valor, valoramos más lo de la izquierda»</em>. No significa eliminar lo de la derecha, sino priorizar.</p>
+
+    <div class="values-grid">
+      <div class="value-card"><span class="vn">Valor 1</span><div class="vt"><b>Individuos e interacciones</b> <s>sobre procesos y herramientas</s></div><p>Las personas que se comunican bien resuelven más que la herramienta más sofisticada.</p></div>
+      <div class="value-card"><span class="vn">Valor 2</span><div class="vt"><b>Software funcionando</b> <s>sobre documentación exhaustiva</s></div><p>Un producto que se puede probar vale más que cien páginas que nadie lee.</p></div>
+      <div class="value-card"><span class="vn">Valor 3</span><div class="vt"><b>Colaboración con el cliente</b> <s>sobre negociación contractual</s></div><p>Se trabaja con el cliente durante el proyecto, no solo contra un contrato firmado.</p></div>
+      <div class="value-card"><span class="vn">Valor 4</span><div class="vt"><b>Responder ante el cambio</b> <s>sobre seguir un plan</s></div><p>El plan es una guía que se ajusta cuando el entorno cambia.</p></div>
+    </div>
+
+    <div class="concept-box">
+      <img class="support-logo" src="imagen2.png" alt="Mixtle, mascota de apoyo">
+      <span class="concept-title">Analogías para recordar</span>
+      <p><strong>Mapa impreso vs. GPS:</strong> el plan tradicional es un mapa fijo; el enfoque ágil es un GPS que recalcula cuando hay un bloqueo en la ruta.</p>
+      <p><strong>Construir una casa vs. cocinar:</strong> en una casa conviene definir todo antes; en un platillo se prueba la sazón en cada paso. El software se parece más a cocinar.</p>
+    </div>
+
+    <h3>Ideas clave de los principios</h3>
+    <ul>
+      <li>Entregar <strong>software funcional con frecuencia</strong>, en periodos cortos (de un par de semanas a un par de meses), y priorizar los periodos más cortos.</li>
+      <li>Aceptar los <strong>cambios de requisitos</strong>, incluso avanzado el proyecto, porque pueden dar ventaja competitiva al cliente.</li>
+      <li>Mantener <strong>colaboración diaria</strong> entre el negocio y el equipo técnico.</li>
+      <li>Fomentar <strong>equipos autoorganizados</strong> y reflexionar periódicamente para mejorar.</li>
+    </ul>
+
+    <figure>
+      <svg viewBox="0 0 640 170" role="img" aria-label="Comparación entre una entrega única al final y entregas frecuentes">
+        <rect width="640" height="170" fill="#FAFAFA" rx="8"/>
+        <text x="20" y="28" font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="#5C4850">Modelo tradicional: una sola entrega al final</text>
+        <rect x="20" y="40" width="470" height="26" fill="#E2D8DA" rx="4"/>
+        <text x="30" y="58" font-family="Inter,sans-serif" font-size="12" fill="#5C4850">Análisis → Diseño → Desarrollo → Pruebas</text>
+        <polygon points="560,36 590,53 560,70" fill="#C85070"/>
+        <text x="520" y="90" font-family="Inter,sans-serif" font-size="11" fill="#5C4850">Entrega (mes 12)</text>
+        <text x="20" y="118" font-family="Inter,sans-serif" font-size="13" font-weight="700" fill="#490b58">Enfoque ágil: entregas pequeñas y frecuentes</text>
+        <g fill="#490b58"><rect x="20" y="130" width="70" height="26" rx="4"/><rect x="105" y="130" width="70" height="26" rx="4"/><rect x="190" y="130" width="70" height="26" rx="4"/><rect x="275" y="130" width="70" height="26" rx="4"/><rect x="360" y="130" width="70" height="26" rx="4"/><rect x="445" y="130" width="70" height="26" rx="4"/></g>
+        <g font-family="Inter,sans-serif" font-size="11" fill="#fff" text-anchor="middle"><text x="55" y="147">Sprint 1</text><text x="140" y="147">Sprint 2</text><text x="225" y="147">Sprint 3</text><text x="310" y="147">Sprint 4</text><text x="395" y="147">Sprint 5</text><text x="480" y="147">Sprint 6</text></g>
+        <text x="525" y="143" font-family="Inter,sans-serif" font-size="11" fill="#490b58">con retroalimentación</text><text x="525" y="157" font-family="Inter,sans-serif" font-size="11" fill="#490b58">en cada entrega</text>
+      </svg>
+      <figcaption>Entregar poco y con frecuencia permite aprender del usuario real y corregir a tiempo.</figcaption>
+    </figure>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Clase 1.2 · Roles y ceremonias en Scrum</h2>
+
+    <div class="roles-grid">
+      <div class="role-card"><span class="role-name">Product Owner</span><span class="role-analogy">El dueño del restaurante</span><p>Maximiza el valor del producto. Ordena el Product Backlog y es la <strong>voz única</strong> sobre las prioridades, después de escuchar a los interesados.</p></div>
+      <div class="role-card"><span class="role-name">Scrum Master</span><span class="role-analogy">El entrenador del equipo</span><p>Facilita el proceso, enseña Scrum y <strong>elimina obstáculos</strong>. No manda ni decide qué se construye.</p></div>
+      <div class="role-card"><span class="role-name">Equipo de Desarrollo</span><span class="role-analogy">Los cocineros</span><p>Deciden <strong>cómo</strong> hacer el trabajo, se autoorganizan y se comprometen con lo que pueden completar.</p></div>
+    </div>
+
+    <table>
+      <thead><tr><th></th><th>Sprint Planning</th><th>Daily Scrum</th></tr></thead>
+      <tbody>
+        <tr><td><strong>¿Cuándo?</strong></td><td>Una vez, al inicio del sprint</td><td>Todos los días del sprint</td></tr>
+        <tr><td><strong>Duración</strong></td><td>De 1 a 2 horas aproximadamente, según el sprint</td><td>Máximo 15 minutos, de pie</td></tr>
+        <tr><td><strong>Propósito</strong></td><td>Definir qué se hará y crear el Sprint Backlog con un objetivo claro</td><td>Sincronizar al equipo y detectar impedimentos</td></tr>
+        <tr><td><strong>Quién decide</strong></td><td>El PO aclara el «qué»; el equipo elige cuánto puede completar según su capacidad</td><td>El Equipo de Desarrollo; el Scrum Master facilita y apoya</td></tr>
+        <tr><td><strong>Analogía</strong></td><td>Planear las comidas de la semana (meal prep)</td><td>El huddle de un equipo deportivo antes de la jugada</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout note mt-1">
+      <p><strong>Las tres preguntas de la Daily:</strong> ¿qué hice ayer para ayudar al objetivo del sprint? · ¿qué haré hoy? · ¿tengo algún obstáculo que me detenga?</p>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Ponte a prueba: tarjetas de repaso</h2>
+    <p class="text-muted" style="margin-bottom:1rem">Intenta responder en voz alta antes de abrir cada tarjeta.</p>
+
+    <details class="flash"><summary>¿Por qué el cuarto valor dice «sobre seguir un plan» y no «en lugar de un plan»?</summary><div class="ans">Porque planear sigue siendo valioso. Lo que se cuestiona es tratar el plan como algo inamovible cuando cambian las condiciones.</div></details>
+    <details class="flash"><summary>¿Qué principio ágil se relaciona con la frecuencia de las entregas?</summary><div class="ans">Entregar software funcionando con frecuencia, en ciclos cortos, para obtener retroalimentación real y reducir el riesgo de construir lo que ya no se necesita.</div></details>
+    <details class="flash"><summary>¿Quién es responsable de ordenar el Product Backlog y por qué?</summary><div class="ans">El Product Owner, porque es el responsable de maximizar el valor del producto; escucha a los interesados y decide las prioridades.</div></details>
+    <details class="flash"><summary>¿Qué diferencia hay entre el Scrum Master y un jefe de proyecto tradicional?</summary><div class="ans">El Scrum Master no asigna tareas ni manda: facilita, enseña y elimina obstáculos para que el equipo se autoorganice.</div></details>
+    <details class="flash"><summary>¿La Daily Scrum es un reporte de estatus para la gerencia?</summary><div class="ans">No. Es una reunión breve del Equipo de Desarrollo para sincronizarse y detectar impedimentos frente al objetivo del sprint.</div></details>
+    <details class="flash"><summary>¿Quién decide cuánto trabajo entra en un sprint y con qué criterio?</summary><div class="ans">El Equipo de Desarrollo, según su capacidad real. El Product Owner aclara el «qué», pero el equipo solo se compromete con lo que puede terminar.</div></details>
+    <details class="flash"><summary>¿Qué se obtiene al final de la Sprint Planning?</summary><div class="ans">Un objetivo del sprint y un Sprint Backlog: la lista de elementos que el equipo se compromete a entregar, con un plan para lograrlo.</div></details>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Conclusión</h2>
+    <p>El Manifiesto Ágil da la <strong>mentalidad</strong>: personas, software funcional, colaboración y adaptación. Scrum da la <strong>estructura</strong>: tres roles con responsabilidades claras y ceremonias breves, como la Sprint Planning y la Daily, que mantienen al equipo alineado. En la evaluación, el reto es reconocer en cada caso qué principio o qué rol está en juego y elegir la decisión que mejor respalda la agilidad. Repasa con calma, usa las analogías y confía en lo que ya has practicado en clase.</p>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Referencias bibliográficas</h2>
+    <p class="text-sm">European Scrum. (2024). <em>Guía Metodologías Agile 2024</em> (v.1.0). https://www.europeanscrum.org/uploads/2/4/5/1/24513648/gui%CC%81a_metodologi%CC%81as_agile_2024.v1.0_-_europeanscrum.org.pdf</p>
+    <p class="text-sm">Project Management Institute, Agile Alliance. (2017). <em>Guía práctica de ágil</em>. Project Management Institute, Inc.</p>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Unidad 1 · Repaso previo a la evaluación</span>
+</footer>
+
+</body>
+</html>
