@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily 3 — La importancia de Scrum hoy</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .support-logo { height: 62px; width: auto; float: right; margin-left: 1rem; }
+  .btn { font-family: var(--font-ui); font-size: .9rem; font-weight: 600; padding: .6rem 1.3rem; border-radius: var(--radius-md); border: 1.5px solid var(--guinda); cursor: pointer; background: var(--guinda); color: var(--white); transition: background .15s; }
+  .btn:hover:not(:disabled) { background: var(--guinda-dark); }
+  .btn.ghost { background: var(--white); color: var(--guinda); }
+  .btn.ghost:hover { background: var(--guinda-light); }
+  .btn:disabled { opacity: .45; cursor: not-allowed; }
+  .row { display: flex; gap: .6rem; flex-wrap: wrap; align-items: center; justify-content: center; }
+
+  /* Línea de tiempo de 15 minutos */
+  .tl { display: flex; border-radius: var(--radius-md); overflow: hidden; margin: 1rem 0 .4rem; box-shadow: var(--shadow-sm); }
+  .tl div { padding: .7rem .4rem; color: var(--white); font-family: var(--font-ui); font-size: .76rem; text-align: center; line-height: 1.3; }
+  .tl div b { display: block; font-size: 1rem; }
+  .tl .t1 { flex: 2; background: #490b58; } .tl .t2 { flex: 3; background: #691f35; } .tl .t3 { flex: 4; background: #C85070; }
+  .tl .t4 { flex: 2; background: #8a3a74; } .tl .t5 { flex: 3; background: #5C4850; } .tl .t6 { flex: 1; background: #3a2a30; }
+  .tl-caption { font-family: var(--font-ui); font-size: .8rem; color: var(--ink-muted); }
+
+  /* Por qué importa */
+  .why-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .9rem; margin: 1.2rem 0; }
+  @media (max-width: 700px) { .why-grid { grid-template-columns: 1fr; } }
+  .why { background: var(--off-white); border: 1px solid var(--border); border-left: 5px solid var(--guinda); border-radius: var(--radius-lg); padding: 1rem 1.2rem; box-shadow: var(--shadow-sm); }
+  .why .wn { font-family: var(--font-ui); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--guinda-mid); font-weight: 700; }
+  .why h4 { margin: .2rem 0 .35rem; font-family: var(--font-ui); font-size: 1rem; color: var(--guinda-dark); }
+  .why p { margin: 0; font-size: .9rem; line-height: 1.55; color: var(--ink-secondary); }
+  .why .an { margin-top: .4rem; font-style: italic; color: var(--guinda-mid); }
+
+  .stats { display: grid; grid-template-columns: repeat(2, 1fr); gap: .8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .stats { grid-template-columns: 1fr; } }
+  .stat { background: var(--guinda); color: var(--white); border-radius: var(--radius-lg); padding: 1rem 1.2rem; text-align: center; }
+  .stat .n { font-family: var(--font-display); font-size: 2.6rem; font-weight: 700; line-height: 1; }
+  .stat .l { font-family: var(--font-ui); font-size: .8rem; opacity: .85; margin-top: .4rem; display: block; line-height: 1.4; }
+
+  /* Tarjetas de empresas (se abren al tocarlas) */
+  .co-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1.2rem 0; align-items: start; }
+  @media (max-width: 700px) { .co-grid { grid-template-columns: 1fr; } }
+  .co { border: 1.5px solid var(--border); border-radius: var(--radius-lg); background: var(--white); box-shadow: var(--shadow-sm); text-align: left; padding: 0; cursor: pointer; font: inherit; overflow: hidden; transition: border-color .15s, transform .15s; }
+  .co:hover { border-color: var(--guinda-rule); transform: translateY(-2px); }
+  .co .co-h { background: var(--guinda); color: var(--white); padding: .65rem 1.1rem; font-family: var(--font-ui); font-weight: 700; font-size: .95rem; display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+  .co .co-h span { font-size: .7rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; opacity: .85; }
+  .co .front { padding: .9rem 1.1rem; font-size: .92rem; line-height: 1.5; color: var(--ink-secondary); }
+  .co .front em { display: block; margin-top: .5rem; font-family: var(--font-ui); font-size: .78rem; font-style: normal; color: var(--guinda); font-weight: 600; }
+  .co .back { display: none; padding: 0 1.1rem 1rem; font-size: .9rem; line-height: 1.55; color: var(--ink); border-top: 1px dashed var(--border-strong); margin: 0 1.1rem; padding: .8rem 0 1rem; }
+  .co.open .back { display: block; }
+  .co.open .front em { display: none; }
+  .co .pr { display: inline-block; margin-top: .5rem; background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .2rem .7rem; font-family: var(--font-ui); font-size: .78rem; font-weight: 600; color: var(--guinda-dark); }
+
+  /* Antes / después */
+  .ba-tabs { display: flex; gap: .5rem; flex-wrap: wrap; margin: .8rem 0; }
+  .ba-tabs button { flex: 1; min-width: 200px; font-family: var(--font-ui); font-weight: 600; font-size: .9rem; padding: .7rem 1rem; border: 2px solid var(--border-strong); background: var(--white); border-radius: var(--radius-md); cursor: pointer; color: var(--ink-secondary); }
+  .ba-tabs button.on { background: var(--guinda); border-color: var(--guinda); color: var(--white); }
+  .ba-panel { display: none; background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.1rem 1.4rem; }
+  .ba-panel.on { display: block; }
+  .ba-panel ul { margin: .4rem 0 0; padding-left: 1.2rem; }
+  .ba-panel li { margin-bottom: .45rem; font-size: .95rem; line-height: 1.55; }
+  .ba-panel .link { margin-top: .6rem; font-family: var(--font-ui); font-size: .85rem; color: var(--guinda-dark); background: var(--guinda-light); padding: .5rem .8rem; border-radius: var(--radius-sm); }
+
+  .disc { counter-reset: q; list-style: none; padding: 0; margin: 1rem 0; }
+  .disc li { counter-increment: q; background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: .8rem 1rem .8rem 3.2rem; margin-bottom: .6rem; position: relative; font-size: .95rem; line-height: 1.55; }
+  .disc li::before { content: counter(q); position: absolute; left: .9rem; top: .8rem; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--guinda); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-ui); font-weight: 700; font-size: .85rem; }
+
+  /* Scrum Poker de claridad */
+  .poker { background: var(--white); border: 2px solid var(--guinda); border-radius: var(--radius-lg); padding: 1.4rem 1.2rem 1.6rem; margin: 1.2rem 0; box-shadow: var(--shadow-sm); }
+  .poker .pq { font-family: var(--font-display); color: var(--guinda-dark); font-size: 1.45rem; text-align: center; margin: 0 0 .9rem; font-weight: 600; line-height: 1.3; }
+  .pchips { display: flex; justify-content: center; flex-wrap: wrap; gap: .5rem; margin-bottom: 1rem; }
+  .pchip { font-family: var(--font-ui); font-size: .78rem; padding: .35rem .8rem; border-radius: 999px; border: 1.5px solid var(--border-strong); background: var(--white); color: var(--ink-secondary); cursor: pointer; }
+  .pchip b { color: var(--guinda); margin-right: .25rem; }
+  .pchip:hover:not(:disabled) { border-color: var(--guinda); background: var(--guinda-light); }
+  .pchip:disabled { opacity: .5; cursor: not-allowed; }
+  .phint { text-align: center; font-family: var(--font-ui); font-size: .8rem; color: var(--ink-muted); margin: -.4rem 0 .9rem; }
+  .pgrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: .7rem; margin-bottom: 1rem; }
+  @media (max-width: 800px) { .pgrid { grid-template-columns: repeat(2, 1fr); } }
+  .ptile { border: 2px solid var(--border-strong); border-radius: var(--radius-lg); padding: .9rem .5rem .8rem; text-align: center; background: var(--white); cursor: pointer; font-family: var(--font-ui); transition: border-color .15s, box-shadow .15s; }
+  .ptile.sel { border-color: var(--guinda); box-shadow: 0 0 0 3px var(--guinda-light); }
+  .ptile .pc { width: 62px; height: 86px; margin: 0 auto .6rem; border: 2px dashed var(--border-strong); border-radius: 8px; background: var(--off-white); display: flex; align-items: center; justify-content: center; font-family: var(--font-display); font-size: 2rem; font-weight: 700; color: var(--white); }
+  .ptile.voted .pc { border: 2px solid var(--guinda); background: var(--guinda) url('imagen1.png') center/70% no-repeat; }
+  .ptile.shown .pc { background-image: none; }
+  .ptile.v-low .pc { background-color: #c0392b; border-color: #c0392b; }
+  .ptile.v-mid .pc { background-color: #e0a400; border-color: #e0a400; }
+  .ptile.v-high .pc { background-color: #2e7d4f; border-color: #2e7d4f; }
+  .ptile .pn { font-weight: 700; font-size: .95rem; color: var(--ink); display: block; }
+  .ptile .ps { font-size: .8rem; color: var(--ink-muted); display: block; margin-top: .15rem; }
+  .pres { margin-top: 1.2rem; border-radius: var(--radius-lg); padding: 1rem 1.3rem; font-family: var(--font-ui); display: none; }
+  .pres.show { display: block; }
+  .pres.verde { background: #e9f7ee; border: 2px solid #2e7d4f; }
+  .pres.amarillo { background: #fff6dc; border: 2px solid #e0a400; }
+  .pres.rojo { background: #fdecec; border: 2px solid #c0392b; }
+  .pres h4 { margin: 0 0 .3rem; font-size: 1.05rem; color: var(--ink); }
+  .pres p { margin: .2rem 0; font-size: .92rem; color: var(--ink-secondary); line-height: 1.5; }
+  tr.hit td { background: var(--guinda-light) !important; font-weight: 600; }
+  .dot { display: inline-block; width: .8rem; height: .8rem; border-radius: 50%; margin-right: .4rem; vertical-align: middle; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-wrap"><img src="imagen1.png" alt="Mixtle, mascota del IEDEP"></div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Daily Scrum — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<section class="class-hero">
+  <span class="class-label">Unidad 1 · Daily Scrum n.º 3 · 15 minutos</span>
+  <h1>La importancia de Scrum hoy en el desarrollo de software</h1>
+  <span class="class-subtitle">¿Por qué, veinte años después, Scrum sigue siendo la base de tantos equipos? Y cómo lo viven empresas como Salesforce e Intel.</span>
+  <div class="meta-row">
+    <div class="meta-item">Asignatura<span>Ingeniería de Software I</span></div>
+    <div class="meta-item">Tema<span>Scrum en la industria actual</span></div>
+    <div class="meta-item">Fecha<span>Jueves 15 de octubre de 2026</span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <section class="section">
+    <h2 class="section-title">Datos generales</h2>
+    <table>
+      <tbody>
+        <tr><td><strong>Programa educativo</strong></td><td>Licenciatura en Sistemas Computacionales</td></tr>
+        <tr><td><strong>Asignatura</strong></td><td>Ingeniería de Software I</td></tr>
+        <tr><td><strong>Unidad</strong></td><td>1. Metodologías Ágiles y Gestión de Tareas</td></tr>
+        <tr><td><strong>Tema</strong></td><td>Importancia de Scrum en la actualidad y ejemplos de empresas que lo usan</td></tr>
+        <tr><td><strong>Fecha</strong></td><td>Jueves 15 de octubre de 2026</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Competencias a desarrollar</h2>
+    <div class="competency-card"><span class="comp-num">01</span><span class="comp-text"><strong>Explicar</strong> por qué Scrum sigue siendo relevante en el desarrollo de software actual.</span></div>
+    <div class="competency-card"><span class="comp-num">02</span><span class="comp-text"><strong>Relacionar</strong> casos de empresas reales con los conceptos de Scrum que practicamos en equipo.</span></div>
+    <div class="competency-card"><span class="comp-num">03</span><span class="comp-text"><strong>Autoevaluar</strong> el nivel de claridad del tema mediante un Scrum Poker.</span></div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Cómo usamos los 15 minutos</h2>
+    <div class="tl">
+      <div class="t1"><b>2</b>Apertura</div>
+      <div class="t2"><b>3</b>Por qué importa</div>
+      <div class="t3"><b>4</b>Empresas</div>
+      <div class="t4"><b>2</b>Nuestro equipo</div>
+      <div class="t5"><b>3</b>Scrum Poker</div>
+      <div class="t6"><b>1</b>Fin</div>
+    </div>
+    <span class="tl-caption">Minutos sugeridos. Quien modera la Daily (rol rotativo) cuida el tiempo.</span>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">1 · ¿Por qué Scrum importa hoy?</h2>
+    <p>Piensa en cocinar para un cliente que cambia de opinión mientras tú cocinas. Si tienes una receta de 12 pasos que no se puede modificar, terminarás sirviendo algo que ya no quiere. Scrum es una forma de cocinar en pequeñas tandas, probar y ajustar. El desarrollo de software vive justo en ese escenario: los requisitos cambian, los mercados se mueven y los usuarios esperan mejoras constantes.</p>
+
+    <div class="why-grid">
+      <div class="why"><span class="wn">Razón 1</span><h4>El cambio es la regla</h4><p>Los sprints cortos permiten ajustar el rumbo cada pocas semanas en lugar de descubrir el error al final del proyecto.</p><p class="an">Analogía: un GPS que recalcula la ruta.</p></div>
+      <div class="why"><span class="wn">Razón 2</span><h4>Entregar valor temprano</h4><p>Cada sprint produce un incremento que se puede mostrar y usar. El cliente opina con algo real en las manos.</p><p class="an">Analogía: probar la sazón en cada paso.</p></div>
+      <div class="why"><span class="wn">Razón 3</span><h4>Equipos pequeños que deciden</h4><p>Un equipo autoorganizado, con un Product Owner que prioriza, decide más rápido y se responsabiliza de lo que construye.</p><p class="an">Analogía: una banda de música, no una orquesta de cien.</p></div>
+      <div class="why"><span class="wn">Razón 4</span><h4>Transparencia y mejora continua</h4><p>La Daily, el tablero y la Retrospectiva hacen visible lo que pasa y obligan a mejorar sprint tras sprint.</p><p class="an">Analogía: un espejo que se mira cada día.</p></div>
+    </div>
+
+    <h3>Dos datos para ubicarnos</h3>
+    <div class="stats">
+      <div class="stat"><div class="n">87 %</div><span class="l">de los participantes del 16.º informe «State of Agile» (Digital.ai, 2022) reportó usar Scrum</span></div>
+      <div class="stat"><div class="n">84 %</div><span class="l">usa o planea usar inteligencia artificial en el desarrollo, según el 18.º informe (2025)</span></div>
+    </div>
+    <div class="callout"><p><strong>Idea para llevarse:</strong> la inteligencia artificial acelera la programación, pero alguien sigue decidiendo <em>qué</em> construir y <em>para quién</em>. Esa es justo la función del Product Owner y de las historias de usuario que escribimos.</p></div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">2 · Empresas que usan Scrum</h2>
+    <div class="concept-box">
+      <img class="support-logo" src="imagen2.png" alt="Mixtle, mascota de apoyo del IEDEP">
+      <span class="concept-title">Toca cada tarjeta</span>
+      <p>Cada empresa muestra algo distinto que ya practicamos en nuestro equipo. Toca la tarjeta para ver el detalle y qué concepto de clase refleja.</p>
+    </div>
+
+    <div class="co-grid">
+      <button class="co" aria-expanded="false">
+        <div class="co-h">Salesforce <span>Scrum desde 2006</span></div>
+        <div class="front">Reorganizó su área de tecnología en equipos pequeños que trabajan en sprints.<em>Toca para ver más</em></div>
+        <div class="back">En 2006 reorganizó su equipo de tecnología y producto, de unas 150 personas, en <strong>equipos pequeños multifuncionales que trabajan en iteraciones cortas (sprints)</strong>. Definió un estándar común de <strong>«qué significa terminado»</strong> para todos los equipos. Hoy, según su propia plataforma de capacitación, la mayoría de los equipos de Salesforce Cloud usan alguna variación de Scrum.<br><span class="pr">En clase: sprints y criterios de Hecho</span></div>
+      </button>
+      <button class="co" aria-expanded="false">
+        <div class="co-h">Intel <span>Scrum distribuido</span></div>
+        <div class="front">Usó Scrum con equipos en distintos lugares dentro de una cultura de gestión tradicional.<em>Toca para ver más</em></div>
+        <div class="back">Según un caso de estudio recopilado por Applied Frameworks, Intel aplicó <strong>Scrum con equipos distribuidos</strong> en una organización con gestión tradicional. En un año <strong>redujo el tiempo de ciclo en 66 %</strong> y eliminó los retrasos en los plazos de entrega.<br><span class="pr">En clase: ciclos cortos y mejora continua</span></div>
+      </button>
+      <button class="co" aria-expanded="false">
+        <div class="co-h">Spotify <span>Squads</span></div>
+        <div class="front">Organiza su trabajo en squads pequeños y multidisciplinarios.<em>Toca para ver más</em></div>
+        <div class="back">Un <strong>squad</strong> es un equipo pequeño y multidisciplinario, dueño de un área del producto. <strong>Cada squad elige cómo trabajar, por ejemplo con Scrum o con Kanban.</strong> Varios squads forman una <em>tribe</em>, para mantenerse alineados sin perder autonomía.<br><span class="pr">En clase: equipo autoorganizado</span></div>
+      </button>
+      <button class="co" aria-expanded="false">
+        <div class="co-h">Saab Defense <span>Software crítico</span></div>
+        <div class="front">Llevó Scrum a software de misión crítica, no solo a aplicaciones comunes.<em>Toca para ver más</em></div>
+        <div class="back">El experto Jeff Sutherland ayudó a Saab a adoptar métodos ágiles para el software de un <strong>avión de combate avanzado</strong>. Se cita como ejemplo de que <strong>Scrum también funciona en software donde un error es muy costoso</strong>, gracias a las entregas pequeñas y a la revisión constante.<br><span class="pr">En clase: Sprint Review y calidad</span></div>
+      </button>
+    </div>
+
+    <h3>Salesforce: antes y después de Scrum</h3>
+    <p>Elige una etapa y observa qué cambió.</p>
+    <div class="ba-tabs">
+      <button class="on" data-p="ba1">2000–2006 · Antes de Scrum</button>
+      <button data-p="ba2">2006 en adelante · Con Scrum</button>
+    </div>
+    <div class="ba-panel on" id="ba1">
+      <ul>
+        <li>La empresa creció muy rápido desde su fundación en 1999.</li>
+        <li>Para 2006, la innovación se frenó y coordinar la comunicación y la colaboración para cumplir las fechas de lanzamiento se volvió difícil.</li>
+        <li>El tiempo entre lanzamientos importantes aumentaba, mientras que las funciones entregadas por equipo disminuían.</li>
+      </ul>
+      <div class="link">Es el problema del «mapa fijo»: un plan grande que cada vez cuesta más seguir.</div>
+    </div>
+    <div class="ba-panel" id="ba2">
+      <ul>
+        <li>Unas 150 personas se organizaron en <strong>equipos pequeños y multifuncionales</strong>.</li>
+        <li>Trabajan en <strong>sprints</strong>, ciclos cortos que entregan avances.</li>
+        <li>Establecieron una <strong>definición común de «terminado»</strong> para que todos sepan cuándo un trabajo está completo.</li>
+        <li>Hoy la mayoría de sus equipos de Salesforce Cloud usan alguna variación de Scrum.</li>
+      </ul>
+      <div class="link">Son los mismos ingredientes que usamos nosotros: equipo pequeño, sprint y criterios de Hecho.</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">3 · Conecta con nuestro equipo</h2>
+    <p>Respondan en la Daily, cada quien desde su rol:</p>
+    <ol class="disc">
+      <li>De las cuatro empresas, ¿qué práctica podría copiar <strong>nuestro</strong> equipo de 5 sin cambiar nada más?</li>
+      <li>Si una inteligencia artificial nos ayuda a programar más rápido, ¿qué decisiones siguen siendo nuestras?</li>
+    </ol>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">4 · Scrum Poker: ¿qué tan claro quedó el tema?</h2>
+    <p>Cada integrante vota en secreto qué tan claro le quedó el tema. Se revelan los votos al mismo tiempo y el semáforo indica si el equipo puede avanzar.</p>
+
+    <div class="poker">
+      <h3 class="pq">¿Podría explicar por qué Scrum sigue siendo importante hoy y dar un ejemplo de empresa?</h3>
+      <div class="pchips" id="pChips">
+        <button class="pchip" data-v="1"><b>1</b>No lo entiendo</button>
+        <button class="pchip" data-v="2"><b>2</b>Entiendo poco</button>
+        <button class="pchip" data-v="3"><b>3</b>Más o menos</button>
+        <button class="pchip" data-v="5"><b>5</b>Lo tengo claro</button>
+        <button class="pchip" data-v="8"><b>8</b>Puedo explicarlo</button>
+      </div>
+      <p class="phint" id="pHint">Toca a la persona y luego elige su carta.</p>
+      <div class="pgrid" id="pGrid"></div>
+      <div class="row">
+        <button class="btn" id="pReveal" disabled>Revelar votos (0 de 5)</button>
+        <button class="btn ghost" id="pReset">Reiniciar todo</button>
+      </div>
+      <div class="pres" id="pRes"></div>
+    </div>
+
+    <h3>Cómo se decide</h3>
+    <table id="pTable">
+      <thead><tr><th>Resultado</th><th>Condición</th><th>Decisión</th></tr></thead>
+      <tbody>
+        <tr data-r="verde"><td><span class="dot" style="background:#2e7d4f"></span><strong>Verde</strong></td><td>Nadie votó 1 o 2 y la mediana es 5 o más.</td><td>Podemos avanzar al siguiente tema.</td></tr>
+        <tr data-r="amarillo"><td><span class="dot" style="background:#e0a400"></span><strong>Amarillo</strong></td><td>Nadie votó 1 o 2, pero la mediana es menor de 5 o hay 5 puntos o más entre el voto más bajo y el más alto.</td><td>Explican el voto más bajo y el más alto, se resuelve un ejemplo más y se vota de nuevo.</td></tr>
+        <tr data-r="rojo"><td><span class="dot" style="background:#c0392b"></span><strong>Rojo</strong></td><td>Al menos una persona votó 1 o 2.</td><td>No avanzar todavía: reforzar con esa persona y hacer otra ronda.</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Conclusión</h2>
+    <p>Scrum importa hoy porque el software cambia más rápido que cualquier plan. Aporta ciclos cortos, equipos pequeños que deciden, entregas frecuentes y una rutina de mejora continua. Empresas como Salesforce e Intel lo han usado para coordinar equipos grandes y distribuidos, y para entregar más rápido y con mayor claridad. Para nosotros, el aprendizaje es doble: dominar las reglas básicas de Scrum, que también evalúa la certificación, y entender el porqué, para poder aplicarlas con criterio en nuestro propio proyecto.</p>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Referencias bibliográficas</h2>
+    <p class="text-sm">Salesforce. (s. f.). <em>Understand why Salesforce adopted agile</em>. Trailhead. https://trailhead.salesforce.com/content/learn/modules/salesforce-agile-basics/understand-why-salesforce-adopted-agile</p>
+    <p class="text-sm">Scrum Alliance. (s. f.). <em>Salesforce: An agile case study</em>. https://resources.scrumalliance.org/Article/salesforce-an-agile-case-study</p>
+    <p class="text-sm">Applied Frameworks. (s. f.). <em>Scrum case studies and examples</em>. https://agile.appliedframeworks.com/applied-frameworks-agile-blog/scrum-case-studies-examples</p>
+    <p class="text-sm">Atlassian. (s. f.). <em>Spotify model: Squads, tribes, chapters and guilds</em>. https://www.atlassian.com/agile/agile-at-scale/spotify</p>
+    <p class="text-sm">IT Brief. (2022). <em>Digital.ai uncovers how agile is used in today's enterprises</em> (16.º informe State of Agile). https://itbrief.co.uk/story/digital-ai-uncovers-how-agile-is-used-in-today-s-enterprises</p>
+    <p class="text-sm">Scrum.org. (2025). <em>18th State of Agile report</em>. https://www.scrum.org/resources/blog/18th-state-agile-report</p>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Unidad 1 · Daily Scrum n.º 3 · Jueves 15 de octubre de 2026</span>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+
+  /* Tarjetas de empresas */
+  document.querySelectorAll('.co').forEach(function (c) {
+    c.addEventListener('click', function () {
+      var open = c.classList.toggle('open'); c.setAttribute('aria-expanded', open ? 'true' : 'false');
+    });
+  });
+
+  /* Antes / después */
+  document.querySelectorAll('.ba-tabs button').forEach(function (b) {
+    b.addEventListener('click', function () {
+      document.querySelectorAll('.ba-tabs button').forEach(function (x) { x.classList.remove('on'); });
+      document.querySelectorAll('.ba-panel').forEach(function (x) { x.classList.remove('on'); });
+      b.classList.add('on'); $(b.dataset.p).classList.add('on');
+    });
+  });
+
+  /* Scrum Poker de claridad */
+  var NAMES = ['Hiram', 'Stephany', 'Zuri', 'Kevin Eduardo', 'Alexei'];
+  var LABEL = { 1: 'No lo entiendo', 2: 'Entiendo poco', 3: 'Más o menos', 5: 'Lo tengo claro', 8: 'Puedo explicarlo' };
+  var votes = [], sel = 0, revealed = false;
+
+  function build() {
+    votes = NAMES.map(function () { return null; }); sel = 0; revealed = false;
+    var g = $('pGrid'); g.innerHTML = '';
+    NAMES.forEach(function (n, i) {
+      var t = document.createElement('div'); t.className = 'ptile'; t.id = 'pt' + i; t.setAttribute('role', 'button'); t.tabIndex = 0;
+      t.innerHTML = '<div class="pc"></div><span class="pn"></span><span class="ps">Pendiente</span>';
+      t.querySelector('.pn').textContent = n;
+      t.addEventListener('click', function () { if (!revealed) { sel = i; paint(); } });
+      t.addEventListener('keydown', function (e) { if ((e.key === 'Enter' || e.key === ' ') && !revealed) { e.preventDefault(); sel = i; paint(); } });
+      g.appendChild(t);
+    });
+    $('pRes').className = 'pres'; $('pRes').innerHTML = '';
+    document.querySelectorAll('#pTable tr').forEach(function (r) { r.classList.remove('hit'); });
+    paint();
+  }
+
+  function paint() {
+    var n = votes.filter(function (v) { return v !== null; }).length;
+    NAMES.forEach(function (nm, i) {
+      var t = $('pt' + i), v = votes[i], pc = t.querySelector('.pc'), ps = t.querySelector('.ps');
+      t.className = 'ptile' + (i === sel && !revealed ? ' sel' : '') + (v !== null ? ' voted' : '');
+      pc.textContent = '';
+      if (revealed && v !== null) { t.classList.add('shown', v <= 2 ? 'v-low' : (v === 3 ? 'v-mid' : 'v-high')); pc.textContent = v; ps.textContent = LABEL[v]; }
+      else ps.textContent = v !== null ? 'Ya votó' : 'Pendiente';
+    });
+    $('pReveal').textContent = 'Revelar votos (' + n + ' de ' + NAMES.length + ')';
+    $('pReveal').disabled = revealed || n < NAMES.length;
+    document.querySelectorAll('#pChips .pchip').forEach(function (c) { c.disabled = revealed; });
+    $('pHint').textContent = revealed ? 'Votos revelados. Toca «Reiniciar todo» para una nueva ronda.' : 'Elige la carta de: ' + NAMES[sel] + '.';
+  }
+
+  document.querySelectorAll('#pChips .pchip').forEach(function (c) {
+    c.addEventListener('click', function () {
+      if (revealed) return;
+      votes[sel] = parseInt(c.dataset.v, 10);
+      var nxt = -1;
+      for (var k = 1; k <= NAMES.length; k++) { var j = (sel + k) % NAMES.length; if (votes[j] === null) { nxt = j; break; } }
+      if (nxt > -1) sel = nxt;
+      paint();
+    });
+  });
+
+  function namesFor(fn) { return NAMES.filter(function (n, i) { return fn(votes[i]); }).join(', '); }
+
+  $('pReveal').addEventListener('click', function () {
+    revealed = true;
+    var s = votes.slice().sort(function (a, b) { return a - b; });
+    var mid = s.length % 2 ? s[(s.length - 1) / 2] : (s[s.length / 2 - 1] + s[s.length / 2]) / 2;
+    var mn = s[0], mx = s[s.length - 1];
+    var res, cls, title, txt;
+    var low = namesFor(function (v) { return v <= 2; });
+    if (mn <= 2) { cls = 'rojo'; title = 'Semáforo rojo: no avanzar todavía'; txt = 'Reforzar con ' + low + ' y hacer otra ronda.'; }
+    else if (mid < 5 || (mx - mn) >= 5) { cls = 'amarillo'; title = 'Semáforo amarillo: aclarar antes de avanzar'; txt = 'Explican el voto más bajo (' + namesFor(function (v) { return v === mn; }) + ') y el más alto (' + namesFor(function (v) { return v === mx; }) + '), se resuelve un ejemplo más y se vota de nuevo.'; }
+    else { cls = 'verde'; title = 'Semáforo verde: podemos avanzar'; txt = 'El equipo tiene claro el tema y puede pasar al siguiente.'; }
+    var r = $('pRes'); r.className = 'pres show ' + cls;
+    r.innerHTML = '';
+    var h = document.createElement('h4'); h.textContent = title; r.appendChild(h);
+    var p1 = document.createElement('p'); p1.textContent = txt; r.appendChild(p1);
+    var p2 = document.createElement('p'); p2.textContent = 'Mediana: ' + mid + ' · Voto más bajo: ' + mn + ' · Voto más alto: ' + mx + ' · Diferencia: ' + (mx - mn) + ' puntos.'; r.appendChild(p2);
+    document.querySelectorAll('#pTable tr[data-r]').forEach(function (row) { row.classList.toggle('hit', row.dataset.r === cls); });
+    paint();
+    r.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
+  $('pReset').addEventListener('click', build);
+  build();
+})();
+</script>
+</body>
+</html>
