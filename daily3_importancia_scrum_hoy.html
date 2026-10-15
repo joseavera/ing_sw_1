@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily 3 — La importancia de Scrum hoy</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .support-logo { height: 62px; width: auto; float: right; margin-left: 1rem; }
+  figure svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+  /* Línea de tiempo de 15 minutos */
+  .tl { display: flex; border-radius: var(--radius-md); overflow: hidden; margin: 1rem 0 .4rem; box-shadow: var(--shadow-sm); }
+  .tl div { padding: .7rem .5rem; color: var(--white); font-family: var(--font-ui); font-size: .78rem; text-align: center; line-height: 1.3; }
+  .tl div b { display: block; font-size: 1rem; }
+  .tl .t1 { flex: 2; background: #490b58; } .tl .t2 { flex: 3; background: #691f35; } .tl .t3 { flex: 5; background: #C85070; }
+  .tl .t4 { flex: 3; background: #8a3a74; } .tl .t5 { flex: 2; background: #5C4850; }
+  .tl-caption { font-family: var(--font-ui); font-size: .8rem; color: var(--ink-muted); }
+
+  /* Por qué importa */
+  .why-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: .9rem; margin: 1.2rem 0; }
+  @media (max-width: 700px) { .why-grid { grid-template-columns: 1fr; } }
+  .why { background: var(--off-white); border: 1px solid var(--border); border-left: 5px solid var(--guinda); border-radius: var(--radius-lg); padding: 1rem 1.2rem; box-shadow: var(--shadow-sm); }
+  .why .wn { font-family: var(--font-ui); font-size: .72rem; letter-spacing: .12em; text-transform: uppercase; color: var(--guinda-mid); font-weight: 700; }
+  .why h4 { margin: .2rem 0 .35rem; font-family: var(--font-ui); font-size: 1rem; color: var(--guinda-dark); }
+  .why p { margin: 0; font-size: .9rem; line-height: 1.55; color: var(--ink-secondary); }
+  .why .an { margin-top: .4rem; font-style: italic; color: var(--guinda-mid); }
+
+  /* Cifras */
+  .stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .stats { grid-template-columns: 1fr; } }
+  .stat { background: var(--guinda); color: var(--white); border-radius: var(--radius-lg); padding: 1rem 1.2rem; text-align: center; }
+  .stat .n { font-family: var(--font-display); font-size: 2.6rem; font-weight: 700; line-height: 1; }
+  .stat .l { font-family: var(--font-ui); font-size: .8rem; opacity: .85; margin-top: .4rem; display: block; line-height: 1.4; }
+
+  /* Empresas */
+  .co-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 1rem; margin: 1.2rem 0; }
+  @media (max-width: 700px) { .co-grid { grid-template-columns: 1fr; } }
+  .co { border: 1px solid var(--border); border-radius: var(--radius-lg); overflow: hidden; background: var(--white); box-shadow: var(--shadow-sm); }
+  .co .co-h { background: var(--guinda); color: var(--white); padding: .6rem 1.1rem; font-family: var(--font-ui); font-weight: 700; font-size: .95rem; display: flex; justify-content: space-between; align-items: center; gap: .5rem; }
+  .co .co-h span { font-size: .7rem; font-weight: 600; letter-spacing: .08em; text-transform: uppercase; opacity: .8; }
+  .co .co-b { padding: .9rem 1.1rem 1rem; font-size: .9rem; line-height: 1.55; color: var(--ink-secondary); }
+  .co .co-b p { margin: 0 0 .5rem; }
+  .co .pr { display: inline-block; background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .2rem .7rem; font-family: var(--font-ui); font-size: .78rem; font-weight: 600; color: var(--guinda-dark); }
+  .tag-ill { display: inline-block; font-family: var(--font-ui); font-size: .72rem; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; background: #fff4d6; color: #7a5200; border: 1px solid #ecd08a; border-radius: 999px; padding: .15rem .7rem; margin-bottom: .5rem; }
+
+  /* Sprint de un squad */
+  .day { display: grid; grid-template-columns: 90px 1fr; gap: .4rem .9rem; margin: .8rem 0; font-size: .92rem; }
+  .day .d { font-family: var(--font-ui); font-weight: 700; color: var(--guinda); font-size: .8rem; text-transform: uppercase; letter-spacing: .06em; padding-top: .15rem; }
+  .day .t { line-height: 1.5; border-bottom: 1px dashed var(--border); padding-bottom: .4rem; }
+
+  .disc { counter-reset: q; list-style: none; padding: 0; margin: 1rem 0; }
+  .disc li { counter-increment: q; background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: .8rem 1rem .8rem 3.2rem; margin-bottom: .6rem; position: relative; font-size: .95rem; line-height: 1.55; }
+  .disc li::before { content: counter(q); position: absolute; left: .9rem; top: .8rem; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--guinda); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-ui); font-weight: 700; font-size: .85rem; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-wrap"><img src="imagen1.png" alt="Mixtle, mascota del IEDEP"></div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Daily Scrum — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<section class="class-hero">
+  <span class="class-label">Unidad 1 · Daily Scrum n.º 3 · 15 minutos</span>
+  <h1>La importancia de Scrum hoy en el desarrollo de software</h1>
+  <span class="class-subtitle">¿Por qué, veinte años después, Scrum sigue siendo la base de tantos equipos? Y cómo lo viven empresas como Amazon, Netflix, Spotify y Mercado Libre.</span>
+  <div class="meta-row">
+    <div class="meta-item">Asignatura<span>Ingeniería de Software I</span></div>
+    <div class="meta-item">Tema<span>Scrum en la industria actual</span></div>
+    <div class="meta-item">Fecha<span>Jueves 15 de octubre de 2026</span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <section class="section">
+    <h2 class="section-title">Datos generales</h2>
+    <table>
+      <tbody>
+        <tr><td><strong>Programa educativo</strong></td><td>Licenciatura en Sistemas Computacionales</td></tr>
+        <tr><td><strong>Asignatura</strong></td><td>Ingeniería de Software I</td></tr>
+        <tr><td><strong>Unidad</strong></td><td>1. Metodologías Ágiles y Gestión de Tareas</td></tr>
+        <tr><td><strong>Tema</strong></td><td>Importancia de Scrum en la actualidad y ejemplos de empresas de tecnología</td></tr>
+        <tr><td><strong>Fecha</strong></td><td>Jueves 15 de octubre de 2026</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Competencias a desarrollar</h2>
+    <div class="competency-card"><span class="comp-num">01</span><span class="comp-text"><strong>Explicar</strong> por qué Scrum y los principios ágiles siguen siendo relevantes en el desarrollo de software actual.</span></div>
+    <div class="competency-card"><span class="comp-num">02</span><span class="comp-text"><strong>Relacionar</strong> prácticas de empresas reales con los principios ágiles y con el trabajo de su propio equipo.</span></div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Cómo usamos los 15 minutos</h2>
+    <div class="tl">
+      <div class="t1"><b>2</b>Apertura</div>
+      <div class="t2"><b>3</b>Por qué importa</div>
+      <div class="t3"><b>5</b>Cuatro empresas</div>
+      <div class="t4"><b>3</b>Nuestro equipo</div>
+      <div class="t5"><b>2</b>Cierre</div>
+    </div>
+    <span class="tl-caption">Minutos sugeridos. Quien modera la Daily (rol rotativo) cuida el tiempo.</span>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">1 · ¿Por qué Scrum importa hoy?</h2>
+    <p>Piensa en cocinar para un cliente que cambia de opinión mientras tú cocinas. Si tienes una receta de 12 pasos que no se puede modificar, terminarás sirviendo algo que ya no quiere. Scrum es una forma de cocinar en pequeñas tandas, probar y ajustar. El desarrollo de software vive justo en ese escenario: los requisitos cambian, los mercados se mueven y los usuarios esperan mejoras constantes.</p>
+
+    <div class="why-grid">
+      <div class="why"><span class="wn">Razón 1</span><h4>El cambio es la regla</h4><p>Los sprints cortos permiten ajustar el rumbo cada pocas semanas en lugar de descubrir el error al final del proyecto.</p><p class="an">Analogía: un GPS que recalcula la ruta.</p></div>
+      <div class="why"><span class="wn">Razón 2</span><h4>Entregar valor temprano</h4><p>Cada sprint produce un incremento que se puede mostrar y usar. El cliente opina con algo real en las manos.</p><p class="an">Analogía: probar la sazón en cada paso.</p></div>
+      <div class="why"><span class="wn">Razón 3</span><h4>Equipos pequeños que deciden</h4><p>Un equipo autoorganizado, con un Product Owner que prioriza, decide más rápido y se responsabiliza de lo que construye.</p><p class="an">Analogía: una banda de música, no una orquesta de cien.</p></div>
+      <div class="why"><span class="wn">Razón 4</span><h4>Transparencia y mejora continua</h4><p>La Daily, el tablero y la Retrospectiva hacen visible lo que pasa y obligan a mejorar sprint tras sprint.</p><p class="an">Analogía: un espejo que se mira cada día.</p></div>
+    </div>
+
+    <h3>Un dato para ubicarnos</h3>
+    <p>El 18.º informe «State of Agile» (Digital.ai, 2025) muestra que el panorama real es más matizado de lo que parece:</p>
+    <div class="stats">
+      <div class="stat"><div class="n">74 %</div><span class="l">usa modelos híbridos o propios, adaptando las prácticas a su contexto</span></div>
+      <div class="stat"><div class="n">13 %</div><span class="l">dice que ágil está plenamente integrado en toda su empresa</span></div>
+      <div class="stat"><div class="n">84 %</div><span class="l">usa o planea usar inteligencia artificial en el ciclo de desarrollo</span></div>
+    </div>
+    <div class="callout"><p><strong>Idea para llevarse:</strong> Scrum sigue siendo la base del trabajo en equipo, pero casi nadie lo aplica «de manual». Las empresas lo adaptan. Y la inteligencia artificial acelera la programación, aunque alguien sigue teniendo que decidir <em>qué</em> construir y <em>para quién</em>, y esa es justo la función del Product Owner y de las historias de usuario.</p></div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">2 · Cuatro empresas, cuatro principios</h2>
+    <div class="concept-box">
+      <img class="support-logo" src="imagen2.png" alt="Mixtle, mascota de apoyo del IEDEP">
+      <span class="concept-title">Ojo: pensamiento crítico</span>
+      <p>Ninguna de estas empresas sigue «Scrum de libro» en todos sus equipos. Lo valioso es qué <strong>principios ágiles</strong> se ven en cómo trabajan. Así también se evita repetir la frase «Netflix usa Scrum», que sería falsa.</p>
+    </div>
+
+    <div class="co-grid">
+      <div class="co">
+        <div class="co-h">Amazon <span>Equipos pequeños</span></div>
+        <div class="co-b">
+          <p>Se le atribuye a Jeff Bezos la regla de los <strong>«dos pizzas»</strong>: si dos pizzas no alcanzan para alimentar al equipo, es demasiado grande. Equipos pequeños y autónomos que pueden probar y decidir con rapidez, y cuya contribución individual es visible.</p>
+          <p><span class="pr">Principio: equipos autoorganizados</span></p>
+        </div>
+      </div>
+      <div class="co">
+        <div class="co-h">Netflix <span>Cultura sobre proceso</span></div>
+        <div class="co-b">
+          <p>Un ingeniero de Netflix declaró en 2016 que no se adhieren explícitamente a ágil como empresa: no hay una metodología impuesta, cada equipo elige lo que le funciona. Se apoyan en <strong>«libertad y responsabilidad»</strong> y en medir el éxito con <strong>software funcionando</strong>.</p>
+          <p><span class="pr">Principio: software funcionando</span></p>
+        </div>
+      </div>
+      <div class="co">
+        <div class="co-h">Spotify <span>Squads</span></div>
+        <div class="co-b">
+          <p>Popularizó los <strong>squads</strong>: equipos pequeños y multidisciplinarios, cada uno dueño de un área del producto. <strong>Cada squad elige su forma de trabajar</strong>, por ejemplo Scrum o Kanban. Varios squads forman una <em>tribe</em>. Spotify aclaró que no es un marco fijo y que su modelo ha evolucionado.</p>
+          <p><span class="pr">Principio: autonomía con alineación</span></p>
+        </div>
+      </div>
+      <div class="co">
+        <div class="co-h">Mercado Libre <span>Entrega continua</span></div>
+        <div class="co-b">
+          <p>Según una entrevista con uno de sus directivos, la empresa hace alrededor de <strong>30,000 despliegues de código al día</strong> con más de 18,000 ingenieros. La propiedad del producto no depende del cargo y una <strong>plataforma interna</strong> automatiza escalamiento y seguridad para que los equipos se concentren en el usuario. Objetivos de 3 a 5 metas que se revisan cada trimestre.</p>
+          <p><span class="pr">Principio: entregas frecuentes</span></p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Un día en un squad estilo Spotify</h2>
+    <span class="tag-ill">Ejemplo ilustrativo, no un caso documentado</span>
+    <p>Imaginemos un squad pequeño responsable de la función «Mis playlists», que trabaja con sprints de dos semanas. Así se vería Scrum en su rutina:</p>
+    <div class="day">
+      <div class="d">Lunes, día 1</div><div class="t"><strong>Sprint Planning.</strong> El Product Owner presenta las historias más valiosas, por ejemplo: <em>«Como oyente, quiero ordenar mi playlist por fecha, para encontrar lo último que agregué»</em>. El equipo elige las que puede completar.</div>
+      <div class="d">Cada día</div><div class="t"><strong>Daily de 15 minutos.</strong> ¿Qué avancé? ¿Qué haré hoy? ¿Qué me detiene? El Scrum Master (o coach) remueve los obstáculos.</div>
+      <div class="d">Durante el sprint</div><div class="t"><strong>Construcción y pruebas.</strong> Se programa, se prueba y se cumplen los criterios de Hecho. La función se publica de forma gradual a un grupo pequeño de usuarios para aprender de datos reales.</div>
+      <div class="d">Viernes, día 10</div><div class="t"><strong>Sprint Review y Retrospectiva.</strong> Se muestra lo logrado y luego el equipo conversa, ya sin invitados, sobre cómo mejorar su forma de trabajar.</div>
+    </div>
+    <div class="result-line">Es el mismo ciclo que practicamos: Planning → Dailys → Review → Retrospectiva.</div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">3 · Conecta con nuestro equipo</h2>
+    <p>Respondan en la Daily, cada quien desde su rol:</p>
+    <ol class="disc">
+      <li>De las cuatro empresas, ¿qué práctica podría copiar <strong>nuestro</strong> equipo de 5 sin cambiar nada más?</li>
+      <li>Si nuestro Product Owner tuviera que explicar en una frase por qué esta historia es la más valiosa del sprint, ¿cuál sería?</li>
+      <li>Si una inteligencia artificial nos ayuda a programar más rápido, ¿qué decisiones siguen siendo nuestras?</li>
+    </ol>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Conclusión</h2>
+    <p>Scrum importa hoy porque el software cambia más rápido que cualquier plan. Aporta ciclos cortos, equipos pequeños que deciden, entregas frecuentes y una rutina de mejora continua. Las grandes empresas no lo copian al pie de la letra, sino que adaptan sus principios a su cultura. Para nosotros, el aprendizaje es doble: dominar las reglas básicas de Scrum, que también evalúa la certificación, y entender el porqué, para poder adaptarlas con criterio.</p>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Referencias bibliográficas</h2>
+    <p class="text-sm">Atlassian. (s. f.). <em>Spotify model: Squads, tribes, chapters and guilds</em>. https://www.atlassian.com/agile/agile-at-scale/spotify</p>
+    <p class="text-sm">Nuclino. (2019, 20 de marzo). <em>Two-pizza teams: The science behind Jeff Bezos' rule</em>. https://blog.nuclino.com/two-pizza-teams-the-science-behind-jeff-bezos-rule</p>
+    <p class="text-sm">TechWell. (2016, octubre). <em>Why Netflix doesn't stick to agile</em>. https://www.techwell.com/techwell-insights/2016/10/why-netflix-doesn-t-stick-agile</p>
+    <p class="text-sm">Lenny's Newsletter. (s. f.). <em>Inside Mercado Libre</em> (entrevista con Sebastian Barrios). https://www.lennysnewsletter.com/p/inside-mercado-libre-sebastian-barrios</p>
+    <p class="text-sm">Scrum.org. (2025). <em>18th State of Agile report</em> (reseña del informe de Digital.ai). https://www.scrum.org/resources/blog/18th-state-agile-report</p>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Unidad 1 · Daily Scrum n.º 3 · Jueves 15 de octubre de 2026</span>
+</footer>
+
+</body>
+</html>
