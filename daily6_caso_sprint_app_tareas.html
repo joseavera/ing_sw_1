@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily 6 — Caso del sprint</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .support-logo { height: 58px; width: auto; float: right; margin-left: 1rem; }
+  figure svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: .7rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--guinda); color: var(--white); border-radius: var(--radius-lg); padding: .8rem 1rem; text-align: center; }
+  .kpi .n { font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; line-height: 1; }
+  .kpi .l { font-family: var(--font-ui); font-size: .76rem; opacity: .85; display: block; margin-top: .3rem; }
+  .kpi.alt { background: #8a3a74; }
+
+  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .board { grid-template-columns: 1fr; } }
+  .col { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem; }
+  .col h4 { margin: 0 0 .6rem; font-family: var(--font-ui); font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-dark); }
+  .col.done { border-top: 4px solid #2e7d4f; } .col.prog { border-top: 4px solid #e0a400; } .col.todo { border-top: 4px solid var(--border-strong); }
+  .tk { background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--guinda); border-radius: var(--radius-md); padding: .65rem .8rem; margin-bottom: .5rem; font-size: .88rem; line-height: 1.45; box-shadow: var(--shadow-sm); }
+  .tk b { display: block; color: var(--ink); }
+  .tk .pt { display: inline-block; margin-top: .3rem; background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .1rem .6rem; font-family: var(--font-ui); font-size: .74rem; font-weight: 700; color: var(--guinda-dark); }
+  .tk .st { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); display: block; margin-top: .2rem; }
+  .epic { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: var(--radius-md); padding: .6rem 1rem; font-family: var(--font-ui); font-size: .88rem; color: var(--guinda-dark); margin-bottom: .8rem; }
+  .epic strong { text-transform: uppercase; letter-spacing: .1em; font-size: .72rem; margin-right: .5rem; color: var(--guinda-mid); }
+
+  .qs { list-style: none; padding: 0; margin: 1rem 0; counter-reset: q; }
+  .qs > li { counter-increment: q; background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.2rem 1rem 3.6rem; margin-bottom: .8rem; position: relative; box-shadow: var(--shadow-sm); }
+  .qs > li::before { content: counter(q); position: absolute; left: 1rem; top: 1rem; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--guinda); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-ui); font-weight: 700; }
+  .qs .qt { font-size: 1rem; line-height: 1.55; color: var(--ink); margin: 0 0 .6rem; }
+  .qs details summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: .85rem; color: var(--guinda); }
+  .qs details .ans { margin-top: .5rem; padding: .7rem 1rem; background: var(--white); border-left: 4px solid var(--guinda); border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: .93rem; line-height: 1.55; color: var(--ink-secondary); }
+
+  .cert { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.2rem 1.4rem; margin-bottom: 1rem; }
+  .cert .cn { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .cert .ct { font-size: 1.02rem; line-height: 1.6; margin: .3rem 0 .8rem; color: var(--ink); }
+  .cert .opt { display: block; width: 100%; text-align: left; background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: .7rem .95rem; margin-bottom: .45rem; font-size: .95rem; line-height: 1.5; cursor: pointer; font-family: var(--font-body); color: var(--ink); }
+  .cert .opt:hover:not(:disabled) { border-color: var(--guinda-rule); }
+  .cert .opt.good { border-color: #2e7d4f; background: #e9f7ee; }
+  .cert .opt.bad { border-color: #c0392b; background: #fdecec; }
+  .cert .exp { display: none; margin-top: .5rem; font-size: .9rem; line-height: 1.6; color: var(--ink-secondary); background: var(--white); border-left: 4px solid var(--guinda); padding: .7rem 1rem; border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+  .cert.done .exp { display: block; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-wrap"><img src="imagen1.png" alt="Mixtle, mascota del IEDEP"></div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Daily Scrum — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<section class="class-hero">
+  <span class="class-label">Unidad 1 · Daily Scrum n.º 6 · 15 minutos</span>
+  <h1>Caso del sprint: la app de tareas para estudiantes</h1>
+  <span class="class-subtitle">Un caso breve para repasar épicas, estimación, criterios de Hecho, burndown y Retrospectiva.</span>
+  <div class="meta-row">
+    <div class="meta-item">Programa educativo<span>Lic. en Sistemas Computacionales</span></div>
+    <div class="meta-item">Asignatura<span>Ingeniería de Software I</span></div>
+    <div class="meta-item">Fecha<span>Martes 20 de octubre de 2026</span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <section class="section">
+    <h2 class="section-title">Contexto</h2>
+    <div class="concept-box">
+      <img class="support-logo" src="imagen2.png" alt="Mixtle, mascota de apoyo del IEDEP">
+      <span class="concept-title">El caso</span>
+      <p>Nuestro equipo de 5 (Product Owner, Scrum Master y 3 del Scrum Team) construye la app de tareas para estudiantes. Vamos en el <strong>día 6 de un sprint de 10 días</strong>. Comprometimos <strong>16 puntos</strong>, y nuestra velocidad promedio es de 20.</p>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="n">6/10</div><span class="l">día del sprint</span></div>
+      <div class="kpi"><div class="n">16</div><span class="l">puntos comprometidos</span></div>
+      <div class="kpi"><div class="n">5</div><span class="l">puntos terminados</span></div>
+      <div class="kpi alt"><div class="n">11</div><span class="l">puntos pendientes</span></div>
+    </div>
+
+    <div class="epic"><strong>Épica</strong>Gestión de tareas del estudiante</div>
+    <div class="board">
+      <div class="col todo"><h4>Por hacer</h4><p class="text-muted" style="margin:0">Sin elementos.</p></div>
+      <div class="col prog"><h4>En curso</h4>
+        <div class="tk"><b>Recibir un recordatorio un día antes</b><span class="pt">8 puntos</span><span class="st">Nadie la entiende del todo.</span></div>
+        <div class="tk"><b>Marcar una tarea como completada</b><span class="pt">3 puntos</span><span class="st">Programada, pero sin probar.</span></div>
+      </div>
+      <div class="col done"><h4>Hecho</h4>
+        <div class="tk"><b>Crear una tarea con fecha límite</b><span class="pt">5 puntos</span><span class="st">Terminada y probada.</span></div>
+      </div>
+    </div>
+
+    <figure>
+      <svg viewBox="0 0 640 260" role="img" aria-label="Burndown del sprint: línea ideal y avance real en el día 6">
+        <rect width="640" height="260" rx="10" fill="#FAFAFA"/>
+        <g font-family="Inter,sans-serif" font-size="11" fill="#8C7880">
+          <line x1="50" y1="20" x2="50" y2="210" stroke="#C8B4BA"/><line x1="50" y1="210" x2="610" y2="210" stroke="#C8B4BA"/>
+          <text x="40" y="214" text-anchor="end">0</text><text x="40" y="162" text-anchor="end">4</text><text x="40" y="115" text-anchor="end">8</text><text x="40" y="67" text-anchor="end">12</text><text x="40" y="24" text-anchor="end">16</text>
+          <text x="50" y="228" text-anchor="middle">0</text><text x="106" y="228" text-anchor="middle">1</text><text x="162" y="228" text-anchor="middle">2</text><text x="218" y="228" text-anchor="middle">3</text><text x="274" y="228" text-anchor="middle">4</text><text x="330" y="228" text-anchor="middle">5</text><text x="386" y="228" text-anchor="middle">6</text><text x="442" y="228" text-anchor="middle">7</text><text x="498" y="228" text-anchor="middle">8</text><text x="554" y="228" text-anchor="middle">9</text><text x="610" y="228" text-anchor="middle">10</text>
+          <text x="330" y="248" text-anchor="middle" fill="#5C4850">Días del sprint</text>
+        </g>
+        <line x1="50" y1="20" x2="610" y2="210" stroke="#8C7880" stroke-width="2" stroke-dasharray="6 5"/>
+        <!-- ideal en día 6: 6.4 puntos -> y = 210 - 6.4*11.875 = 134 -->
+        <circle cx="386" cy="134" r="6" fill="#8C7880"/>
+        <!-- real en día 6: 11 puntos -> y = 210 - 11*11.875 = 79 -->
+        <circle cx="386" cy="79" r="7" fill="#C85070"/>
+        <line x1="386" y1="85" x2="386" y2="128" stroke="#C85070" stroke-width="2" stroke-dasharray="3 3"/>
+        <g font-family="Inter,sans-serif" font-size="12">
+          <text x="398" y="82" fill="#C85070" font-weight="700">Real: 11 puntos</text>
+          <text x="398" y="140" fill="#5C4850">Ideal: unos 6 puntos</text>
+          <text x="70" y="196" fill="#5C4850">Línea punteada: ideal</text>
+        </g>
+      </svg>
+      <figcaption>En el día 6 vamos por encima de la línea ideal.</figcaption>
+    </figure>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Preguntas para la Daily</h2>
+    <p class="text-muted" style="margin-top:0">Se responden en voz alta, cada quien desde su rol. Al final de cada una se puede abrir la respuesta esperada.</p>
+    <ol class="qs">
+      <li><p class="qt">¿Qué es «Gestión de tareas del estudiante» y por qué no la trabajamos tal cual en un sprint?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">Es una <strong>épica</strong>: es demasiado grande y se divide en historias de usuario más pequeñas.</div></details></li>
+      <li><p class="qt">La historia de 8 puntos tiene al equipo confundido. ¿Qué hacemos con ella?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">Pedir al <strong>Product Owner</strong> que la aclare, o dividirla en historias más pequeñas, y volver a estimarla con Planning Poker.</div></details></li>
+      <li><p class="qt">«Marcar como completada» ya está programada. ¿La mostramos como terminada en la Sprint Review?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans"><strong>No</strong>, hasta cumplir todos los <strong>criterios de Hecho</strong>, incluida la prueba.</div></details></li>
+      <li><p class="qt">Terminamos 5 de 16 puntos en el día 6, y la línea ideal marcaría unos 6 puntos pendientes. ¿Vamos adelantados o atrasados? ¿Quién ayuda y dónde lo detectamos?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans"><strong>Atrasados:</strong> quedan 11 puntos. Se detecta en la <strong>Daily</strong>, el <strong>Scrum Master</strong> ayuda a quitar impedimentos y el <strong>Product Owner</strong> puede decidir qué historia sacar o dejar para el siguiente sprint.</div></details></li>
+      <li><p class="qt">Para la Retrospectiva: ¿qué una cosa continuarían, qué dejarían de hacer y qué empezarían?</p>
+        <details><summary>Ver nota</summary><div class="ans">Pregunta abierta: cada integrante responde desde su rol.</div></details></li>
+    </ol>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Dos preguntas tipo certificación</h2>
+    <p class="text-muted" style="margin-top:0">Con el estilo y el vocabulario del examen Scrum Fundamentals Certified (SBOK®), basadas en el mismo caso.</p>
+    <div id="certBox"></div>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Unidad 1 · Daily Scrum n.º 6 · Martes 20 de octubre de 2026</span>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
+  var QS = [
+    { q: 'La historia «Marcar una tarea como completada» está programada, pero todavía no se ha probado. Según los Done Criteria (criterios de Hecho) del equipo, esta historia:',
+      o: ['Se considera terminada, porque el código ya está escrito.', 'No se considera terminada hasta cumplir todos los criterios acordados, incluida la prueba.', 'Se considera terminada si el Product Owner la aprueba de palabra.', 'Se considera terminada si el Scrum Master así lo decide.'], c: 1,
+      e: 'Los Done Criteria son la definición compartida de «terminado». Un elemento solo se presenta como completado cuando cumple todos los criterios acordados; de lo contrario no se muestra como terminado en la Sprint Review.' },
+    { q: 'En el día 6 del sprint, el burndown chart del equipo muestra 11 puntos pendientes, y la línea ideal marca 6. ¿Qué muestra un burndown chart y qué indica esta situación?',
+      o: ['El trabajo restante a lo largo del tiempo; el equipo va con retraso respecto a lo planeado.', 'Los puntos completados acumulados; el equipo va adelantado.', 'El presupuesto restante; el proyecto excede el costo.', 'La velocidad histórica del equipo; el equipo debe aumentar su velocidad.'], c: 0,
+      e: 'El burndown chart muestra el trabajo que falta por terminar a lo largo del sprint. Si la línea real está por encima de la ideal, quedan más puntos de los esperados y el equipo va atrasado. Es un tema para tratar en la Daily y con el Scrum Master.' }
+  ];
+  var box = document.getElementById('certBox');
+  QS.forEach(function (it, qi) {
+    var wrap = document.createElement('div'); wrap.className = 'cert';
+    var n = document.createElement('div'); n.className = 'cn'; n.textContent = 'Pregunta de certificación ' + (qi + 1) + ' de ' + QS.length; wrap.appendChild(n);
+    var t = document.createElement('div'); t.className = 'ct'; t.textContent = it.q; wrap.appendChild(t);
+    var opts = shuffle(it.o.map(function (x, i) { return { t: x, ok: i === it.c }; })), btns = [];
+    opts.forEach(function (op) {
+      var b = document.createElement('button'); b.className = 'opt'; b.textContent = op.t; btns.push(b);
+      b.addEventListener('click', function () {
+        if (wrap.classList.contains('done')) return; wrap.classList.add('done');
+        btns.forEach(function (x, i) { x.disabled = true; if (opts[i].ok) x.classList.add('good'); });
+        if (!op.ok) b.classList.add('bad');
+      });
+      wrap.appendChild(b);
+    });
+    var e = document.createElement('div'); e.className = 'exp'; var s = document.createElement('strong'); s.textContent = 'Explicación: '; e.appendChild(s); e.appendChild(document.createTextNode(it.e)); wrap.appendChild(e);
+    box.appendChild(wrap);
+  });
+})();
+</script>
+</body>
+</html>
