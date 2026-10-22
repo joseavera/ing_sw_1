@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily 8 — De la entrevista a las historias</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .support-logo { height: 58px; width: auto; float: right; margin-left: 1rem; }
+  figure svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: .7rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--guinda); color: var(--white); border-radius: var(--radius-lg); padding: .8rem 1rem; text-align: center; }
+  .kpi .n { font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; line-height: 1; }
+  .kpi .l { font-family: var(--font-ui); font-size: .76rem; opacity: .85; display: block; margin-top: .3rem; }
+  .kpi.alt { background: #8a3a74; }
+
+  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .board { grid-template-columns: 1fr; } }
+  .col { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem; }
+  .col h4 { margin: 0 0 .6rem; font-family: var(--font-ui); font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-dark); }
+  .col.done { border-top: 4px solid #2e7d4f; } .col.prog { border-top: 4px solid #e0a400; } .col.todo { border-top: 4px solid var(--border-strong); }
+  .tk { background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--guinda); border-radius: var(--radius-md); padding: .65rem .8rem; margin-bottom: .5rem; font-size: .88rem; line-height: 1.45; box-shadow: var(--shadow-sm); }
+  .tk b { display: block; color: var(--ink); }
+  .tk .pt { display: inline-block; margin-top: .3rem; background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .1rem .6rem; font-family: var(--font-ui); font-size: .74rem; font-weight: 700; color: var(--guinda-dark); }
+  .tk .st { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); display: block; margin-top: .2rem; }
+  .epic { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: var(--radius-md); padding: .6rem 1rem; font-family: var(--font-ui); font-size: .88rem; color: var(--guinda-dark); margin-bottom: .8rem; }
+  .epic strong { text-transform: uppercase; letter-spacing: .1em; font-size: .72rem; margin-right: .5rem; color: var(--guinda-mid); }
+
+  .qs { list-style: none; padding: 0; margin: 1rem 0; counter-reset: q; }
+  .qs > li { counter-increment: q; background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.2rem 1rem 3.6rem; margin-bottom: .8rem; position: relative; box-shadow: var(--shadow-sm); }
+  .qs > li::before { content: counter(q); position: absolute; left: 1rem; top: 1rem; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--guinda); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-ui); font-weight: 700; }
+  .qs .qt { font-size: 1rem; line-height: 1.55; color: var(--ink); margin: 0 0 .6rem; }
+  .qs details summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: .85rem; color: var(--guinda); }
+  .qs details .ans { margin-top: .5rem; padding: .7rem 1rem; background: var(--white); border-left: 4px solid var(--guinda); border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: .93rem; line-height: 1.55; color: var(--ink-secondary); }
+
+  .cert { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.2rem 1.4rem; margin-bottom: 1rem; }
+  .cert .cn { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .cert .ct { font-size: 1.02rem; line-height: 1.6; margin: .3rem 0 .8rem; color: var(--ink); }
+  .cert .opt { display: block; width: 100%; text-align: left; background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: .7rem .95rem; margin-bottom: .45rem; font-size: .95rem; line-height: 1.5; cursor: pointer; font-family: var(--font-body); color: var(--ink); }
+  .cert .opt:hover:not(:disabled) { border-color: var(--guinda-rule); }
+  .cert .opt.good { border-color: #2e7d4f; background: #e9f7ee; }
+  .cert .opt.bad { border-color: #c0392b; background: #fdecec; }
+  .cert .exp { display: none; margin-top: .5rem; font-size: .9rem; line-height: 1.6; color: var(--ink-secondary); background: var(--white); border-left: 4px solid var(--guinda); padding: .7rem 1rem; border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+  .cert.done .exp { display: block; }
+
+  .req { background: var(--white); border: 2px dashed var(--guinda); border-radius: var(--radius-lg); padding: .9rem 1.2rem; margin: 1rem 0; }
+  .req .who { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .req p { margin: .3rem 0 0; font-size: .98rem; line-height: 1.55; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .two { grid-template-columns: 1fr; } }
+  .pb .tk { display: flex; gap: .7rem; align-items: flex-start; }
+  .pb .rk { flex: none; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--guinda); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-ui); font-weight: 700; font-size: .8rem; }
+  .col.lock { border-top: 4px solid var(--guinda); }
+  .col.free { border-top: 4px solid #e0a400; }
+  .col .sub { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); margin: -.3rem 0 .6rem; display: block; }
+
+  .notes { margin: .5rem 0 0; padding-left: 1.2rem; font-size: .93rem; line-height: 1.6; }
+  .story b { font-weight: 400; font-style: italic; }
+  .story .ttl { display: block; font-family: var(--font-ui); font-style: normal; font-weight: 700; font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-mid); margin-bottom: .25rem; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-wrap"><img src="imagen1.png" alt="Mixtle, mascota del IEDEP"></div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Daily Scrum — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<section class="class-hero">
+  <span class="class-label">Unidad 1 · Daily Scrum n.º 8 · 15 minutos</span>
+  <h1>Caso del sprint: de la entrevista a las historias</h1>
+  <span class="class-subtitle">Un caso breve para repasar cómo se capturan los requerimientos: entrevistas, épicas, historias de usuario y criterios de aceptación.</span>
+  <div class="meta-row">
+    <div class="meta-item">Programa educativo<span>Lic. en Sistemas Computacionales</span></div>
+    <div class="meta-item">Asignatura<span>Ingeniería de Software I</span></div>
+    <div class="meta-item">Fecha<span>Jueves 22 de octubre de 2026</span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <section class="section">
+    <h2 class="section-title">Contexto</h2>
+    <div class="concept-box">
+      <img class="support-logo" src="imagen2.png" alt="Mixtle, mascota de apoyo del IEDEP">
+      <span class="concept-title">El caso, con continuidad</span>
+      <p>Ayer la coordinadora académica pidió «compartir una tarea con un compañero» y la petición quedó en el Product Backlog. Hoy es el <strong>día 4 del sprint</strong>. El sprint sigue intacto, con sus 18 puntos, y el <strong>Product Owner</strong> aprovecha para entender mejor la petición: tuvo una <strong>entrevista de 20 minutos</strong> con la coordinadora y dos estudiantes que usarán la app.</p>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="n">4/10</div><span class="l">día del sprint</span></div>
+      <div class="kpi"><div class="n">18</div><span class="l">puntos del sprint, sin cambios</span></div>
+      <div class="kpi"><div class="n">1</div><span class="l">entrevista con usuarios</span></div>
+      <div class="kpi alt"><div class="n">3</div><span class="l">historias por redactar</span></div>
+    </div>
+
+    <div class="req">
+      <span class="who">Notas de la entrevista, tal como quedaron</span>
+      <ul class="notes">
+        <li>«Quiero que dos compañeros vean la misma tarea.»</li>
+        <li>«A veces solo quiero que la vean; otras, que también la editen.»</li>
+        <li>«Que a mi compañero le llegue un aviso cuando le comparto algo.»</li>
+      </ul>
+    </div>
+
+    <div class="epic"><strong>Épica</strong>Colaboración entre estudiantes</div>
+    <div class="board">
+      <div class="tk story"><span class="ttl">Historia 1</span><b>Como estudiante, quiero compartir una tarea con un compañero, para trabajar en equipo.</b><span class="st">Sin estimar.</span></div>
+      <div class="tk story"><span class="ttl">Historia 2</span><b>Como estudiante, quiero elegir si mi compañero solo ve la tarea o también la edita, para controlar los cambios.</b><span class="st">Sin estimar.</span></div>
+      <div class="tk story"><span class="ttl">Historia 3</span><b>Como estudiante, quiero recibir un aviso cuando me comparten una tarea, para enterarme a tiempo.</b><span class="st">Sin estimar.</span></div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Preguntas para la Daily</h2>
+    <p class="text-muted" style="margin-top:0">Se responden en voz alta, cada quien desde su rol. Al final de cada una se puede abrir la respuesta esperada.</p>
+    <ol class="qs">
+      <li><p class="qt">El Product Owner hizo una entrevista con usuarios. ¿Tenía que grabarla?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans"><strong>No es obligatorio.</strong> Scrum no exige grabar nada: lo importante es que lo recogido quede escrito como historias de usuario en el Product Backlog. Si se graba, se necesita el consentimiento de las personas entrevistadas.</div></details></li>
+      <li><p class="qt">Las notas son frases sueltas. ¿Cómo se convierten en algo que el equipo pueda trabajar?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">«Colaboración entre estudiantes» es una <strong>épica</strong>; se divide en <strong>historias de usuario</strong> con el formato «Como…, quiero…, para…», como las tres del caso.</div></details></li>
+      <li><p class="qt">Para la historia 1, escriban dos criterios de aceptación.</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">Ejemplos: <strong>el compañero ve la tarea en su propia lista</strong> y <strong>puedo dejar de compartirla cuando quiera</strong>. Son condiciones concretas que el Product Owner revisa para aceptar la historia.</div></details></li>
+      <li><p class="qt">Las tres historias están «sin estimar». ¿Quién las estima, cuándo y con qué técnica?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">Las estima el <strong>Scrum Team</strong>, no el Product Owner, con <strong>Planning Poker</strong>, antes de comprometerlas en un sprint. Se hace en la planeación, no a mitad del sprint en curso.</div></details></li>
+      <li><p class="qt">Si pudieran hacerle una sola pregunta más a la coordinadora para entender mejor la petición, ¿cuál sería y por qué?</p>
+        <details><summary>Ver nota</summary><div class="ans">Pregunta abierta. Pista: en Scrum las historias son breves a propósito y se aclaran <strong>conversando</strong> con el Product Owner, no con un documento cerrado.</div></details></li>
+    </ol>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Dos preguntas tipo certificación</h2>
+    <p class="text-muted" style="margin-top:0">Con el estilo y el vocabulario del examen Scrum Fundamentals Certified (SBOK®), basadas en el mismo caso.</p>
+    <div id="certBox"></div>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Unidad 1 · Daily Scrum n.º 8 · Jueves 22 de octubre de 2026</span>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
+  var QS = [
+    { q: 'Un Product Owner entrevista a los usuarios para entender una petición nueva. ¿Qué enunciado describe mejor cómo captura requerimientos un equipo Scrum?',
+      o: ['Los redacta en un documento exhaustivo que se firma antes de iniciar el proyecto.', 'Los expresa como historias de usuario en el Prioritized Product Backlog y los aclara mediante conversación continua con el Product Owner.', 'Graba obligatoriamente cada entrevista y la anexa como requerimiento oficial.', 'Los redacta el Scrum Master y el equipo los acepta sin discutirlos.'], c: 1,
+      e: 'En Scrum los requerimientos se capturan como historias de usuario dentro del Prioritized Product Backlog y se van aclarando conversando con el Product Owner. No se exige grabar entrevistas ni un documento cerrado al inicio.' },
+    { q: 'La historia «Compartir una tarea con un compañero» se aceptará cuando el compañero vea la tarea en su propia lista. Esa condición específica de la historia, que el Product Owner revisa, se llama:',
+      o: ['Criterios de aceptación (Acceptance Criteria).', 'Done Criteria, que se aplican igual a todas las historias del equipo.', 'Épica, porque agrupa varias historias.', 'Impedimento, porque bloquea el avance del equipo.'], c: 0,
+      e: 'Los Acceptance Criteria son las condiciones que debe cumplir una historia concreta para que el Product Owner la acepte. Los Done Criteria, en cambio, son la definición compartida de «terminado» y aplican a todo lo que entrega el equipo.' }
+  ];
+  var box = document.getElementById('certBox');
+  QS.forEach(function (it, qi) {
+    var wrap = document.createElement('div'); wrap.className = 'cert';
+    var n = document.createElement('div'); n.className = 'cn'; n.textContent = 'Pregunta de certificación ' + (qi + 1) + ' de ' + QS.length; wrap.appendChild(n);
+    var t = document.createElement('div'); t.className = 'ct'; t.textContent = it.q; wrap.appendChild(t);
+    var opts = shuffle(it.o.map(function (x, i) { return { t: x, ok: i === it.c }; })), btns = [];
+    opts.forEach(function (op) {
+      var b = document.createElement('button'); b.className = 'opt'; b.textContent = op.t; btns.push(b);
+      b.addEventListener('click', function () {
+        if (wrap.classList.contains('done')) return; wrap.classList.add('done');
+        btns.forEach(function (x, i) { x.disabled = true; if (opts[i].ok) x.classList.add('good'); });
+        if (!op.ok) b.classList.add('bad');
+      });
+      wrap.appendChild(b);
+    });
+    var e = document.createElement('div'); e.className = 'exp'; var s = document.createElement('strong'); s.textContent = 'Explicación: '; e.appendChild(s); e.appendChild(document.createTextNode(it.e)); wrap.appendChild(e);
+    box.appendChild(wrap);
+  });
+})();
+</script>
+</body>
+</html>
