@@ -1,0 +1,701 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clase 24 de octubre — Scrum Fundamentals en acción</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .support-logo { height: 62px; width: auto; float: right; margin-left: 1rem; }
+  figure svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+  h3 { font-family: var(--font-display); color: var(--guinda); margin: 1.6rem 0 .5rem; }
+  .text-sm { overflow-wrap: anywhere; }
+  @media (max-width: 500px) { td, th { padding: .5rem .5rem; } thead th { font-size: .68rem; letter-spacing: 0; } }
+  .btn { font-family: var(--font-ui); font-size: .85rem; font-weight: 600; background: var(--guinda); color: var(--white); border: 0; border-radius: var(--radius-md); padding: .55rem 1.1rem; cursor: pointer; }
+  .btn:hover { background: var(--guinda-dark); }
+  .btn.ghost { background: var(--white); color: var(--guinda); border: 1.5px solid var(--guinda); }
+
+  /* agenda */
+  .agenda { display: grid; grid-template-columns: repeat(2, 1fr); gap: .6rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .agenda { grid-template-columns: 1fr; } }
+  .ag { background: var(--off-white); border: 1px solid var(--border); border-left: 4px solid var(--guinda); border-radius: var(--radius-md); padding: .6rem .9rem; font-size: .92rem; line-height: 1.45; }
+  .ag b { display: block; font-family: var(--font-ui); font-size: .76rem; text-transform: uppercase; letter-spacing: .08em; color: var(--guinda-mid); }
+
+  /* tarjetas de repaso */
+  details.flash { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem 1.1rem; margin-bottom: .6rem; }
+  details.flash summary { cursor: pointer; font-weight: 600; line-height: 1.5; }
+  details.flash .tagd { display: inline-block; font-family: var(--font-ui); font-size: .7rem; font-weight: 700; letter-spacing: .08em; background: var(--guinda); color: var(--white); border-radius: 999px; padding: .1rem .6rem; margin-right: .5rem; }
+  details.flash .ans { margin-top: .6rem; padding: .7rem 1rem; background: var(--white); border-left: 4px solid var(--guinda); border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: .95rem; line-height: 1.6; color: var(--ink-secondary); }
+
+  /* camino de una petición */
+  .path { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin: 1rem 0; counter-reset: p; }
+  @media (max-width: 800px) { .path { grid-template-columns: repeat(2, 1fr); } }
+  .path .st { background: var(--white); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: .6rem .7rem; font-size: .86rem; line-height: 1.4; position: relative; text-align: center; }
+  .path .st b { display: block; color: var(--guinda-dark); font-family: var(--font-ui); font-size: .84rem; }
+  .path .st .dd { display: inline-block; margin-top: .3rem; background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: 0 .55rem; font-family: var(--font-ui); font-size: .7rem; font-weight: 700; color: var(--guinda-dark); }
+
+  /* pestañas */
+  .tabs { display: flex; flex-wrap: wrap; gap: .4rem; margin: .8rem 0; }
+  .tabs button { font-family: var(--font-ui); font-size: .82rem; font-weight: 600; background: var(--off-white); border: 1.5px solid var(--border-strong); border-radius: 999px; padding: .4rem .9rem; cursor: pointer; color: var(--ink-secondary); }
+  .tabs button.on { background: var(--guinda); color: var(--white); border-color: var(--guinda); }
+  .panel { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.3rem; }
+  .panel h4 { margin: 0 0 .3rem; font-family: var(--font-display); font-size: 1.25rem; color: var(--guinda); }
+  .panel .en { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .08em; }
+  .panel p { margin: .5rem 0; font-size: .96rem; line-height: 1.6; }
+  .panel .proj { background: var(--white); border-left: 4px solid var(--guinda-rule); padding: .55rem .9rem; border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: .92rem; }
+
+  /* caso VMfoods */
+  .case { background: var(--white); border: 2px dashed var(--guinda); border-radius: var(--radius-lg); padding: 1rem 1.3rem; margin: 1rem 0; }
+  .case .who { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .case p { margin: .4rem 0 0; font-size: .96rem; line-height: 1.6; }
+
+  /* pasos de la fase Iniciar */
+  .proc { display: grid; grid-template-columns: repeat(6, 1fr); gap: .4rem; margin: 1rem 0 .6rem; }
+  @media (max-width: 800px) { .proc { grid-template-columns: repeat(2, 1fr); } }
+  .proc button { font-family: var(--font-ui); font-size: .76rem; font-weight: 600; line-height: 1.3; background: var(--off-white); border: 1.5px solid var(--border-strong); border-radius: var(--radius-md); padding: .55rem .4rem; cursor: pointer; color: var(--ink-secondary); text-align: center; }
+  .proc button .n { display: block; font-size: 1.1rem; color: var(--guinda); font-weight: 700; }
+  .proc button.on { background: var(--guinda); color: var(--white); border-color: var(--guinda); }
+  .proc button.on .n { color: var(--white); }
+  .io { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-top: .6rem; }
+  @media (max-width: 700px) { .io { grid-template-columns: 1fr; } }
+  .io div { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: .6rem .8rem; font-size: .88rem; line-height: 1.5; }
+  .io b { display: block; font-family: var(--font-ui); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--guinda-mid); margin-bottom: .2rem; }
+
+  /* relacionar */
+  .match { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem 1.1rem; margin-bottom: .6rem; }
+  .match p { margin: 0 0 .5rem; font-size: .95rem; line-height: 1.55; }
+  .match select { font-family: var(--font-ui); font-size: .85rem; padding: .4rem .5rem; border: 1.5px solid var(--border-strong); border-radius: var(--radius-md); background: var(--white); max-width: 100%; }
+  .match .fb { font-family: var(--font-ui); font-size: .84rem; margin-top: .45rem; min-height: 1.2em; }
+  .match.ok { border-color: #2e7d4f; background: #e9f7ee; } .match.no { border-color: #c0392b; background: #fdecec; }
+  .match .fb.ok { color: #1f6b3d; } .match .fb.no { color: #a52a1f; }
+
+  /* simulador */
+  .sim { display: grid; grid-template-columns: 1fr 1.25fr; gap: 1rem; margin: 1rem 0; }
+  @media (max-width: 800px) { .sim { grid-template-columns: 1fr; } }
+  .box { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.2rem; }
+  .box h4 { margin: 0 0 .6rem; font-family: var(--font-ui); font-size: .78rem; letter-spacing: .1em; text-transform: uppercase; color: var(--guinda-dark); }
+  .row { display: flex; align-items: center; justify-content: space-between; gap: .8rem; margin-bottom: .6rem; font-size: .92rem; }
+  .row input[type=number] { width: 4.5rem; padding: .35rem .4rem; font-family: var(--font-ui); border: 1.5px solid var(--border-strong); border-radius: var(--radius-md); }
+  .row input[type=range] { flex: 1; accent-color: var(--guinda); }
+  .row .val { font-family: var(--font-ui); font-weight: 700; color: var(--guinda); min-width: 2.2rem; text-align: right; }
+  .big { background: var(--guinda); color: var(--white); border-radius: var(--radius-lg); padding: .7rem 1rem; text-align: center; margin: .6rem 0; }
+  .big .n { font-family: var(--font-display); font-size: 2rem; font-weight: 700; line-height: 1.1; }
+  .big .l { font-family: var(--font-ui); font-size: .76rem; opacity: .9; }
+  .status { font-family: var(--font-ui); font-size: .9rem; font-weight: 700; padding: .55rem .9rem; border-radius: var(--radius-md); margin-top: .6rem; }
+  .status.ok { background: #e9f7ee; color: #1f6b3d; border: 1px solid #2e7d4f; } .status.warn { background: #fff4d6; color: #7a5600; border: 1px solid #e0a400; } .status.bad { background: #fdecec; color: #a52a1f; border: 1px solid #c0392b; }
+
+  /* taller */
+  .wk { background: var(--off-white); border: 1px solid var(--border); border-left: 5px solid var(--guinda); border-radius: var(--radius-lg); padding: 1rem 1.3rem; margin-bottom: 1rem; }
+  .wk h4 { margin: 0 0 .2rem; font-family: var(--font-display); font-size: 1.25rem; color: var(--guinda); }
+  .wk .tag { font-family: var(--font-ui); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--guinda-mid); font-weight: 700; }
+  .wk label { display: block; font-family: var(--font-ui); font-size: .8rem; font-weight: 600; color: var(--ink-secondary); margin: .7rem 0 .2rem; }
+  .wk input[type=text], .wk textarea, .wk select { width: 100%; font-family: var(--font-body); font-size: .95rem; padding: .5rem .65rem; border: 1.5px solid var(--border-strong); border-radius: var(--radius-md); background: var(--white); color: var(--ink); box-sizing: border-box; }
+  .wk textarea { min-height: 3.2rem; resize: vertical; }
+  .wk .two { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; }
+  @media (max-width: 700px) { .wk .two { grid-template-columns: 1fr; } }
+  .wk .prev { margin-top: .8rem; background: var(--white); border: 1px dashed var(--guinda-rule); border-radius: var(--radius-md); padding: .6rem .9rem; font-size: .93rem; line-height: 1.55; font-style: italic; color: var(--ink-secondary); }
+  .story-in { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: .5rem .9rem .8rem; margin-top: .7rem; }
+  .story-in .sn { font-family: var(--font-ui); font-size: .76rem; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--guinda-mid); margin-top: .4rem; }
+  .dc { display: flex; flex-wrap: wrap; gap: .4rem .9rem; margin-top: .5rem; }
+  .dc label { display: flex; align-items: center; gap: .4rem; margin: 0; font-weight: 500; font-size: .88rem; }
+  .ficha { background: var(--white); border: 2px solid var(--guinda); border-radius: var(--radius-lg); padding: 1.1rem 1.4rem; font-size: .95rem; line-height: 1.6; }
+  .ficha h4 { margin: 0 0 .4rem; font-family: var(--font-display); font-size: 1.4rem; color: var(--guinda); }
+  .ficha .fl { font-family: var(--font-ui); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--guinda-mid); font-weight: 700; margin-top: .7rem; }
+  .ficha .ph { color: var(--ink-muted); font-style: italic; }
+  .ficha ol, .ficha ul { margin: .3rem 0 0 1.2rem; padding: 0; }
+  @media print { body.print-ficha .site-header, body.print-ficha .class-hero, body.print-ficha .site-footer, body.print-ficha .section:not(#sec-ficha) { display: none !important; } body.print-ficha #sec-ficha .btnrow { display: none; } }
+
+  /* simulacro */
+  .cert { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.2rem 1.4rem; margin-bottom: 1rem; }
+  .cert .cn { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .cert .ct { font-size: 1.02rem; line-height: 1.6; margin: .3rem 0 .8rem; color: var(--ink); }
+  .cert .opt { display: block; width: 100%; text-align: left; background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: .7rem .95rem; margin-bottom: .45rem; font-size: .95rem; line-height: 1.5; cursor: pointer; font-family: var(--font-body); color: var(--ink); }
+  .cert .opt:hover:not(:disabled) { border-color: var(--guinda-rule); }
+  .cert .opt.good { border-color: #2e7d4f; background: #e9f7ee; }
+  .cert .opt.bad { border-color: #c0392b; background: #fdecec; }
+  .cert .exp { display: none; margin-top: .5rem; font-size: .9rem; line-height: 1.6; color: var(--ink-secondary); background: var(--white); border-left: 4px solid var(--guinda); padding: .7rem 1rem; border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+  .cert.done .exp { display: block; }
+  .scorebar { position: sticky; top: 0; z-index: 5; background: var(--guinda); color: var(--white); font-family: var(--font-ui); font-size: .85rem; border-radius: var(--radius-md); padding: .5rem 1rem; margin: .8rem 0; display: flex; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .result { display: none; background: var(--guinda-light); border: 2px solid var(--guinda); border-radius: var(--radius-lg); padding: 1.1rem 1.4rem; margin-top: 1rem; text-align: center; }
+  .result.show { display: block; }
+  .result .n { font-family: var(--font-display); font-size: 2.6rem; color: var(--guinda); font-weight: 700; line-height: 1.1; }
+  .tipo { display: inline-block; font-family: var(--font-ui); font-size: .68rem; font-weight: 700; letter-spacing: .08em; background: var(--guinda-light); color: var(--guinda-dark); border: 1px solid #D8A8BA; border-radius: 999px; padding: 0 .5rem; margin-left: .4rem; text-transform: none; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-wrap"><img src="imagen1.png" alt="Mixtle, mascota del IEDEP"></div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Material de clase — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<section class="class-hero">
+  <span class="class-label">Unidad 1 · Preparación para la certificación Scrum Fundamentals · Clase interactiva</span>
+  <h1>Scrum Fundamentals en acción: de la teoría a tu proyecto integrador</h1>
+  <span class="class-subtitle">Repasamos lo vivido en las Dailies, completamos el Tema 1 con las métricas de agilidad y llevamos todo a nuestro propio proyecto, con un simulacro de preguntas estilo SFC.</span>
+  <div class="meta-row">
+    <div class="meta-item">Asignatura<span>Ingeniería de Software I</span></div>
+    <div class="meta-item">Tema<span>1.4 Métricas de agilidad y repaso integrador SFC</span></div>
+    <div class="meta-item">Fecha<span>Sábado 24 de octubre de 2026</span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <section class="section">
+    <h2 class="section-title">Datos generales</h2>
+    <table>
+      <tbody>
+        <tr><td><strong>Programa educativo</strong></td><td>Licenciatura en Sistemas Computacionales</td></tr>
+        <tr><td><strong>Asignatura</strong></td><td>Ingeniería de Software I</td></tr>
+        <tr><td><strong>Unidad</strong></td><td>1. Metodologías Ágiles y Gestión de Tareas</td></tr>
+        <tr><td><strong>Tema</strong></td><td>1.4 Métricas de agilidad (burndown y velocidad del equipo), con repaso integrador y aplicación al proyecto integrador</td></tr>
+        <tr><td><strong>Fecha</strong></td><td>Sábado 24 de octubre de 2026</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Competencias a desarrollar</h2>
+    <div class="competency-card"><span class="comp-num">01</span><span class="comp-text"><strong>Relacionar</strong> los seis principios de Scrum del SBOK® con situaciones reales del trabajo en equipo.</span></div>
+    <div class="competency-card"><span class="comp-num">02</span><span class="comp-text"><strong>Ubicar</strong> los procesos de la fase Iniciar en un caso (VMfoods) e identificar sus elementos obligatorios.</span></div>
+    <div class="competency-card"><span class="comp-num">03</span><span class="comp-text"><strong>Interpretar</strong> el burndown y la velocidad del equipo para decidir cuánto comprometer y detectar retrasos.</span></div>
+    <div class="competency-card"><span class="comp-num">04</span><span class="comp-text"><strong>Aplicar</strong> visión, roles, épica, historias, criterios de aceptación, priorización y criterios de Hecho al proyecto integrador.</span></div>
+    <div class="competency-card"><span class="comp-num">05</span><span class="comp-text"><strong>Resolver</strong> preguntas con el estilo y el vocabulario del examen Scrum Fundamentals Certified (SFC).</span></div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Mapa de la sesión</h2>
+    <p>Hoy no hay teoría nueva por acumular: hay teoría por <strong>conectar y usar</strong>. Cada bloque termina en algo que se hace con las manos. Los tiempos son sugeridos y se pueden ajustar.</p>
+    <div class="agenda">
+      <div class="ag"><b>Bloque 1 · 15 min</b><span>Lo que construimos esta semana (Dailies 3, 6, 7 y 8)</span></div>
+      <div class="ag"><b>Bloque 2 · 25 min</b><span>Los seis principios de Scrum según el SBOK®</span></div>
+      <div class="ag"><b>Bloque 3 · 30 min</b><span>Caso VMfoods y la fase Iniciar</span></div>
+      <div class="ag"><b>Bloque 4 · 20 min</b><span>Métricas de agilidad: velocidad y burndown</span></div>
+      <div class="ag"><b>Bloque 5 · 40 min</b><span>Taller: Scrum en nuestro proyecto integrador</span></div>
+      <div class="ag"><b>Bloque 6 · 25 min</b><span>Simulacro: 10 preguntas estilo certificación</span></div>
+      <div class="ag"><b>Cierre · 5 min</b><span>Conclusión y tarea</span></div>
+      <div class="ag"><b>Meta</b><span>Scrum Fundamentals Certified (SFC)</span></div>
+    </div>
+    <div class="concept-box">
+      <img class="support-logo" src="imagen2.png" alt="Mixtle, mascota de apoyo del IEDEP">
+      <span class="concept-title">Recordatorio: el examen SFC</span>
+      <p>Tiene <strong>40 preguntas de opción múltiple</strong>, dura <strong>60 minutos</strong> y se aprueba con <strong>30 respuestas correctas</strong> (75 %). Se basa en el <strong>SBOK® Guide</strong>. Las preguntas de hoy usan ese vocabulario.</p>
+    </div>
+  </section>
+
+  <!-- ===== BLOQUE 1 ===== -->
+  <section class="section">
+    <h2 class="section-title">Bloque 1 · Lo que construimos esta semana</h2>
+    <p>En las Dailies fuimos armando, sin darnos cuenta, el camino completo de una petición: desde que alguien la pide hasta que se entrega. Mira el recorrido y luego pon a prueba tu memoria.</p>
+    <div class="path">
+      <div class="st"><b>Un interesado pide algo</b>Stakeholder<br><span class="dd">Daily 7</span></div>
+      <div class="st"><b>Entrevista con usuarios</b>El Product Owner conversa<br><span class="dd">Daily 8</span></div>
+      <div class="st"><b>Épica e historias</b>Con criterios de aceptación<br><span class="dd">Daily 8</span></div>
+      <div class="st"><b>Product Backlog priorizado</b>Lo ordena el Product Owner<br><span class="dd">Daily 7</span></div>
+      <div class="st"><b>Sprint Planning</b>Se compromete lo que cabe<br><span class="dd">Daily 7</span></div>
+      <div class="st"><b>Sprint en marcha</b>Daily y burndown<br><span class="dd">Daily 6</span></div>
+      <div class="st"><b>Incremento terminado</b>Solo si cumple los Done Criteria<br><span class="dd">Daily 6</span></div>
+      <div class="st"><b>Sprint Review y Retro</b>Se muestra y se mejora<br><span class="dd">Daily 3 y 6</span></div>
+    </div>
+
+    <p>Ahora, antes de abrir cada tarjeta, responde en voz alta.</p>
+    <details class="flash"><summary><span class="tagd">DAILY 3</span>¿Por qué Scrum sigue siendo importante hoy en el desarrollo de software?</summary><div class="ans">Porque entrega valor en ciclos cortos y permite adaptarse al cambio con rapidez. Por eso empresas como las que revisamos en esa Daily lo han adoptado.</div></details>
+    <details class="flash"><summary><span class="tagd">DAILY 6</span>Una historia está programada pero sin probar. ¿Se muestra como terminada? ¿Y qué pasa si el burndown real queda por encima de la línea ideal?</summary><div class="ans">No se muestra como terminada hasta cumplir todos los <strong>Done Criteria</strong>. Y si la línea real queda por encima de la ideal, el equipo va atrasado: se trata en la Daily y el Scrum Master ayuda a quitar impedimentos.</div></details>
+    <details class="flash"><summary><span class="tagd">DAILY 7</span>Llega una petición urgente a mitad del sprint. ¿Dónde se registra, quién la prioriza y cuándo se considera?</summary><div class="ans">Se registra en el <strong>Product Backlog</strong>, la prioriza el <strong>Product Owner</strong> según el valor y se considera, por regla general, en el siguiente Sprint Planning. Quien la pidió es un <strong>Stakeholder</strong>: influye, pero no forma parte del Core Team.</div></details>
+    <details class="flash"><summary><span class="tagd">DAILY 8</span>¿Cómo se convierten las notas de una entrevista en trabajo para el equipo? ¿Hay que grabarla?</summary><div class="ans">Se redactan como <strong>épicas e historias de usuario</strong> («Como…, quiero…, para…») con criterios de aceptación. Grabar no es obligatorio; lo importante es que quede escrito en el backlog.</div></details>
+  </section>
+
+  <!-- ===== BLOQUE 2 ===== -->
+  <section class="section">
+    <h2 class="section-title">Bloque 2 · Los seis principios de Scrum</h2>
+    <p>Piensa en los principios como las reglas de convivencia de una casa: los procesos y las herramientas pueden cambiar de una casa a otra, pero estas reglas no se negocian. El SBOK® establece que los <strong>seis principios son obligatorios</strong> y deben aplicarse tal como se especifican, mientras que los aspectos y los procesos se pueden adaptar al proyecto. Explora uno por uno.</p>
+    <div class="tabs" id="prTabs"></div>
+    <div class="panel" id="prPanel"></div>
+
+    <h3>Entrega basada en valor frente a gestión tradicional</h3>
+    <p>Esta comparación aparece con frecuencia en el examen. Fíjate en la palabra clave de cada fila.</p>
+    <table>
+      <thead><tr><th>Aspecto</th><th>Scrum (entrega basada en valor)</th><th>Gestión tradicional</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Requerimientos</strong></td><td>Se priorizan por valor de negocio y se actualizan con regularidad</td><td>Se fijan en el plan del proyecto</td></tr>
+        <tr><td><strong>Cómo se mide el desempeño</strong></td><td>Por el valor de negocio entregado</td><td>Por la conformidad con el plan</td></tr>
+        <tr><td><strong>Retorno de la inversión</strong></td><td>Desde el inicio y a lo largo del proyecto</td><td>Al final del proyecto</td></tr>
+      </tbody>
+    </table>
+    <div class="callout note"><p><strong>Para el examen:</strong> cuando una opción diga «en ambos…», sospecha. Casi siempre una de las dos formas de trabajar no lo hace.</p></div>
+  </section>
+
+  <!-- ===== BLOQUE 3 ===== -->
+  <section class="section">
+    <h2 class="section-title">Bloque 3 · Caso VMfoods y la fase Iniciar</h2>
+    <p>La fase <strong>Iniciar</strong> (Initiate) del SBOK reúne seis procesos: es el «antes de empezar a construir» y responde a las preguntas: ¿para qué?, ¿quién?, ¿qué y en qué orden? Lo vamos a ver con un caso.</p>
+    <div class="case">
+      <span class="who">Caso: VMfoods</span>
+      <p>VMfoods es una cadena nacional de supermercados con 10 sucursales. La gerencia observó que sus clientes llevan un estilo de vida muy agitado y no viajan largas distancias para hacer sus compras. Como las compras en el supermercado no son un proceso muy complicado, y VMfoods siempre ofrece productos de alta calidad, considera que la mejor forma de aumentar su cuota de mercado es hacer <strong>entregas a domicilio</strong>.</p>
+      <p>Usted es la persona encargada de tecnologías de la información y la alta gerencia le pidió a su equipo que desarrolle un <strong>sitio web para que los clientes preparen y paguen su pedido en línea</strong>. El equipo tecnológico tiene 18 personas y trabaja en <strong>dos equipos Scrum de 9 personas cada uno</strong>. Usted forma parte del Equipo Scrum 1.</p>
+    </div>
+
+    <h3>Los seis procesos de la fase Iniciar</h3>
+    <p>Toca cada proceso para ver sus elementos <strong>obligatorios</strong> (los marcados con asterisco en el SBOK) y cómo se vería en VMfoods.</p>
+    <div class="proc" id="procBtns"></div>
+    <div class="panel" id="procPanel"></div>
+    <div class="callout note"><p><strong>Recomendación para el estudio:</strong> los elementos obligatorios siguen la estructura de procesos del SBOK. Confirma cada uno en tu ejemplar de la quinta edición antes del examen.</p></div>
+
+    <h3>Reto: ¿en qué proceso estamos?</h3>
+    <p>Lee cada situación de VMfoods y elige el proceso que corresponde. Recibirás respuesta al instante.</p>
+    <div id="matchBox"></div>
+  </section>
+
+  <!-- ===== BLOQUE 4 ===== -->
+  <section class="section">
+    <h2 class="section-title">Bloque 4 · Métricas de agilidad: velocidad y burndown</h2>
+    <p>Dos números responden dos preguntas muy distintas. La <strong>velocidad</strong> contesta «¿cuánto suele terminar este equipo en un sprint?» y sirve para <em>planear</em>. El <strong>burndown</strong> contesta «¿cómo vamos dentro de este sprint?» y sirve para <em>dar seguimiento</em>. Piensa en un viaje en carretera: la velocidad es lo que normalmente recorres por día; el burndown es el mapa que te muestra si vas a tiempo hoy.</p>
+    <p>En el SBOK, la velocidad del sprint anterior es una <strong>entrada</strong> para crear el Sprint Backlog, y el Sprint Burndown Chart se <strong>actualiza durante la Daily Standup</strong>. Juega con los controles.</p>
+
+    <div class="sim">
+      <div class="box">
+        <h4>1 · Velocidad del equipo</h4>
+        <div class="row"><span>Sprint 1: puntos terminados</span><input type="number" id="v1" min="0" max="60" value="18"></div>
+        <div class="row"><span>Sprint 2: puntos terminados</span><input type="number" id="v2" min="0" max="60" value="22"></div>
+        <div class="row"><span>Sprint 3: puntos terminados</span><input type="number" id="v3" min="0" max="60" value="20"></div>
+        <div class="row"><span>Puntos que faltan en el Product Backlog</span><input type="number" id="vb" min="1" max="500" value="100"></div>
+        <div class="big"><div class="n" id="vAvg">20</div><div class="l">velocidad promedio (puntos por sprint)</div></div>
+        <div class="big" style="background:#8a3a74"><div class="n" id="vSpr">5</div><div class="l">sprints estimados para terminar el backlog</div></div>
+      </div>
+      <div class="box">
+        <h4>2 · Burndown del sprint en curso</h4>
+        <div class="row"><span>Puntos comprometidos</span><input type="range" id="bc" min="8" max="30" value="16"><span class="val" id="bcV">16</span></div>
+        <div class="row"><span>Día del sprint (de 10)</span><input type="range" id="bd" min="0" max="10" value="6"><span class="val" id="bdV">6</span></div>
+        <div class="row"><span>Puntos terminados</span><input type="range" id="bp" min="0" max="30" value="5"><span class="val" id="bpV">5</span></div>
+        <figure style="margin:.4rem 0 0">
+          <svg viewBox="0 0 640 260" role="img" aria-label="Burndown del sprint: línea ideal y punto real según los controles">
+            <rect width="640" height="260" rx="10" fill="#FAFAFA"/>
+            <g font-family="Inter,sans-serif" font-size="17" fill="#8C7880" id="bdAxes"></g>
+            <line id="bdIdeal" x1="50" y1="20" x2="610" y2="210" stroke="#8C7880" stroke-width="2" stroke-dasharray="6 5"/>
+            <polyline id="bdReal" fill="none" stroke="#C85070" stroke-width="2.5" points=""/>
+            <circle id="bdIdealPt" r="6" fill="#8C7880"/>
+            <circle id="bdRealPt" r="7" fill="#C85070"/>
+            <g font-family="Inter,sans-serif" font-size="18"><text id="bdTxtReal" fill="#C85070" font-weight="700"></text><text id="bdTxtIdeal" fill="#5C4850"></text></g>
+          </svg>
+        </figure>
+        <div class="status" id="bdStatus"></div>
+      </div>
+    </div>
+    <div class="callout"><p><strong>Idea clave:</strong> la velocidad no es una meta para presionar al equipo, sino una referencia para comprometer lo que realmente cabe. Si el equipo termina 20 puntos en promedio, comprometer 40 solo produce un burndown rojo desde el segundo día.</p></div>
+  </section>
+
+  <!-- ===== BLOQUE 5 ===== -->
+  <section class="section">
+    <h2 class="section-title">Bloque 5 · Taller: Scrum en nuestro proyecto integrador</h2>
+    <p>Hasta ahora practicamos con casos. Ahora usamos exactamente las mismas piezas con el <strong>proyecto integrador</strong> que el equipo lleva desarrollando desde el cuatrimestre anterior. Cada paso corresponde a un proceso del SBOK. Al final se arma sola una <strong>ficha del proyecto</strong> que pueden copiar a Jira.</p>
+    <div class="callout note"><p>Esta página no guarda lo que escriben: al cerrarla o recargarla se pierde. Antes de salir, copien la ficha.</p></div>
+
+    <div class="wk">
+      <span class="tag">Paso 1 · Create Project Vision</span>
+      <h4>La visión del proyecto</h4>
+      <label for="w_name">Nombre del proyecto</label><input type="text" id="w_name" placeholder="Nombre de su proyecto integrador">
+      <div class="two">
+        <div><label for="w_users">¿Para quién es? (usuarios)</label><input type="text" id="w_users" placeholder="los usuarios principales"></div>
+        <div><label for="w_need">¿Qué necesidad o problema resuelve?</label><input type="text" id="w_need" placeholder="lo que hoy les cuesta o les falta"></div>
+      </div>
+      <label for="w_benefit">¿Qué valor les entrega?</label><input type="text" id="w_benefit" placeholder="el beneficio principal">
+      <div class="prev" id="visPrev"></div>
+    </div>
+
+    <div class="wk">
+      <span class="tag">Pasos 2 y 3 · Identify Scrum Master and Stakeholder(s) · Form Scrum Team</span>
+      <h4>Roles y personas interesadas</h4>
+      <div class="two">
+        <div><label for="w_po">Product Owner</label><input type="text" id="w_po"></div>
+        <div><label for="w_sm">Scrum Master</label><input type="text" id="w_sm"></div>
+      </div>
+      <label for="w_team">Scrum Team (integrantes)</label><input type="text" id="w_team" placeholder="nombres separados por comas">
+      <label for="w_stake">Stakeholders (quién usa, paga o se ve afectado, pero no está en el Core Team)</label><input type="text" id="w_stake" placeholder="clientes, usuarios, docentes, coordinación…">
+    </div>
+
+    <div class="wk">
+      <span class="tag">Pasos 4 y 5 · Develop Epic(s) · Create Prioritized Product Backlog</span>
+      <h4>Épica, historias y prioridad</h4>
+      <label for="w_epic">Épica (la gran meta que se dividirá)</label><input type="text" id="w_epic" placeholder="por ejemplo: «Gestión de pedidos»">
+      
+      <div class="story-in">
+        <div class="sn">Historia 1</div>
+        <div class="two">
+          <div><label for="s1_role">Como… (rol)</label><input type="text" id="s1_role" placeholder="estudiante, docente, cliente…"></div>
+          <div><label for="s1_goal">Quiero… (meta)</label><input type="text" id="s1_goal" placeholder="lo que necesita hacer"></div>
+        </div>
+        <label for="s1_why">Para… (beneficio)</label><input type="text" id="s1_why" placeholder="el valor que obtiene">
+        <label for="s1_acc">Criterio de aceptación</label><input type="text" id="s1_acc" placeholder="condición concreta que el Product Owner revisará">
+        <div class="two">
+          <div><label for="s1_pts">Puntos de historia (Planning Poker)</label><select id="s1_pts"><option value="">Sin estimar</option><option>1</option><option>2</option><option>3</option><option>5</option><option>8</option><option>13</option></select></div>
+          <div><label for="s1_mos">Prioridad MoSCoW</label><select id="s1_mos"><option value="">Sin definir</option><option value="M">Must (debe tener)</option><option value="S">Should (debería tener)</option><option value="C">Could (podría tener)</option><option value="W">Won't (no por ahora)</option></select></div>
+        </div>
+      </div>
+      <div class="story-in">
+        <div class="sn">Historia 2</div>
+        <div class="two">
+          <div><label for="s2_role">Como… (rol)</label><input type="text" id="s2_role" placeholder="estudiante, docente, cliente…"></div>
+          <div><label for="s2_goal">Quiero… (meta)</label><input type="text" id="s2_goal" placeholder="lo que necesita hacer"></div>
+        </div>
+        <label for="s2_why">Para… (beneficio)</label><input type="text" id="s2_why" placeholder="el valor que obtiene">
+        <label for="s2_acc">Criterio de aceptación</label><input type="text" id="s2_acc" placeholder="condición concreta que el Product Owner revisará">
+        <div class="two">
+          <div><label for="s2_pts">Puntos de historia (Planning Poker)</label><select id="s2_pts"><option value="">Sin estimar</option><option>1</option><option>2</option><option>3</option><option>5</option><option>8</option><option>13</option></select></div>
+          <div><label for="s2_mos">Prioridad MoSCoW</label><select id="s2_mos"><option value="">Sin definir</option><option value="M">Must (debe tener)</option><option value="S">Should (debería tener)</option><option value="C">Could (podría tener)</option><option value="W">Won't (no por ahora)</option></select></div>
+        </div>
+      </div>
+      <div class="story-in">
+        <div class="sn">Historia 3</div>
+        <div class="two">
+          <div><label for="s3_role">Como… (rol)</label><input type="text" id="s3_role" placeholder="estudiante, docente, cliente…"></div>
+          <div><label for="s3_goal">Quiero… (meta)</label><input type="text" id="s3_goal" placeholder="lo que necesita hacer"></div>
+        </div>
+        <label for="s3_why">Para… (beneficio)</label><input type="text" id="s3_why" placeholder="el valor que obtiene">
+        <label for="s3_acc">Criterio de aceptación</label><input type="text" id="s3_acc" placeholder="condición concreta que el Product Owner revisará">
+        <div class="two">
+          <div><label for="s3_pts">Puntos de historia (Planning Poker)</label><select id="s3_pts"><option value="">Sin estimar</option><option>1</option><option>2</option><option>3</option><option>5</option><option>8</option><option>13</option></select></div>
+          <div><label for="s3_mos">Prioridad MoSCoW</label><select id="s3_mos"><option value="">Sin definir</option><option value="M">Must (debe tener)</option><option value="S">Should (debería tener)</option><option value="C">Could (podría tener)</option><option value="W">Won't (no por ahora)</option></select></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="wk">
+      <span class="tag">Paso 5 · Done Criteria</span>
+      <h4>¿Cuándo está «terminado»?</h4>
+      <p class="text-sm" style="margin:.2rem 0">Marquen lo que acuerdan que debe cumplir <strong>cualquier</strong> historia para darse por terminada.</p>
+      <div class="dc"><label><input type="checkbox" class="dcb" value="Código revisado por otro integrante"> Código revisado por otro integrante</label><label><input type="checkbox" class="dcb" value="Pruebas realizadas y sin errores"> Pruebas realizadas y sin errores</label><label><input type="checkbox" class="dcb" value="Criterios de aceptación cumplidos"> Criterios de aceptación cumplidos</label><label><input type="checkbox" class="dcb" value="Subido al repositorio"> Subido al repositorio</label><label><input type="checkbox" class="dcb" value="Probado en el dispositivo de un usuario"> Probado en el dispositivo de un usuario</label></div>
+      <label for="w_dcx">Otro criterio propio (opcional)</label><input type="text" id="w_dcx">
+    </div>
+
+    <div class="wk">
+      <span class="tag">Paso 6 · Conduct Release Planning</span>
+      <h4>¿Cuánto cabe en un sprint?</h4>
+      <div class="two">
+        <div><label for="w_vel">Velocidad estimada del equipo (puntos por sprint)</label><input type="text" id="w_vel" value="20" inputmode="numeric"></div>
+        <div><label for="w_len">Duración del sprint</label><select id="w_len"><option>1 semana</option><option selected>2 semanas</option><option>3 semanas</option></select></div>
+      </div>
+    </div>
+
+    <h3>Ficha del proyecto</h3>
+    <div class="ficha" id="ficha"></div>
+    <div class="btnrow" style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:.8rem">
+      <button class="btn" id="btnCopy" type="button">Copiar ficha</button>
+      <button class="btn ghost" id="btnPrint" type="button">Imprimir o guardar como PDF</button>
+      <span class="text-sm text-muted" id="copyFb" style="align-self:center"></span>
+    </div>
+  </section>
+
+  <!-- ===== BLOQUE 6 ===== -->
+  <section class="section" id="sec-sim">
+    <h2 class="section-title">Bloque 6 · Simulacro de certificación</h2>
+    <p>Diez preguntas con el estilo y el vocabulario del examen SFC. Las tres primeras usan el caso VMfoods; las demás integran el principio, la métrica o la Daily de la semana. Responde sin ayuda y revisa la explicación.</p>
+    <div class="scorebar"><span id="scProg">Respondidas: 0 de 10</span><span id="scOk">Aciertos: 0</span></div>
+    <div id="simBox"></div>
+    <div class="result" id="simRes">
+      <div class="n" id="simN"></div>
+      <p id="simMsg" style="margin:.4rem 0 .8rem"></p>
+      <button class="btn" id="simAgain" type="button">Intentar de nuevo</button>
+    </div>
+    <div class="callout note"><p><strong>Referencia:</strong> el examen real exige 30 de 40 (75 %). Aquí, 8 de 10 equivale a esa meta. Algunas preguntas se adaptaron de ejercicios de práctica; verifica los términos en tu ejemplar del SBOK® Guide.</p></div>
+  </section>
+
+  <!-- ===== CIERRE ===== -->
+  <section class="section">
+    <h2 class="section-title">Conclusión</h2>
+    <p>Hoy unimos las piezas: una petición nace en un <strong>Stakeholder</strong>, se aclara en una entrevista, se escribe como <strong>épica e historias</strong>, el <strong>Product Owner</strong> la ordena por valor, el equipo compromete lo que su <strong>velocidad</strong> permite, vigila el avance con el <strong>burndown</strong> y solo muestra como terminado lo que cumple los <strong>Done Criteria</strong>. Los <strong>seis principios</strong> sostienen todo el recorrido. Lo importante es que ya no son definiciones sueltas: son decisiones que ustedes toman en su propio proyecto.</p>
+    <div class="callout"><p><strong>Tarea:</strong> (1) lleven la ficha del proyecto a Jira: creen la épica y las tres historias con su criterio de aceptación; (2) vuelvan a resolver las preguntas del simulacro que fallaron y expliquen en una frase por qué la correcta lo es; (3) lleguen a la próxima sesión con su velocidad estimada y una duda sobre los procesos de la fase Iniciar.</p></div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Referencias bibliográficas</h2>
+    <p class="text-sm">SCRUMstudy. (s. f.). <em>A Guide to the Scrum Body of Knowledge (SBOK® Guide)</em> (5.ª ed.). VMEdu, Inc.</p>
+    <p class="text-sm">SCRUMstudy. (s. f.). <em>Scrum Fundamentals Certified (SFC)</em>. https://www.scrumstudy.com/certification/scrum-fundamentals-certified</p>
+    <p class="text-sm">European Scrum. (2024). <em>Guía Metodologías Agile 2024</em> (v.1.0). https://www.europeanscrum.org/uploads/2/4/5/1/24513648/gui%CC%81a_metodologi%CC%81as_agile_2024.v1.0_-_europeanscrum.org.pdf</p>
+    <p class="text-sm">Project Management Institute, Agile Alliance. (2017). <em>Guía práctica de ágil</em>. Project Management Institute, Inc.</p>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Unidad 1 · Tema 1.4 y repaso SFC · Sábado 24 de octubre de 2026</span>
+</footer>
+<script>
+(function () {
+  'use strict';
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function num(id, d) { var v = parseFloat($(id).value); return isNaN(v) ? d : v; }
+
+  /* ---------- Bloque 2: principios ---------- */
+  var PR = [
+    { n: 'Empirical Process Control', es: 'Control empírico del proceso',
+      d: 'Es la filosofía central de Scrum: se decide con base en lo observado y no en suposiciones. Se apoya en tres ideas: <strong>transparencia, inspección y adaptación</strong>.',
+      p: 'El tablero en Jira es visible para todos (transparencia), se revisa en cada Daily y Sprint Review (inspección) y se corrige el rumbo en la Retrospectiva (adaptación).' },
+    { n: 'Self-organization', es: 'Autoorganización',
+      d: 'Las personas rinden más cuando asumen la responsabilidad de su trabajo. Sus resultados son el <strong>compromiso del equipo, la propiedad colectiva del trabajo, un ambiente más innovador y creativo</strong> y la entrega de resultados tangibles. El estilo de liderazgo que la acompaña es de apoyo, no de mando.',
+      p: 'Nadie les asigna tareas una por una: en la Sprint Planning el propio equipo decide cómo repartirse el trabajo y se hace responsable del resultado completo, no de «su parte».' },
+    { n: 'Collaboration', es: 'Colaboración',
+      d: 'El equipo central (Product Owner, Scrum Master y Scrum Team) trabaja de forma continua con los interesados. Tiene tres elementos: <strong>conciencia, articulación y apropiación</strong>. La <strong>coubicación</strong> la favorece: las preguntas se responden rápido, los problemas se resuelven en el momento, hay menos fricción entre las interacciones y la confianza se gana más rápido.',
+      p: 'Hablar con el Product Owner en cuanto surge una duda, en lugar de esperar al final del sprint, es colaboración.' },
+    { n: 'Value-based Prioritization', es: 'Priorización basada en valor',
+      d: 'Se busca entregar el <strong>máximo valor de negocio en el menor tiempo posible</strong>. El Product Owner ordena las historias del Prioritized Product Backlog considerando el <strong>valor, el riesgo o la incertidumbre y las dependencias</strong>.',
+      p: 'Si una historia es muy valiosa pero depende de otra, primero se resuelve la dependencia. Por eso el orden no es el de «quién lo pidió primero».' },
+    { n: 'Time-boxing', es: 'Cajas de tiempo',
+      d: 'El tiempo es una restricción limitante: cada proceso y reunión tiene una duración fija (el sprint, la Daily de unos 15 minutos, la Planning, la Review). Así se maneja la carga de trabajo y se evita el perfeccionismo sin fin.',
+      p: 'Si la Daily dura 40 minutos, ya no es una Daily: los temas largos se llevan a otra conversación aparte.' },
+    { n: 'Iterative Development', es: 'Desarrollo iterativo',
+      d: 'El producto se construye en ciclos repetidos. Las épicas se dividen en historias de usuario más pequeñas, de modo que el equipo pueda aprender y corregir sobre la marcha, y el cliente reciba valor en cada iteración.',
+      p: 'En lugar de entregar «todo el sitio» al final, se entrega primero «armar un pedido», después «pagarlo» y luego «repetir un pedido».' }
+  ];
+  var prT = $('prTabs'), prP = $('prPanel');
+  function showPr(i) {
+    var p = PR[i];
+    prP.innerHTML = '<span class="en">' + esc(p.es) + '</span><h4>' + esc(p.n) + '</h4><p>' + p.d + '</p><div class="proj"><strong>En nuestro proyecto:</strong> ' + p.p + '</div>';
+    Array.prototype.forEach.call(prT.children, function (b, k) { b.classList.toggle('on', k === i); });
+  }
+  PR.forEach(function (p, i) { var b = document.createElement('button'); b.type = 'button'; b.textContent = p.n; b.addEventListener('click', function () { showPr(i); }); prT.appendChild(b); });
+  showPr(0);
+
+  /* ---------- Bloque 3: fase Iniciar ---------- */
+  var PROC = [
+    { n: 'Create Project Vision', es: 'Crear la visión del proyecto',
+      e: ['Project Business Case (caso de negocio del proyecto)'], h: ['Project Vision Meeting (reunión de visión)'], s: ['Project Vision Statement (declaración de visión)', 'Product Owner identificado'],
+      v: 'El caso de negocio es aumentar la cuota de mercado con entregas a domicilio. De la reunión de visión sale una declaración como «los clientes ocupados reciben compras de calidad en su puerta» y se identifica al Product Owner.' },
+    { n: 'Identify Scrum Master and Stakeholder(s)', es: 'Identificar al Scrum Master y a los interesados',
+      e: ['Product Owner', 'Project Vision Statement'], h: ['Selection Criteria (criterios de selección)'], s: ['Scrum Master identificado', 'Stakeholder(s) identificados'],
+      v: 'Se elige con criterios (experiencia, disponibilidad) a quien guiará al Equipo Scrum 1 y se identifica a gerencia, clientes y usuarios del sitio web.' },
+    { n: 'Form Scrum Team', es: 'Formar el equipo Scrum',
+      e: ['Product Owner', 'Scrum Master', 'Project Vision Statement'], h: ['Scrum Team Selection (selección del equipo)'], s: ['Scrum Team identificado'],
+      v: 'Se forman los equipos de 9 personas con las habilidades necesarias: diseño, desarrollo, pruebas y bases de datos.' },
+    { n: 'Develop Epic(s)', es: 'Desarrollar las épicas',
+      e: ['Scrum Core Team (equipo central)', 'Project Vision Statement'], h: ['User Group Meetings (reuniones con grupos de usuarios)'], s: ['Epic(s) (épicas)', 'Personas'],
+      v: 'Reuniones con grupos de clientes: surge la épica «Armar y pagar un pedido en línea» y una persona como «la mamá que compra entre juntas de trabajo».' },
+    { n: 'Create Prioritized Product Backlog', es: 'Crear el Product Backlog priorizado',
+      e: ['Scrum Core Team', 'Epic(s)', 'Personas'], h: ['User Story Prioritization Methods: MoSCoW, comparación por pares, método de 100 puntos, Kano'], s: ['Prioritized Product Backlog', 'Done Criteria (criterios de Hecho)'],
+      v: 'Se ordenan historias como «pagar en línea» y «repetir un pedido anterior» y se acuerda cuándo una historia se considera terminada.' },
+    { n: 'Conduct Release Planning', es: 'Realizar la planeación de lanzamientos',
+      e: ['Scrum Core Team', 'Stakeholder(s)', 'Project Vision Statement', 'Prioritized Product Backlog', 'Done Criteria'], h: ['Release Planning Sessions (sesiones de planeación)', 'Release Prioritization Methods'], s: ['Release Planning Schedule (calendario de lanzamientos)', 'Length of Sprint (duración del sprint)'],
+      v: 'Se decide cuándo liberar la primera versión del sitio y cuánto durará cada sprint.' }
+  ];
+  var pb = $('procBtns'), pp = $('procPanel');
+  function li(a) { return a.map(function (x) { return '• ' + esc(x); }).join('<br>'); }
+  function showProc(i) {
+    var p = PROC[i];
+    pp.innerHTML = '<span class="en">' + esc(p.es) + '</span><h4>' + esc(p.n) + '</h4>' +
+      '<div class="io"><div><b>Entradas obligatorias *</b>' + li(p.e) + '</div><div><b>Herramienta obligatoria *</b>' + li(p.h) + '</div><div><b>Salidas obligatorias *</b>' + li(p.s) + '</div></div>' +
+      '<p class="proj" style="margin-top:.8rem"><strong>En VMfoods:</strong> ' + esc(p.v) + '</p>';
+    Array.prototype.forEach.call(pb.children, function (b, k) { b.classList.toggle('on', k === i); });
+  }
+  PROC.forEach(function (p, i) { var b = document.createElement('button'); b.type = 'button'; b.innerHTML = '<span class="n">' + (i + 1) + '</span>' + esc(p.n); b.addEventListener('click', function () { showProc(i); }); pb.appendChild(b); });
+  showProc(0);
+
+  var MATCH = [
+    { t: 'La gerencia presenta su caso de negocio y se redacta la declaración «entregar compras de calidad a domicilio».', a: 0, w: 'Es la visión: nace del caso de negocio en la reunión de visión.' },
+    { t: 'Se nombra a quien guiará al Equipo Scrum 1 y se identifica a clientes, usuarios y patrocinadores del sitio web.', a: 1, w: 'Se identifican al Scrum Master y a los Stakeholders.' },
+    { t: 'Se seleccionan las 9 personas de cada equipo según las habilidades que necesita el sitio.', a: 2, w: 'Es la formación del Scrum Team.' },
+    { t: 'En reuniones con grupos de clientes surge «Pedido en línea» como gran meta del producto.', a: 3, w: 'Es una épica; las reuniones con grupos de usuarios son la herramienta de este proceso.' },
+    { t: 'Ordenan las historias con MoSCoW y acuerdan los Done Criteria.', a: 4, w: 'Priorizar el backlog y definir los criterios de Hecho son las salidas de este proceso.' },
+    { t: 'Deciden en qué fecha se lanzará la primera versión y cuánto durará cada sprint.', a: 5, w: 'Eso es planear los lanzamientos: calendario y duración del sprint.' }
+  ];
+  var mb = $('matchBox');
+  shuffle(MATCH).forEach(function (m) {
+    var d = document.createElement('div'); d.className = 'match';
+    var p = document.createElement('p'); p.textContent = m.t; d.appendChild(p);
+    var s = document.createElement('select');
+    var o0 = document.createElement('option'); o0.value = ''; o0.textContent = 'Elige el proceso…'; s.appendChild(o0);
+    PROC.forEach(function (x, i) { var o = document.createElement('option'); o.value = i; o.textContent = (i + 1) + '. ' + x.n; s.appendChild(o); });
+    var fb = document.createElement('div'); fb.className = 'fb';
+    s.addEventListener('change', function () {
+      if (s.value === '') { d.className = 'match'; fb.className = 'fb'; fb.textContent = ''; return; }
+      if (parseInt(s.value, 10) === m.a) { d.className = 'match ok'; fb.className = 'fb ok'; fb.textContent = 'Correcto. ' + m.w; }
+      else { d.className = 'match no'; fb.className = 'fb no'; fb.textContent = 'Todavía no. Piensa qué se produce en esa situación y qué proceso lo entrega.'; }
+    });
+    d.appendChild(s); d.appendChild(fb); mb.appendChild(d);
+  });
+
+  /* ---------- Bloque 4: velocidad y burndown ---------- */
+  function velUpd() {
+    var a = Math.max(0, num('v1', 0)), b = Math.max(0, num('v2', 0)), c = Math.max(0, num('v3', 0)), bl = Math.max(0, num('vb', 0));
+    var avg = (a + b + c) / 3;
+    $('vAvg').textContent = (Math.round(avg * 10) / 10).toString();
+    $('vSpr').textContent = avg > 0 && bl > 0 ? Math.ceil(bl / avg) : '—';
+  }
+  ['v1', 'v2', 'v3', 'vb'].forEach(function (id) { $(id).addEventListener('input', velUpd); }); velUpd();
+
+  var NS = 'http://www.w3.org/2000/svg';
+  function burnUpd() {
+    var C = parseInt($('bc').value, 10), d = parseInt($('bd').value, 10), p = parseInt($('bp').value, 10);
+    $('bp').max = C; if (p > C) { p = C; $('bp').value = C; }
+    $('bcV').textContent = C; $('bdV').textContent = d; $('bpV').textContent = p;
+    var ax = $('bdAxes'); while (ax.firstChild) ax.removeChild(ax.firstChild);
+    function t(x, y, s, anchor) { var e = document.createElementNS(NS, 'text'); e.setAttribute('x', x); e.setAttribute('y', y); e.setAttribute('text-anchor', anchor || 'middle'); e.textContent = s; ax.appendChild(e); }
+    function ln(x1, y1, x2, y2) { var e = document.createElementNS(NS, 'line'); e.setAttribute('x1', x1); e.setAttribute('y1', y1); e.setAttribute('x2', x2); e.setAttribute('y2', y2); e.setAttribute('stroke', '#C8B4BA'); ax.appendChild(e); }
+    ln(50, 20, 50, 210); ln(50, 210, 610, 210);
+    for (var k = 0; k <= 4; k++) { var val = Math.round(C * k / 4 * 10) / 10; t(42, 216 - k * 47.5, val, 'end'); }
+    for (var i = 0; i <= 10; i++) t(50 + i * 56, 232, i);
+    var tt = document.createElementNS(NS, 'text'); tt.setAttribute('x', 330); tt.setAttribute('y', 254); tt.setAttribute('text-anchor', 'middle'); tt.setAttribute('fill', '#5C4850'); tt.setAttribute('font-size', '17'); tt.textContent = 'Días del sprint'; ax.appendChild(tt);
+    function Y(rem) { return 210 - (rem / C) * 190; }
+    var x = 50 + d * 56, idealRem = C * (1 - d / 10), realRem = C - p;
+    $('bdReal').setAttribute('points', '50,' + Y(C) + ' ' + x + ',' + Y(realRem));
+    $('bdIdealPt').setAttribute('cx', x); $('bdIdealPt').setAttribute('cy', Y(idealRem));
+    $('bdRealPt').setAttribute('cx', x); $('bdRealPt').setAttribute('cy', Y(realRem));
+    var left = x > 470, anc = left ? 'end' : 'start', tx = left ? x - 12 : x + 12;
+    var yr = Y(realRem), yi = Y(idealRem), gap = Math.abs(yr - yi);
+    var a = $('bdTxtReal'), b = $('bdTxtIdeal');
+    a.setAttribute('x', tx); b.setAttribute('x', tx); a.setAttribute('text-anchor', anc); b.setAttribute('text-anchor', anc);
+    a.setAttribute('y', (gap < 18 ? yr - 8 : yr + 4)); b.setAttribute('y', (gap < 18 ? yi + 16 : yi + 4));
+    a.textContent = 'Real: ' + realRem + ' pts'; b.textContent = 'Ideal: ' + (Math.round(idealRem * 10) / 10) + ' pts';
+    var diff = realRem - idealRem, st = $('bdStatus'), r = Math.round(idealRem * 10) / 10;
+    if (d === 0) { st.className = 'status ok'; st.textContent = 'El sprint apenas inicia: todo el trabajo está por hacer.'; }
+    else if (diff > 1) { st.className = 'status bad'; st.textContent = 'Atrasados: quedan ' + realRem + ' puntos y la línea ideal marcaría ' + r + '. Se detecta en la Daily; el Scrum Master ayuda a quitar impedimentos.'; }
+    else if (diff < -1) { st.className = 'status ok'; st.textContent = 'Adelantados: quedan ' + realRem + ' puntos y la línea ideal marcaría ' + r + '. Verifiquen que lo terminado cumpla los Done Criteria.'; }
+    else { st.className = 'status ok'; st.textContent = 'En línea con el plan: quedan ' + realRem + ' puntos; el ideal marca ' + r + '.'; }
+  }
+  ['bc', 'bd', 'bp'].forEach(function (id) { $(id).addEventListener('input', burnUpd); }); burnUpd();
+
+  /* ---------- Bloque 5: ficha del proyecto ---------- */
+  function val(id) { return $(id).value.trim(); }
+  var MOS = { M: 'Must', S: 'Should', C: 'Could', W: "Won't" };
+  function stories() {
+    var out = [];
+    [1, 2, 3].forEach(function (n) {
+      var r = val('s' + n + '_role'), g = val('s' + n + '_goal'), w = val('s' + n + '_why');
+      if (!r && !g && !w) return;
+      out.push({ txt: 'Como ' + (r || '…') + ', quiero ' + (g || '…') + ', para ' + (w || '…') + '.', acc: val('s' + n + '_acc'), pts: parseInt($('s' + n + '_pts').value, 10) || 0, mos: $('s' + n + '_mos').value, idx: n });
+    });
+    var ord = { M: 0, S: 1, C: 2, W: 3, '': 4 };
+    out.sort(function (a, b) { return (ord[a.mos] - ord[b.mos]) || (a.idx - b.idx); });
+    return out;
+  }
+  function dcs() { var a = []; Array.prototype.forEach.call(document.querySelectorAll('.dcb'), function (c) { if (c.checked) a.push(c.value); }); if (val('w_dcx')) a.push(val('w_dcx')); return a; }
+  function ficData() {
+    var users = val('w_users'), need = val('w_need'), ben = val('w_benefit'), name = val('w_name');
+    var vision = (users || need || ben) ? 'Para ' + (users || '…') + ', que ' + (need || '…') + ', ' + (name || 'el proyecto') + ' es una solución que ' + (ben || '…') + '.' : '';
+    var st = stories(), total = 0, must = 0;
+    st.forEach(function (s) { total += s.pts; if (s.mos === 'M') must += s.pts; });
+    var vel = parseFloat(val('w_vel')); if (isNaN(vel) || vel <= 0) vel = 0;
+    return { name: name, vision: vision, po: val('w_po'), sm: val('w_sm'), team: val('w_team'), stake: val('w_stake'), epic: val('w_epic'), st: st, dc: dcs(), total: total, must: must, vel: vel, len: $('w_len').value, sprints: vel > 0 && total > 0 ? Math.ceil(total / vel) : 0 };
+  }
+  function ph(x) { return x ? esc(x) : '<span class="ph">por completar</span>'; }
+  function renderFicha() {
+    var f = ficData();
+    $('visPrev').textContent = f.vision || 'Aquí aparecerá la declaración de visión de su proyecto.';
+    var h = '<h4>' + (f.name ? esc(f.name) : 'Proyecto integrador') + '</h4>';
+    h += '<div class="fl">Visión</div><div>' + ph(f.vision) + '</div>';
+    h += '<div class="fl">Roles</div><div>Product Owner: ' + ph(f.po) + '<br>Scrum Master: ' + ph(f.sm) + '<br>Scrum Team: ' + ph(f.team) + '<br>Stakeholders: ' + ph(f.stake) + '</div>';
+    h += '<div class="fl">Épica</div><div>' + ph(f.epic) + '</div>';
+    h += '<div class="fl">Product Backlog priorizado</div>';
+    if (!f.st.length) h += '<div class="ph">Escriban al menos una historia.</div>';
+    else { h += '<ol>'; f.st.forEach(function (s) { h += '<li>' + esc(s.txt) + ' <strong>[' + (s.mos ? MOS[s.mos] : 'sin prioridad') + ' · ' + (s.pts ? s.pts + ' pts' : 'sin estimar') + ']</strong>' + (s.acc ? '<br><em>Criterio de aceptación:</em> ' + esc(s.acc) : '') + '</li>'; }); h += '</ol>'; }
+    h += '<div class="fl">Done Criteria</div>';
+    if (!f.dc.length) h += '<div class="ph">por completar</div>'; else { h += '<ul>'; f.dc.forEach(function (d) { h += '<li>' + esc(d) + '</li>'; }); h += '</ul>'; }
+    h += '<div class="fl">Planeación</div><div>Total estimado: <strong>' + f.total + ' pts</strong> (Must: ' + f.must + ' pts). Sprint de ' + esc(f.len) + '. ' + (f.sprints ? 'Con una velocidad de ' + f.vel + ' pts por sprint, el backlog actual cabe en <strong>' + f.sprints + ' sprint' + (f.sprints > 1 ? 's' : '') + '</strong>.' : 'Estimen las historias y definan la velocidad para calcular los sprints.') + '</div>';
+    $('ficha').innerHTML = h;
+  }
+  function fichaText() {
+    var f = ficData(), L = [];
+    L.push('PROYECTO: ' + (f.name || 'Proyecto integrador'));
+    L.push('VISIÓN: ' + (f.vision || '—'));
+    L.push('Product Owner: ' + (f.po || '—') + ' | Scrum Master: ' + (f.sm || '—'));
+    L.push('Scrum Team: ' + (f.team || '—'));
+    L.push('Stakeholders: ' + (f.stake || '—'));
+    L.push('ÉPICA: ' + (f.epic || '—'));
+    L.push('PRODUCT BACKLOG PRIORIZADO:');
+    f.st.forEach(function (s, i) { L.push((i + 1) + '. ' + s.txt + ' [' + (s.mos ? MOS[s.mos] : 'sin prioridad') + ' · ' + (s.pts ? s.pts + ' pts' : 'sin estimar') + ']' + (s.acc ? ' Criterio de aceptación: ' + s.acc : '')); });
+    L.push('DONE CRITERIA: ' + (f.dc.length ? f.dc.join('; ') : '—'));
+    L.push('PLANEACIÓN: ' + f.total + ' pts estimados (Must: ' + f.must + '); sprint de ' + f.len + (f.sprints ? '; ' + f.sprints + ' sprint(s) a ' + f.vel + ' pts de velocidad' : ''));
+    return L.join('\n');
+  }
+  Array.prototype.forEach.call(document.querySelectorAll('.wk input, .wk select, .wk textarea'), function (e) { e.addEventListener('input', renderFicha); e.addEventListener('change', renderFicha); });
+  renderFicha();
+  $('btnCopy').addEventListener('click', function () {
+    var txt = fichaText(), fb = $('copyFb');
+    function ok() { fb.textContent = 'Ficha copiada. Pégala en Jira.'; }
+    function fallback() {
+      var ta = document.createElement('textarea'); ta.value = txt; ta.style.position = 'fixed'; ta.style.opacity = '0'; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy') ? ok() : (fb.textContent = 'No se pudo copiar; usa Imprimir o guardar como PDF.'); } catch (e) { fb.textContent = 'No se pudo copiar; usa Imprimir o guardar como PDF.'; }
+      document.body.removeChild(ta);
+    }
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(txt).then(ok, fallback); else fallback();
+  });
+  $('btnPrint').addEventListener('click', function () {
+    var f = document.querySelector('.ficha'); var sec = f.closest('.section'); sec.id = 'sec-ficha';
+    document.body.classList.add('print-ficha'); window.print();
+    setTimeout(function () { document.body.classList.remove('print-ficha'); }, 500);
+  });
+
+  /* ---------- Bloque 6: simulacro ---------- */
+  var QS = [
+    { tipo: 'Caso VMfoods', q: 'Caso VMfoods. El equipo inicia el proyecto del sitio web de pedidos en línea. ¿Cuál es la entrada obligatoria del proceso Crear la visión del proyecto (Create Project Vision)?',
+      o: ['El caso de negocio del proyecto (Project Business Case).', 'El gráfico de avance del sprint (Sprint Burndown Chart).', 'El Product Backlog priorizado.', 'El registro de impedimentos del equipo.'], c: 0,
+      e: 'En Create Project Vision, la entrada obligatoria es el Project Business Case: aquí, aumentar la cuota de mercado con entregas a domicilio. La herramienta obligatoria es la Project Vision Meeting y las salidas obligatorias son la declaración de visión y el Product Owner identificado.' },
+    { tipo: 'Caso VMfoods', q: 'Caso VMfoods. Los dos equipos Scrum de 9 personas construyen el mismo sitio web y sus tareas dependen una de la otra. ¿Qué reunión coordina esas dependencias entre los equipos?',
+      o: ['La Scrum of Scrums Meeting, con representantes de cada equipo.', 'La Retrospect Sprint Meeting de un solo equipo.', 'La Daily Standup de cada equipo por separado, que ya sincroniza a ambos.', 'La Sprint Review con los clientes.'], c: 0,
+      e: 'La Scrum of Scrums Meeting coordina a varios equipos. Cada representante responde, entre otras, qué trabajó su equipo desde la última reunión, qué hará hasta la siguiente y qué podría afectar a los otros equipos.' },
+    { tipo: 'Caso VMfoods', q: 'Caso VMfoods. La gerencia quiere que el Product Owner ordene las funciones del sitio: pagar en línea, ver promociones y repetir un pedido anterior. ¿Qué criterio guía este orden en Scrum?',
+      o: ['El valor para el negocio, considerando también el riesgo y las dependencias.', 'El orden en que cada función fue solicitada.', 'La función que el equipo prefiera programar primero.', 'La función más fácil de construir, siempre primero.'], c: 0,
+      e: 'La priorización basada en valor busca entregar el máximo valor de negocio en el menor tiempo, y el Product Owner considera el valor, el riesgo o la incertidumbre y las dependencias al ordenar el backlog.' },
+    { tipo: 'Principios', q: '¿Cuál de las siguientes opciones NO es un resultado de la autoorganización?',
+      o: ['La entrega de resultados tangibles.', 'El compromiso del equipo.', 'Propiedad individual.', 'Propiedad colectiva.'], c: 2,
+      e: 'La autoorganización produce propiedad colectiva y compromiso del equipo, no propiedad individual: el equipo es responsable del resultado completo.' },
+    { tipo: 'Principios', q: '¿Cuál de los siguientes pares principio–característica está incorrectamente relacionado?',
+      o: ['Value-based Prioritization: enfoque en entregar el máximo valor de negocio.', 'Collaboration: el equipo central y los interesados interactúan constantemente.', 'Time-boxing: los procesos no tienen límite de duración, para poder perfeccionar el trabajo.', 'Empirical Process Control: transparencia, inspección y adaptación.'], c: 2,
+      e: 'El time-boxing hace lo contrario: fija una duración a cada proceso y reunión, trata el tiempo como restricción limitante y evita el perfeccionismo sin fin. Los otros tres pares son correctos.' },
+    { tipo: 'Principios', q: '¿Cuál de los siguientes NO es un resultado de la coubicación en Scrum?',
+      o: ['Las preguntas se responden rápidamente.', 'Los problemas se solucionan en el momento.', 'Mayor desconfianza, ya que los miembros de un equipo coubicado tienen mayor proximidad entre sí.', 'Hay menor fricción entre las interacciones.'], c: 2,
+      e: 'La cercanía física favorece la confianza, no la desconfianza: las preguntas se responden rápido, los problemas se resuelven en el momento y hay menos fricción.' },
+    { tipo: 'Valor', q: '¿Cuál de los siguientes enunciados es verdadero sobre la entrega basada en valor y la gestión tradicional de proyectos?',
+      o: ['En Scrum los requerimientos se priorizan por valor de negocio y se actualizan con regularidad; en la gestión tradicional se fijan en el plan.', 'En ambos, los requerimientos se priorizan con base en el valor de negocio.', 'En ambos, el retorno de la inversión se obtiene hasta el final del proyecto.', 'En ambos, el desempeño se mide por el valor de negocio entregado.'], c: 0,
+      e: 'Scrum prioriza por valor y actualiza los requerimientos; el enfoque tradicional los fija en el plan, mide la conformidad con el plan y obtiene el retorno al final. Cuidado con las opciones que dicen «en ambos».' },
+    { tipo: 'Métricas', q: 'En los últimos tres sprints, un equipo terminó 18, 22 y 20 puntos. Al Product Backlog le faltan 100 puntos. Si mantiene su velocidad promedio, ¿cuántos sprints necesitará para terminarlo?',
+      o: ['4 sprints.', '5 sprints.', '6 sprints.', '10 sprints.'], c: 1, fixed: true,
+      e: 'La velocidad promedio es (18 + 22 + 20) ÷ 3 = 20 puntos por sprint. Entonces 100 ÷ 20 = 5 sprints. La velocidad sirve para planear, no para presionar.' },
+    { tipo: 'Daily 6', q: 'Durante la Daily Standup, un integrante dice que no puede avanzar porque no tiene acceso al servidor de pruebas. ¿De qué se trata y quién ayuda a resolverlo?',
+      o: ['De un impedimento; el Scrum Master ayuda a eliminarlo.', 'De un cambio solicitado; el Product Owner lo aprueba.', 'De un criterio de aceptación; el equipo lo redefine.', 'De una épica; el equipo la divide en historias.'], c: 0,
+      e: 'En la Daily se responden tres preguntas: qué terminé ayer, qué terminaré hoy y qué impedimentos tengo. Los impedimentos los atiende el Scrum Master.' },
+    { tipo: 'Daily 8', q: 'Tras reunirse con grupos de clientes, el equipo central de VMfoods obtiene la épica «Armar y pagar un pedido en línea». ¿Cuáles son las salidas obligatorias del proceso Desarrollar las épicas (Develop Epic(s))?',
+      o: ['Las épicas y las personas (Personas).', 'El Product Backlog priorizado y los Done Criteria.', 'El Scrum Team identificado y el plan de colaboración.', 'El calendario de lanzamientos y la duración del sprint.'], c: 0,
+      e: 'Develop Epic(s) produce de forma obligatoria las épicas y las personas. Las otras opciones pertenecen a otros procesos: Create Prioritized Product Backlog, Form Scrum Team y Conduct Release Planning.' }
+  ];
+  var box = $('simBox'), answered = 0, hits = 0, N = QS.length;
+  function simUpd() { $('scProg').textContent = 'Respondidas: ' + answered + ' de ' + N; $('scOk').textContent = 'Aciertos: ' + hits; }
+  function simBuild() {
+    box.innerHTML = ''; answered = 0; hits = 0; $('simRes').classList.remove('show'); simUpd();
+    QS.forEach(function (it, qi) {
+      var wrap = document.createElement('div'); wrap.className = 'cert';
+      var n = document.createElement('div'); n.className = 'cn'; n.textContent = 'Pregunta ' + (qi + 1) + ' de ' + N;
+      var tg = document.createElement('span'); tg.className = 'tipo'; tg.textContent = it.tipo; n.appendChild(tg); wrap.appendChild(n);
+      var t = document.createElement('div'); t.className = 'ct'; t.textContent = it.q; wrap.appendChild(t);
+      var base = it.o.map(function (x, i) { return { t: x, ok: i === it.c }; }), opts = it.fixed ? base : shuffle(base), btns = [];
+      opts.forEach(function (op) {
+        var b = document.createElement('button'); b.type = 'button'; b.className = 'opt'; b.textContent = op.t; btns.push(b);
+        b.addEventListener('click', function () {
+          if (wrap.classList.contains('done')) return; wrap.classList.add('done');
+          btns.forEach(function (x, i) { x.disabled = true; if (opts[i].ok) x.classList.add('good'); });
+          answered++; if (op.ok) hits++; else b.classList.add('bad');
+          simUpd();
+          if (answered === N) {
+            $('simN').textContent = hits + ' de ' + N;
+            $('simMsg').textContent = hits >= 8 ? 'Vas por encima del 75 % que exige el examen real. Mantén el repaso y verifica los términos en tu ejemplar del SBOK®.'
+              : (hits >= 6 ? 'Vas cerca de la meta. Revisa las explicaciones de las que fallaste y vuelve a intentarlo.' : 'Aún hay trabajo por hacer, y para eso es el simulacro. Relee los bloques de la clase y vuelve a intentarlo.');
+            $('simRes').classList.add('show');
+          }
+        });
+        wrap.appendChild(b);
+      });
+      var e = document.createElement('div'); e.className = 'exp'; var s = document.createElement('strong'); s.textContent = 'Explicación: '; e.appendChild(s); e.appendChild(document.createTextNode(it.e)); wrap.appendChild(e);
+      box.appendChild(wrap);
+    });
+  }
+  $('simAgain').addEventListener('click', function () { simBuild(); document.getElementById('sec-sim').scrollIntoView({ behavior: 'smooth' }); });
+  simBuild();
+})();
+</script>
+</body>
+</html>
