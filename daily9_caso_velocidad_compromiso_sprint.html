@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily 9 — Cuánto cabe en el sprint</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .support-logo { height: 58px; width: auto; float: right; margin-left: 1rem; }
+  figure svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: .7rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--guinda); color: var(--white); border-radius: var(--radius-lg); padding: .8rem 1rem; text-align: center; }
+  .kpi .n { font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; line-height: 1; }
+  .kpi .l { font-family: var(--font-ui); font-size: .76rem; opacity: .85; display: block; margin-top: .3rem; }
+  .kpi.alt { background: #8a3a74; }
+
+  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .board { grid-template-columns: 1fr; } }
+  .col { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem; }
+  .col h4 { margin: 0 0 .6rem; font-family: var(--font-ui); font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-dark); }
+  .col.done { border-top: 4px solid #2e7d4f; } .col.prog { border-top: 4px solid #e0a400; } .col.todo { border-top: 4px solid var(--border-strong); }
+  .tk { background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--guinda); border-radius: var(--radius-md); padding: .65rem .8rem; margin-bottom: .5rem; font-size: .88rem; line-height: 1.45; box-shadow: var(--shadow-sm); }
+  .tk b { display: block; color: var(--ink); }
+  .tk .pt { display: inline-block; margin-top: .3rem; background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .1rem .6rem; font-family: var(--font-ui); font-size: .74rem; font-weight: 700; color: var(--guinda-dark); }
+  .tk .st { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); display: block; margin-top: .2rem; }
+  .epic { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: var(--radius-md); padding: .6rem 1rem; font-family: var(--font-ui); font-size: .88rem; color: var(--guinda-dark); margin-bottom: .8rem; }
+  .epic strong { text-transform: uppercase; letter-spacing: .1em; font-size: .72rem; margin-right: .5rem; color: var(--guinda-mid); }
+
+  .qs { list-style: none; padding: 0; margin: 1rem 0; counter-reset: q; }
+  .qs > li { counter-increment: q; background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.2rem 1rem 3.6rem; margin-bottom: .8rem; position: relative; box-shadow: var(--shadow-sm); }
+  .qs > li::before { content: counter(q); position: absolute; left: 1rem; top: 1rem; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--guinda); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-ui); font-weight: 700; }
+  .qs .qt { font-size: 1rem; line-height: 1.55; color: var(--ink); margin: 0 0 .6rem; }
+  .qs details summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: .85rem; color: var(--guinda); }
+  .qs details .ans { margin-top: .5rem; padding: .7rem 1rem; background: var(--white); border-left: 4px solid var(--guinda); border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: .93rem; line-height: 1.55; color: var(--ink-secondary); }
+
+  .cert { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.2rem 1.4rem; margin-bottom: 1rem; }
+  .cert .cn { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .cert .ct { font-size: 1.02rem; line-height: 1.6; margin: .3rem 0 .8rem; color: var(--ink); }
+  .cert .opt { display: block; width: 100%; text-align: left; background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: .7rem .95rem; margin-bottom: .45rem; font-size: .95rem; line-height: 1.5; cursor: pointer; font-family: var(--font-body); color: var(--ink); }
+  .cert .opt:hover:not(:disabled) { border-color: var(--guinda-rule); }
+  .cert .opt.good { border-color: #2e7d4f; background: #e9f7ee; }
+  .cert .opt.bad { border-color: #c0392b; background: #fdecec; }
+  .cert .exp { display: none; margin-top: .5rem; font-size: .9rem; line-height: 1.6; color: var(--ink-secondary); background: var(--white); border-left: 4px solid var(--guinda); padding: .7rem 1rem; border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+  .cert.done .exp { display: block; }
+
+  .req { background: var(--white); border: 2px dashed var(--guinda); border-radius: var(--radius-lg); padding: .9rem 1.2rem; margin: 1rem 0; }
+  .req .who { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .req p { margin: .3rem 0 0; font-size: .98rem; line-height: 1.55; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .two { grid-template-columns: 1fr; } }
+  .pb .tk { display: flex; gap: .7rem; align-items: flex-start; }
+  .pb .rk { flex: none; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--guinda); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-ui); font-weight: 700; font-size: .8rem; }
+  .col.lock { border-top: 4px solid var(--guinda); }
+  .col.free { border-top: 4px solid #e0a400; }
+  .col .sub { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); margin: -.3rem 0 .6rem; display: block; }
+
+  .notes { margin: .5rem 0 0; padding-left: 1.2rem; font-size: .93rem; line-height: 1.6; }
+  .story b { font-weight: 400; font-style: italic; }
+  .story .ttl { display: block; font-family: var(--font-ui); font-style: normal; font-weight: 700; font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-mid); margin-bottom: .25rem; }
+
+  .plan { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .9rem 1.1rem; margin: 1rem 0; }
+  .plan .it { display: flex; align-items: center; gap: .7rem; background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--guinda); border-radius: var(--radius-md); padding: .55rem .8rem; margin-bottom: .45rem; font-size: .92rem; cursor: pointer; }
+  .plan .it input { accent-color: var(--guinda); width: 1.1rem; height: 1.1rem; flex: none; }
+  .plan .it .nm { flex: 1; line-height: 1.4; }
+  .plan .it .nm small { display: block; font-family: var(--font-ui); font-size: .74rem; color: var(--ink-muted); }
+  .plan .it .pt { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .1rem .65rem; font-family: var(--font-ui); font-size: .76rem; font-weight: 700; color: var(--guinda-dark); }
+  .meter { height: 18px; background: var(--white); border: 1px solid var(--border-strong); border-radius: 999px; overflow: hidden; margin: .7rem 0 .4rem; position: relative; }
+  .meter .fill { height: 100%; width: 0; background: #2e7d4f; transition: width .25s, background .25s; }
+  .meter .line { position: absolute; top: 0; bottom: 0; width: 3px; background: var(--ink); }
+  .plan .msg { font-family: var(--font-ui); font-size: .88rem; font-weight: 700; padding: .5rem .85rem; border-radius: var(--radius-md); }
+  .plan .msg.ok { background: #e9f7ee; color: #1f6b3d; border: 1px solid #2e7d4f; } .plan .msg.warn { background: #fff4d6; color: #7a5600; border: 1px solid #e0a400; } .plan .msg.bad { background: #fdecec; color: #a52a1f; border: 1px solid #c0392b; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-wrap"><img src="imagen1.png" alt="Mixtle, mascota del IEDEP"></div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Daily Scrum — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<section class="class-hero">
+  <span class="class-label">Unidad 1 · Daily Scrum n.º 9 · 15 minutos</span>
+  <h1>Caso del sprint: ¿cuánto cabe en el siguiente sprint?</h1>
+  <span class="class-subtitle">Un caso breve para repasar la velocidad, el compromiso del equipo, la planeación de lanzamientos y el burndown.</span>
+  <div class="meta-row">
+    <div class="meta-item">Programa educativo<span>Lic. en Sistemas Computacionales</span></div>
+    <div class="meta-item">Asignatura<span>Ingeniería de Software I</span></div>
+    <div class="meta-item">Fecha<span>Lunes 26 de octubre de 2026</span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <section class="section">
+    <h2 class="section-title">Contexto</h2>
+    <div class="concept-box">
+      <img class="support-logo" src="imagen2.png" alt="Mixtle, mascota de apoyo del IEDEP">
+      <span class="concept-title">El caso, con continuidad</span>
+      <p>Hoy empieza la <strong>Sprint Planning</strong> del siguiente sprint de la app de tareas. En los tres últimos sprints el equipo terminó <strong>18, 22 y 20 puntos</strong>. El <strong>Product Owner</strong> ya ordenó el backlog con base en el valor, y el equipo debe decidir cuánto se compromete a terminar.</p>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="n">20</div><span class="l">velocidad promedio</span></div>
+      <div class="kpi"><div class="n">5</div><span class="l">historias candidatas</span></div>
+      <div class="kpi"><div class="n">22</div><span class="l">puntos candidatos en total</span></div>
+      <div class="kpi alt"><div class="n">?</div><span class="l">puntos a comprometer</span></div>
+    </div>
+
+    <div class="plan">
+      <span class="concept-title" style="display:block;margin-bottom:.5rem">Product Backlog priorizado · marquen lo que el equipo se compromete a terminar</span>
+      <label class="it"><input type="checkbox" data-p="5"><span class="nm">1. Compartir una tarea con un compañero<small>Must</small></span><span class="pt">5 pts</span></label>
+      <label class="it"><input type="checkbox" data-p="3"><span class="nm">2. Elegir si el compañero solo ve o también edita<small>Must</small></span><span class="pt">3 pts</span></label>
+      <label class="it"><input type="checkbox" data-p="3"><span class="nm">3. Recibir un aviso cuando me comparten una tarea<small>Should</small></span><span class="pt">3 pts</span></label>
+      <label class="it"><input type="checkbox" data-p="8"><span class="nm">4. Recibir un recordatorio un día antes<small>Should</small></span><span class="pt">8 pts</span></label>
+      <label class="it"><input type="checkbox" data-p="3"><span class="nm">5. Eliminar una tarea<small>Could</small></span><span class="pt">3 pts</span></label>
+      <div class="meter" aria-hidden="true"><div class="fill" id="plFill"></div><div class="line" style="left:100%;margin-left:-3px"></div></div>
+      <div class="msg ok" id="plMsg">0 de 20 puntos de velocidad. Elijan historias respetando el orden del Product Owner.</div>
+    </div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Preguntas para la Daily</h2>
+    <p class="text-muted" style="margin-top:0">Se responden en voz alta, cada quien desde su rol. Al final de cada una se puede abrir la respuesta esperada.</p>
+    <ol class="qs">
+      <li><p class="qt">Con la velocidad de 18, 22 y 20 puntos, ¿cuántos puntos conviene comprometer y qué historias entran?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">La velocidad promedio es <strong>20 puntos</strong>. Siguiendo el orden del Product Owner entran las historias 1 a 4, que suman <strong>19 puntos</strong> (5 + 3 + 3 + 8). La 5 se queda en el backlog para otro sprint.</div></details></li>
+      <li><p class="qt">¿Quién decide el orden de las historias y quién decide cuántas se comprometen?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">El <strong>Product Owner</strong> decide el orden, según valor, riesgo y dependencias. El <strong>Scrum Team</strong> decide cuánto se compromete, apoyándose en su velocidad: es la <strong>autoorganización</strong>. El Scrum Master facilita la reunión.</div></details></li>
+      <li><p class="qt">¿Qué proceso del SBOK define la duración del sprint y el calendario de lanzamientos?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans"><strong>Conduct Release Planning</strong> (realizar la planeación de lanzamientos). Entre sus salidas obligatorias están el calendario de lanzamientos y la duración del sprint.</div></details></li>
+      <li><p class="qt">Ya en el sprint, en el día 5 de 10 quedan 16 de los 19 puntos. ¿Van adelantados o atrasados, dónde se detecta y quién ayuda?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans"><strong>Atrasados:</strong> la línea ideal marcaría unos 9,5 puntos pendientes y quedan 16. Se detecta al actualizar el <strong>burndown</strong> en la <strong>Daily</strong>; el <strong>Scrum Master</strong> ayuda a quitar impedimentos y el <strong>Product Owner</strong> puede decidir qué historia sacar.</div></details></li>
+      <li><p class="qt">En su proyecto integrador: ¿cuál sería su velocidad estimada y qué historia pondrían primero? ¿Por qué?</p>
+        <details><summary>Ver nota</summary><div class="ans">Pregunta abierta. Pista: la primera historia no es la más fácil, sino la que aporta más valor considerando riesgo y dependencias.</div></details></li>
+    </ol>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Dos preguntas tipo certificación</h2>
+    <p class="text-muted" style="margin-top:0">Con el estilo y el vocabulario del examen Scrum Fundamentals Certified (SBOK®), basadas en el mismo caso.</p>
+    <div id="certBox"></div>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Unidad 1 · Daily Scrum n.º 9 · Lunes 26 de octubre de 2026</span>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
+  var QS = [
+    { q: 'El Product Owner ordenó el Prioritized Product Backlog y la velocidad promedio del equipo es de 20 puntos. El cliente presiona para comprometer 30 puntos en el siguiente sprint. ¿Qué enunciado es correcto?',
+      o: ['El Scrum Team decide cuántas historias se compromete a terminar, apoyándose en su velocidad y respetando el orden del Product Owner.', 'El Product Owner fija la cantidad de puntos que el equipo debe terminar.', 'El Scrum Master decide el compromiso y lo asigna a cada integrante.', 'Los Stakeholders deciden el compromiso, porque son quienes pagan el producto.'], c: 0,
+      e: 'La autoorganización implica que el Scrum Team se compromete con el trabajo que considera realista, usando su velocidad como referencia. El Product Owner ordena por valor, el Scrum Master facilita y los Stakeholders influyen, pero no deciden el compromiso del equipo.' },
+    { q: 'Al terminar la planeación, el equipo necesita acordar la duración de cada sprint y las fechas de entrega del producto. ¿Cuál es una salida obligatoria del proceso Conduct Release Planning?',
+      o: ['El calendario de lanzamientos (Release Planning Schedule).', 'Las épicas (Epic(s)).', 'El Scrum Master identificado (Identified Scrum Master).', 'La declaración de visión del proyecto (Project Vision Statement).'], c: 0,
+      e: 'Conduct Release Planning produce, entre otras salidas obligatorias, el calendario de lanzamientos y la duración del sprint. Las épicas salen de Develop Epic(s), el Scrum Master de Identify Scrum Master and Stakeholder(s) y la visión de Create Project Vision.' }
+  ];
+  var box = document.getElementById('certBox');
+  QS.forEach(function (it, qi) {
+    var wrap = document.createElement('div'); wrap.className = 'cert';
+    var n = document.createElement('div'); n.className = 'cn'; n.textContent = 'Pregunta de certificación ' + (qi + 1) + ' de ' + QS.length; wrap.appendChild(n);
+    var t = document.createElement('div'); t.className = 'ct'; t.textContent = it.q; wrap.appendChild(t);
+    var opts = shuffle(it.o.map(function (x, i) { return { t: x, ok: i === it.c }; })), btns = [];
+    opts.forEach(function (op) {
+      var b = document.createElement('button'); b.className = 'opt'; b.textContent = op.t; btns.push(b);
+      b.addEventListener('click', function () {
+        if (wrap.classList.contains('done')) return; wrap.classList.add('done');
+        btns.forEach(function (x, i) { x.disabled = true; if (opts[i].ok) x.classList.add('good'); });
+        if (!op.ok) b.classList.add('bad');
+      });
+      wrap.appendChild(b);
+    });
+    var e = document.createElement('div'); e.className = 'exp'; var s = document.createElement('strong'); s.textContent = 'Explicación: '; e.appendChild(s); e.appendChild(document.createTextNode(it.e)); wrap.appendChild(e);
+    box.appendChild(wrap);
+  });
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  var V = 20, boxes = document.querySelectorAll('.plan input[type=checkbox]'), fill = document.getElementById('plFill'), msg = document.getElementById('plMsg');
+  function upd() {
+    var s = 0; Array.prototype.forEach.call(boxes, function (b) { if (b.checked) s += parseInt(b.getAttribute('data-p'), 10); });
+    fill.style.width = Math.min(100, s / V * 100) + '%';
+    fill.style.background = s > V ? '#c0392b' : (s >= 17 ? '#2e7d4f' : '#e0a400');
+    if (s === 0) { msg.className = 'msg ok'; msg.textContent = '0 de 20 puntos de velocidad. Elijan historias respetando el orden del Product Owner.'; }
+    else if (s > V) { msg.className = 'msg bad'; msg.textContent = s + ' de 20 puntos: se pasan de su velocidad. Es la receta para un burndown rojo desde los primeros días.'; }
+    else if (s >= 17) { msg.className = 'msg ok'; msg.textContent = s + ' de 20 puntos: un compromiso realista, cerca de su velocidad promedio.'; }
+    else { msg.className = 'msg warn'; msg.textContent = s + ' de 20 puntos: hay margen. Si el equipo puede más, la siguiente historia en el orden del Product Owner es la candidata.'; }
+  }
+  Array.prototype.forEach.call(boxes, function (b) { b.addEventListener('change', upd); });
+})();
+</script>
+</body>
+</html>
