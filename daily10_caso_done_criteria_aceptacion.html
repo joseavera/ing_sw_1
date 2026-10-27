@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily 10 — Cuándo está terminada una historia</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .support-logo { height: 58px; width: auto; float: right; margin-left: 1rem; }
+  figure svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: .7rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--guinda); color: var(--white); border-radius: var(--radius-lg); padding: .8rem 1rem; text-align: center; }
+  .kpi .n { font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; line-height: 1; }
+  .kpi .l { font-family: var(--font-ui); font-size: .76rem; opacity: .85; display: block; margin-top: .3rem; }
+  .kpi.alt { background: #8a3a74; }
+
+  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .board { grid-template-columns: 1fr; } }
+  .col { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem; }
+  .col h4 { margin: 0 0 .6rem; font-family: var(--font-ui); font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-dark); }
+  .col.done { border-top: 4px solid #2e7d4f; } .col.prog { border-top: 4px solid #e0a400; } .col.todo { border-top: 4px solid var(--border-strong); }
+  .tk { background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--guinda); border-radius: var(--radius-md); padding: .65rem .8rem; margin-bottom: .5rem; font-size: .88rem; line-height: 1.45; box-shadow: var(--shadow-sm); }
+  .tk b { display: block; color: var(--ink); }
+  .tk .pt { display: inline-block; margin-top: .3rem; background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .1rem .6rem; font-family: var(--font-ui); font-size: .74rem; font-weight: 700; color: var(--guinda-dark); }
+  .tk .st { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); display: block; margin-top: .2rem; }
+  .epic { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: var(--radius-md); padding: .6rem 1rem; font-family: var(--font-ui); font-size: .88rem; color: var(--guinda-dark); margin-bottom: .8rem; }
+  .epic strong { text-transform: uppercase; letter-spacing: .1em; font-size: .72rem; margin-right: .5rem; color: var(--guinda-mid); }
+
+  .qs { list-style: none; padding: 0; margin: 1rem 0; counter-reset: q; }
+  .qs > li { counter-increment: q; background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.2rem 1rem 3.6rem; margin-bottom: .8rem; position: relative; box-shadow: var(--shadow-sm); }
+  .qs > li::before { content: counter(q); position: absolute; left: 1rem; top: 1rem; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--guinda); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-ui); font-weight: 700; }
+  .qs .qt { font-size: 1rem; line-height: 1.55; color: var(--ink); margin: 0 0 .6rem; }
+  .qs details summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: .85rem; color: var(--guinda); }
+  .qs details .ans { margin-top: .5rem; padding: .7rem 1rem; background: var(--white); border-left: 4px solid var(--guinda); border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: .93rem; line-height: 1.55; color: var(--ink-secondary); }
+
+  .cert { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.2rem 1.4rem; margin-bottom: 1rem; }
+  .cert .cn { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .cert .ct { font-size: 1.02rem; line-height: 1.6; margin: .3rem 0 .8rem; color: var(--ink); }
+  .cert .opt { display: block; width: 100%; text-align: left; background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: .7rem .95rem; margin-bottom: .45rem; font-size: .95rem; line-height: 1.5; cursor: pointer; font-family: var(--font-body); color: var(--ink); }
+  .cert .opt:hover:not(:disabled) { border-color: var(--guinda-rule); }
+  .cert .opt.good { border-color: #2e7d4f; background: #e9f7ee; }
+  .cert .opt.bad { border-color: #c0392b; background: #fdecec; }
+  .cert .exp { display: none; margin-top: .5rem; font-size: .9rem; line-height: 1.6; color: var(--ink-secondary); background: var(--white); border-left: 4px solid var(--guinda); padding: .7rem 1rem; border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+  .cert.done .exp { display: block; }
+
+  .req { background: var(--white); border: 2px dashed var(--guinda); border-radius: var(--radius-lg); padding: .9rem 1.2rem; margin: 1rem 0; }
+  .req .who { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .req p { margin: .3rem 0 0; font-size: .98rem; line-height: 1.55; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .two { grid-template-columns: 1fr; } }
+  .pb .tk { display: flex; gap: .7rem; align-items: flex-start; }
+  .pb .rk { flex: none; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--guinda); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-ui); font-weight: 700; font-size: .8rem; }
+  .col.lock { border-top: 4px solid var(--guinda); }
+  .col.free { border-top: 4px solid #e0a400; }
+  .col .sub { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); margin: -.3rem 0 .6rem; display: block; }
+
+  .notes { margin: .5rem 0 0; padding-left: 1.2rem; font-size: .93rem; line-height: 1.6; }
+  .story b { font-weight: 400; font-style: italic; }
+  .story .ttl { display: block; font-family: var(--font-ui); font-style: normal; font-weight: 700; font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-mid); margin-bottom: .25rem; }
+
+  .plan { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .9rem 1.1rem; margin: 1rem 0; }
+  .plan .it { display: flex; align-items: center; gap: .7rem; background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--guinda); border-radius: var(--radius-md); padding: .55rem .8rem; margin-bottom: .45rem; font-size: .92rem; cursor: pointer; }
+  .plan .it input { accent-color: var(--guinda); width: 1.1rem; height: 1.1rem; flex: none; }
+  .plan .it .nm { flex: 1; line-height: 1.4; }
+  .plan .it .nm small { display: block; font-family: var(--font-ui); font-size: .74rem; color: var(--ink-muted); }
+  .plan .it .pt { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .1rem .65rem; font-family: var(--font-ui); font-size: .76rem; font-weight: 700; color: var(--guinda-dark); }
+  .meter { height: 18px; background: var(--white); border: 1px solid var(--border-strong); border-radius: 999px; overflow: hidden; margin: .7rem 0 .4rem; position: relative; }
+  .meter .fill { height: 100%; width: 0; background: #2e7d4f; transition: width .25s, background .25s; }
+  .meter .line { position: absolute; top: 0; bottom: 0; width: 3px; background: var(--ink); }
+  .plan .msg { font-family: var(--font-ui); font-size: .88rem; font-weight: 700; padding: .5rem .85rem; border-radius: var(--radius-md); }
+  .plan .msg.ok { background: #e9f7ee; color: #1f6b3d; border: 1px solid #2e7d4f; } .plan .msg.warn { background: #fff4d6; color: #7a5600; border: 1px solid #e0a400; } .plan .msg.bad { background: #fdecec; color: #a52a1f; border: 1px solid #c0392b; }
+
+  .sortq { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem 1.1rem; margin-bottom: .6rem; }
+  .sortq p { margin: 0 0 .5rem; font-size: .95rem; line-height: 1.55; }
+  .sortq .row { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .sortq button { font-family: var(--font-ui); font-size: .82rem; font-weight: 600; background: var(--white); border: 1.5px solid var(--border-strong); border-radius: 999px; padding: .4rem .9rem; cursor: pointer; color: var(--ink-secondary); }
+  .sortq button:hover:not(:disabled) { border-color: var(--guinda-rule); }
+  .sortq .fb { font-family: var(--font-ui); font-size: .84rem; margin-top: .45rem; }
+  .sortq.ok { border-color: #2e7d4f; background: #e9f7ee; } .sortq.no { border-color: #c0392b; background: #fdecec; }
+  .sortq .fb.ok { color: #1f6b3d; } .sortq .fb.no { color: #a52a1f; }
+  .storycard { background: var(--white); border: 2px dashed var(--guinda); border-radius: var(--radius-lg); padding: .8rem 1.2rem; margin: 1rem 0 .6rem; font-size: .98rem; line-height: 1.55; }
+  .storycard .who { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .plan h5 { margin: 0 0 .5rem; font-family: var(--font-ui); font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-dark); }
+  .plan h5 span { display: block; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--ink-muted); font-size: .76rem; margin-top: .1rem; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-wrap"><img src="imagen1.png" alt="Mixtle, mascota del IEDEP"></div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Daily Scrum — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<section class="class-hero">
+  <span class="class-label">Unidad 1 · Daily Scrum n.º 10 · 15 minutos</span>
+  <h1>Caso del sprint: ¿cuándo está terminada una historia?</h1>
+  <span class="class-subtitle">Un caso breve para reforzar la diferencia entre los criterios de aceptación y los Done Criteria.</span>
+  <div class="meta-row">
+    <div class="meta-item">Programa educativo<span>Lic. en Sistemas Computacionales</span></div>
+    <div class="meta-item">Asignatura<span>Ingeniería de Software I</span></div>
+    <div class="meta-item">Fecha<span>Martes 27 de octubre de 2026</span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <section class="section">
+    <h2 class="section-title">Contexto</h2>
+    <div class="concept-box">
+      <img class="support-logo" src="imagen2.png" alt="Mixtle, mascota de apoyo del IEDEP">
+      <span class="concept-title">El caso, con continuidad</span>
+      <p>Ayer el equipo se comprometió con <strong>19 puntos</strong> en la Sprint Planning. Hoy, en la Daily, una integrante dice: «La historia <em>Compartir una tarea con un compañero</em> ya casi está terminada: la programé y funciona en mi computadora». El <strong>Product Owner</strong> pregunta: «¿Entonces la puedo aceptar?». Para responder, el equipo revisa dos listas distintas.</p>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="n">19</div><span class="l">puntos comprometidos</span></div>
+      <div class="kpi"><div class="n">1</div><span class="l">historia en revisión</span></div>
+      <div class="kpi"><div class="n">3</div><span class="l">criterios de aceptación</span></div>
+      <div class="kpi alt"><div class="n">4</div><span class="l">Done Criteria</span></div>
+    </div>
+
+    <div class="storycard"><span class="who">Historia en revisión · 5 puntos</span><br>Como estudiante, quiero compartir una tarea con un compañero, para trabajar en equipo.</div>
+
+    <div class="two">
+      <div class="plan">
+        <h5>Criterios de aceptación<span>Solo de esta historia · los revisa el Product Owner</span></h5>
+        <label class="it"><input type="checkbox" class="cA"><span class="nm">El compañero ve la tarea en su propia lista</span></label>
+        <label class="it"><input type="checkbox" class="cA"><span class="nm">Puedo dejar de compartirla cuando quiera</span></label>
+        <label class="it"><input type="checkbox" class="cA"><span class="nm">Solo se puede compartir con usuarios registrados</span></label>
+      </div>
+      <div class="plan">
+        <h5>Done Criteria<span>De todas las historias · los acuerda el equipo</span></h5>
+        <label class="it"><input type="checkbox" class="cD"><span class="nm">Código revisado por otro integrante</span></label>
+        <label class="it"><input type="checkbox" class="cD"><span class="nm">Pruebas ejecutadas sin errores</span></label>
+        <label class="it"><input type="checkbox" class="cD"><span class="nm">Cambio subido al repositorio</span></label>
+        <label class="it"><input type="checkbox" class="cD"><span class="nm">Tablero de Jira actualizado</span></label>
+      </div>
+    </div>
+    <div class="plan" style="margin-top:0"><div class="msg warn" id="vdMsg">Marquen lo que ya se cumplió y vean si la historia puede presentarse como terminada.</div></div>
+
+    <h3 style="font-family:var(--font-display);color:var(--guinda);margin:1.4rem 0 .4rem">Reto: ¿de qué tipo es cada criterio?</h3>
+    <div id="sortBox"></div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Preguntas para la Daily</h2>
+    <p class="text-muted" style="margin-top:0">Se responden en voz alta, cada quien desde su rol. Al final de cada una se puede abrir la respuesta esperada.</p>
+    <ol class="qs">
+      <li><p class="qt">¿Qué diferencia hay entre un criterio de aceptación y un Done Criteria?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">El <strong>criterio de aceptación</strong> es una condición propia de <em>una</em> historia, y el Product Owner la revisa para aceptarla. Los <strong>Done Criteria</strong> son una lista común que aplica a <em>todas</em> las historias y define qué significa «terminado». En la práctica, una historia debe cumplir ambos.</div></details></li>
+      <li><p class="qt">La integrante dice que programó la historia y que funciona en su computadora. ¿Está terminada?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans"><strong>No.</strong> Aún faltan, por ejemplo, la revisión por otro integrante, las pruebas, subir el cambio al repositorio y actualizar Jira. «Funciona en mi computadora» no cumple los Done Criteria.</div></details></li>
+      <li><p class="qt">La historia cumple los cuatro Done Criteria, pero ya no se puede dejar de compartir una tarea. ¿La acepta el Product Owner?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans"><strong>No.</strong> Falla un criterio de aceptación, que es justo lo que el Product Owner pidió. Se corrige antes de mostrarla como terminada en la Sprint Review.</div></details></li>
+      <li><p class="qt">¿Quién define cada tipo de criterio y cuándo?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">Los <strong>criterios de aceptación</strong> se escriben junto con cada historia, con el Product Owner, al aclararla. Los <strong>Done Criteria</strong> los acuerda el equipo central una vez, al crear el Product Backlog priorizado, y se pueden mejorar con el tiempo, por ejemplo en la Retrospectiva.</div></details></li>
+      <li><p class="qt">En su proyecto integrador: escriban un criterio de aceptación para su historia 1 y un Done Criteria que cumplirá todo el equipo.</p>
+        <details><summary>Ver nota</summary><div class="ans">Pregunta abierta. Pista: el criterio de aceptación debe poder comprobarse con «sí» o «no», por ejemplo «la lista se guarda sin errores»; el Done Criteria debe servir para cualquier historia, por ejemplo «las pruebas pasan sin errores».</div></details></li>
+    </ol>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Dos preguntas tipo certificación</h2>
+    <p class="text-muted" style="margin-top:0">Con el estilo y el vocabulario del examen Scrum Fundamentals Certified (SBOK®), basadas en el mismo caso.</p>
+    <div id="certBox"></div>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Unidad 1 · Daily Scrum n.º 10 · Martes 27 de octubre de 2026</span>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
+  var QS = [
+    { q: 'El equipo acuerda una lista de verificación que debe cumplir toda historia para considerarse terminada: revisión del código por otro integrante, pruebas sin errores y cambio subido al repositorio. ¿Cómo se llama esa lista y de qué proceso es una salida obligatoria?',
+      o: ['Done Criteria; es una salida de Create Prioritized Product Backlog.', 'Acceptance Criteria; es una salida de Develop Epic(s).', 'Impediment Log; es una salida de Conduct Daily Standup.', 'Release Planning Schedule; es una salida de Conduct Release Planning.'], c: 0,
+      e: 'Los Done Criteria son la definición compartida de «terminado» y aplican a todas las historias. Son una salida obligatoria del proceso Create Prioritized Product Backlog. Los Acceptance Criteria, en cambio, son propios de cada historia.' },
+    { q: 'En la Demonstrate and Validate Sprint, una historia cumple todos los Done Criteria, pero no cumple uno de sus criterios de aceptación. ¿Qué es lo más adecuado?',
+      o: ['El Product Owner no la acepta como terminada y el equipo la corrige.', 'Se acepta, porque cumplir los Done Criteria basta.', 'Se acepta si el Scrum Master la aprueba.', 'Se modifican los Done Criteria para que la historia cumpla.'], c: 0,
+      e: 'Los Done Criteria definen cuándo el trabajo del equipo está terminado, y los criterios de aceptación definen lo que el Product Owner necesita de esa historia. Si falta uno de ellos, el Product Owner no la acepta. Los Done Criteria no se cambian para acomodar una historia.' }
+  ];
+  var box = document.getElementById('certBox');
+  QS.forEach(function (it, qi) {
+    var wrap = document.createElement('div'); wrap.className = 'cert';
+    var n = document.createElement('div'); n.className = 'cn'; n.textContent = 'Pregunta de certificación ' + (qi + 1) + ' de ' + QS.length; wrap.appendChild(n);
+    var t = document.createElement('div'); t.className = 'ct'; t.textContent = it.q; wrap.appendChild(t);
+    var opts = shuffle(it.o.map(function (x, i) { return { t: x, ok: i === it.c }; })), btns = [];
+    opts.forEach(function (op) {
+      var b = document.createElement('button'); b.className = 'opt'; b.textContent = op.t; btns.push(b);
+      b.addEventListener('click', function () {
+        if (wrap.classList.contains('done')) return; wrap.classList.add('done');
+        btns.forEach(function (x, i) { x.disabled = true; if (opts[i].ok) x.classList.add('good'); });
+        if (!op.ok) b.classList.add('bad');
+      });
+      wrap.appendChild(b);
+    });
+    var e = document.createElement('div'); e.className = 'exp'; var s = document.createElement('strong'); s.textContent = 'Explicación: '; e.appendChild(s); e.appendChild(document.createTextNode(it.e)); wrap.appendChild(e);
+    box.appendChild(wrap);
+  });
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  var A = document.querySelectorAll('.cA'), D = document.querySelectorAll('.cD'), msg = document.getElementById('vdMsg');
+  function cnt(l) { var n = 0; Array.prototype.forEach.call(l, function (c) { if (c.checked) n++; }); return n; }
+  function upd() {
+    var a = cnt(A), d = cnt(D), allA = a === A.length, allD = d === D.length;
+    if (a + d === 0) { msg.className = 'msg warn'; msg.textContent = 'Marquen lo que ya se cumplió y vean si la historia puede presentarse como terminada.'; }
+    else if (allA && allD) { msg.className = 'msg ok'; msg.textContent = 'Terminada: cumple los criterios de aceptación y los Done Criteria. Puede mostrarse en la Sprint Review.'; }
+    else if (allD) { msg.className = 'msg bad'; msg.textContent = 'Cumple los Done Criteria, pero falta un criterio de aceptación: el Product Owner no la aceptaría.'; }
+    else if (allA) { msg.className = 'msg bad'; msg.textContent = 'Hace lo que pidió el Product Owner, pero no está terminada: faltan ' + (D.length - d) + ' Done Criteria.'; }
+    else { msg.className = 'msg warn'; msg.textContent = 'En curso: faltan ' + (A.length - a) + ' criterios de aceptación y ' + (D.length - d) + ' Done Criteria.'; }
+  }
+  Array.prototype.forEach.call(A, function (c) { c.addEventListener('change', upd); });
+  Array.prototype.forEach.call(D, function (c) { c.addEventListener('change', upd); });
+
+  var ITEMS = [
+    { t: 'El compañero ve la tarea compartida en su propia lista.', a: 'A', w: 'Es una condición de esta historia en particular.' },
+    { t: 'El código fue revisado por otro integrante del equipo.', a: 'D', w: 'Aplica a cualquier historia, no solo a esta.' },
+    { t: 'Solo se puede compartir con usuarios registrados.', a: 'A', w: 'Es una regla específica de «compartir», que el Product Owner revisa.' },
+    { t: 'Las pruebas se ejecutaron sin errores.', a: 'D', w: 'Todo lo que entrega el equipo debe pasar sus pruebas.' },
+    { t: 'Puedo dejar de compartir la tarea cuando quiera.', a: 'A', w: 'Describe un comportamiento propio de esta historia.' },
+    { t: 'El cambio está subido al repositorio.', a: 'D', w: 'Es un requisito general de trabajo terminado.' }
+  ];
+  var box = document.getElementById('sortBox');
+  ITEMS.forEach(function (it) {
+    var d = document.createElement('div'); d.className = 'sortq';
+    var p = document.createElement('p'); p.textContent = it.t; d.appendChild(p);
+    var r = document.createElement('div'); r.className = 'row';
+    var fb = document.createElement('div'); fb.className = 'fb';
+    [['A', 'Criterio de aceptación'], ['D', 'Done Criteria']].forEach(function (o) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = o[1];
+      b.addEventListener('click', function () {
+        if (o[0] === it.a) { d.className = 'sortq ok'; fb.className = 'fb ok'; fb.textContent = 'Correcto. ' + it.w; Array.prototype.forEach.call(r.children, function (x) { x.disabled = true; }); }
+        else { d.className = 'sortq no'; fb.className = 'fb no'; fb.textContent = 'Todavía no. Pregúntate: ¿aplica solo a esta historia o a todas?'; }
+      });
+      r.appendChild(b);
+    });
+    d.appendChild(r); d.appendChild(fb); box.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>
