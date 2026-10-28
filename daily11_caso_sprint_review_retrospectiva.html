@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily 11 — Sprint Review y Retrospectiva</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .support-logo { height: 58px; width: auto; float: right; margin-left: 1rem; }
+  figure svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: .7rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--guinda); color: var(--white); border-radius: var(--radius-lg); padding: .8rem 1rem; text-align: center; }
+  .kpi .n { font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; line-height: 1; }
+  .kpi .l { font-family: var(--font-ui); font-size: .76rem; opacity: .85; display: block; margin-top: .3rem; }
+  .kpi.alt { background: #8a3a74; }
+
+  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .board { grid-template-columns: 1fr; } }
+  .col { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem; }
+  .col h4 { margin: 0 0 .6rem; font-family: var(--font-ui); font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-dark); }
+  .col.done { border-top: 4px solid #2e7d4f; } .col.prog { border-top: 4px solid #e0a400; } .col.todo { border-top: 4px solid var(--border-strong); }
+  .tk { background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--guinda); border-radius: var(--radius-md); padding: .65rem .8rem; margin-bottom: .5rem; font-size: .88rem; line-height: 1.45; box-shadow: var(--shadow-sm); }
+  .tk b { display: block; color: var(--ink); }
+  .tk .pt { display: inline-block; margin-top: .3rem; background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .1rem .6rem; font-family: var(--font-ui); font-size: .74rem; font-weight: 700; color: var(--guinda-dark); }
+  .tk .st { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); display: block; margin-top: .2rem; }
+  .epic { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: var(--radius-md); padding: .6rem 1rem; font-family: var(--font-ui); font-size: .88rem; color: var(--guinda-dark); margin-bottom: .8rem; }
+  .epic strong { text-transform: uppercase; letter-spacing: .1em; font-size: .72rem; margin-right: .5rem; color: var(--guinda-mid); }
+
+  .qs { list-style: none; padding: 0; margin: 1rem 0; counter-reset: q; }
+  .qs > li { counter-increment: q; background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.2rem 1rem 3.6rem; margin-bottom: .8rem; position: relative; box-shadow: var(--shadow-sm); }
+  .qs > li::before { content: counter(q); position: absolute; left: 1rem; top: 1rem; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--guinda); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-ui); font-weight: 700; }
+  .qs .qt { font-size: 1rem; line-height: 1.55; color: var(--ink); margin: 0 0 .6rem; }
+  .qs details summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: .85rem; color: var(--guinda); }
+  .qs details .ans { margin-top: .5rem; padding: .7rem 1rem; background: var(--white); border-left: 4px solid var(--guinda); border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: .93rem; line-height: 1.55; color: var(--ink-secondary); }
+
+  .cert { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.2rem 1.4rem; margin-bottom: 1rem; }
+  .cert .cn { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .cert .ct { font-size: 1.02rem; line-height: 1.6; margin: .3rem 0 .8rem; color: var(--ink); }
+  .cert .opt { display: block; width: 100%; text-align: left; background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: .7rem .95rem; margin-bottom: .45rem; font-size: .95rem; line-height: 1.5; cursor: pointer; font-family: var(--font-body); color: var(--ink); }
+  .cert .opt:hover:not(:disabled) { border-color: var(--guinda-rule); }
+  .cert .opt.good { border-color: #2e7d4f; background: #e9f7ee; }
+  .cert .opt.bad { border-color: #c0392b; background: #fdecec; }
+  .cert .exp { display: none; margin-top: .5rem; font-size: .9rem; line-height: 1.6; color: var(--ink-secondary); background: var(--white); border-left: 4px solid var(--guinda); padding: .7rem 1rem; border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+  .cert.done .exp { display: block; }
+
+  .req { background: var(--white); border: 2px dashed var(--guinda); border-radius: var(--radius-lg); padding: .9rem 1.2rem; margin: 1rem 0; }
+  .req .who { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .req p { margin: .3rem 0 0; font-size: .98rem; line-height: 1.55; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .two { grid-template-columns: 1fr; } }
+  .pb .tk { display: flex; gap: .7rem; align-items: flex-start; }
+  .pb .rk { flex: none; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--guinda); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-ui); font-weight: 700; font-size: .8rem; }
+  .col.lock { border-top: 4px solid var(--guinda); }
+  .col.free { border-top: 4px solid #e0a400; }
+  .col .sub { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); margin: -.3rem 0 .6rem; display: block; }
+
+  .notes { margin: .5rem 0 0; padding-left: 1.2rem; font-size: .93rem; line-height: 1.6; }
+  .story b { font-weight: 400; font-style: italic; }
+  .story .ttl { display: block; font-family: var(--font-ui); font-style: normal; font-weight: 700; font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-mid); margin-bottom: .25rem; }
+
+  .plan { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .9rem 1.1rem; margin: 1rem 0; }
+  .plan .it { display: flex; align-items: center; gap: .7rem; background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--guinda); border-radius: var(--radius-md); padding: .55rem .8rem; margin-bottom: .45rem; font-size: .92rem; cursor: pointer; }
+  .plan .it input { accent-color: var(--guinda); width: 1.1rem; height: 1.1rem; flex: none; }
+  .plan .it .nm { flex: 1; line-height: 1.4; }
+  .plan .it .nm small { display: block; font-family: var(--font-ui); font-size: .74rem; color: var(--ink-muted); }
+  .plan .it .pt { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .1rem .65rem; font-family: var(--font-ui); font-size: .76rem; font-weight: 700; color: var(--guinda-dark); }
+  .meter { height: 18px; background: var(--white); border: 1px solid var(--border-strong); border-radius: 999px; overflow: hidden; margin: .7rem 0 .4rem; position: relative; }
+  .meter .fill { height: 100%; width: 0; background: #2e7d4f; transition: width .25s, background .25s; }
+  .meter .line { position: absolute; top: 0; bottom: 0; width: 3px; background: var(--ink); }
+  .plan .msg { font-family: var(--font-ui); font-size: .88rem; font-weight: 700; padding: .5rem .85rem; border-radius: var(--radius-md); }
+  .plan .msg.ok { background: #e9f7ee; color: #1f6b3d; border: 1px solid #2e7d4f; } .plan .msg.warn { background: #fff4d6; color: #7a5600; border: 1px solid #e0a400; } .plan .msg.bad { background: #fdecec; color: #a52a1f; border: 1px solid #c0392b; }
+
+  .sortq { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem 1.1rem; margin-bottom: .6rem; }
+  .sortq p { margin: 0 0 .5rem; font-size: .95rem; line-height: 1.55; }
+  .sortq .row { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .sortq button { font-family: var(--font-ui); font-size: .82rem; font-weight: 600; background: var(--white); border: 1.5px solid var(--border-strong); border-radius: 999px; padding: .4rem .9rem; cursor: pointer; color: var(--ink-secondary); }
+  .sortq button:hover:not(:disabled) { border-color: var(--guinda-rule); }
+  .sortq .fb { font-family: var(--font-ui); font-size: .84rem; margin-top: .45rem; }
+  .sortq.ok { border-color: #2e7d4f; background: #e9f7ee; } .sortq.no { border-color: #c0392b; background: #fdecec; }
+  .sortq .fb.ok { color: #1f6b3d; } .sortq .fb.no { color: #a52a1f; }
+  .storycard { background: var(--white); border: 2px dashed var(--guinda); border-radius: var(--radius-lg); padding: .8rem 1.2rem; margin: 1rem 0 .6rem; font-size: .98rem; line-height: 1.55; }
+  .storycard .who { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .plan h5 { margin: 0 0 .5rem; font-family: var(--font-ui); font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-dark); }
+  .plan h5 span { display: block; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--ink-muted); font-size: .76rem; margin-top: .1rem; }
+
+  .rv { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem 1.1rem; margin-bottom: .6rem; }
+  .rv .hd { display: flex; justify-content: space-between; align-items: baseline; gap: .6rem; margin-bottom: .4rem; }
+  .rv .hd b { font-size: .98rem; }
+  .rv .hd .pt { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .1rem .65rem; font-family: var(--font-ui); font-size: .76rem; font-weight: 700; color: var(--guinda-dark); white-space: nowrap; }
+  .rv .st { font-size: .88rem; line-height: 1.5; color: var(--ink-secondary); }
+  .rv .st em { font-style: normal; font-weight: 700; font-family: var(--font-ui); font-size: .78rem; }
+  .rv .yes { color: #1f6b3d; } .rv .not { color: #a52a1f; }
+  .rv .row { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .6rem; }
+  .rv button { font-family: var(--font-ui); font-size: .82rem; font-weight: 600; background: var(--white); border: 1.5px solid var(--border-strong); border-radius: 999px; padding: .4rem .9rem; cursor: pointer; color: var(--ink-secondary); }
+  .rv button:hover:not(:disabled) { border-color: var(--guinda-rule); }
+  .rv .fb { font-family: var(--font-ui); font-size: .84rem; margin-top: .45rem; }
+  .rv.ok { border-color: #2e7d4f; background: #e9f7ee; } .rv.no { border-color: #c0392b; background: #fdecec; }
+  .rv .fb.ok { color: #1f6b3d; } .rv .fb.no { color: #a52a1f; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-wrap"><img src="imagen1.png" alt="Mixtle, mascota del IEDEP"></div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Daily Scrum — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<section class="class-hero">
+  <span class="class-label">Unidad 1 · Daily Scrum n.º 11 · 15 minutos</span>
+  <h1>Caso del sprint: el día de la Sprint Review</h1>
+  <span class="class-subtitle">Un caso breve para ver cómo los Done Criteria y los criterios de aceptación se usan al cerrar el sprint, y para repasar la Retrospectiva.</span>
+  <div class="meta-row">
+    <div class="meta-item">Programa educativo<span>Lic. en Sistemas Computacionales</span></div>
+    <div class="meta-item">Asignatura<span>Ingeniería de Software I</span></div>
+    <div class="meta-item">Fecha<span>Miércoles 28 de octubre de 2026</span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <section class="section">
+    <h2 class="section-title">Contexto</h2>
+    <div class="concept-box">
+      <img class="support-logo" src="imagen2.png" alt="Mixtle, mascota de apoyo del IEDEP">
+      <span class="concept-title">El caso, con continuidad</span>
+      <p>Es el <strong>último día del sprint</strong> de 19 puntos. Llegó la <strong>Sprint Review</strong>, que en el SBOK se llama <em>Demonstrate and Validate Sprint</em>. Participan el equipo central y los Stakeholders. El <strong>Product Owner</strong> decide qué se acepta usando dos listas: los <strong>criterios de aceptación</strong> de cada historia y los <strong>Done Criteria</strong> del equipo.</p>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="n">19</div><span class="l">puntos comprometidos</span></div>
+      <div class="kpi"><div class="n">4</div><span class="l">historias del sprint</span></div>
+      <div class="kpi"><div class="n">20</div><span class="l">velocidad promedio anterior</span></div>
+      <div class="kpi alt"><div class="n" id="kAcc">?</div><span class="l" id="kAccL">puntos aceptados</span></div>
+    </div>
+
+    <p><strong>Decidan como Product Owner:</strong> para cada historia, ¿se acepta o se rechaza? Se muestra su estado real.</p>
+    <div id="rvBox"></div>
+    <div class="plan" style="margin-top:.8rem"><div class="msg warn" id="rvMsg">Tomen la decisión de las cuatro historias.</div></div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Preguntas para la Daily</h2>
+    <p class="text-muted" style="margin-top:0">Se responden en voz alta, cada quien desde su rol. Al final de cada una se puede abrir la respuesta esperada.</p>
+    <ol class="qs">
+      <li><p class="qt">¿Qué se hace en la Sprint Review, quiénes participan y qué decide el Product Owner?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">Se <strong>muestra el trabajo terminado</strong> y se valida. Participan el equipo central (Product Owner, Scrum Master y Scrum Team) y los <strong>Stakeholders</strong>. El Product Owner decide qué entregables se <strong>aceptan</strong> y cuáles se <strong>rechazan</strong>.</div></details></li>
+      <li><p class="qt">¿Qué dos listas necesita el Product Owner para decidir si acepta una historia?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">Los <strong>Done Criteria</strong> (comunes a todas las historias) y los <strong>criterios de aceptación</strong> de esa historia. Son entradas obligatorias de este proceso, por eso conviene tenerlos escritos <em>antes</em> del sprint.</div></details></li>
+      <li><p class="qt">La historia del recordatorio (8 puntos) está programada, pero sin pruebas. ¿Se muestra como terminada? ¿Cuántos puntos cuentan para la velocidad?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans"><strong>No se muestra como terminada</strong>, porque no cumple los Done Criteria. Como regla general, a la velocidad solo se suman los puntos de lo terminado, así que de esta historia cuentan <strong>0</strong>. La velocidad de este sprint sería de <strong>8 puntos</strong>, no de 19.</div></details></li>
+      <li><p class="qt">La historia 2 fue rechazada por no respetar «solo ver». ¿Qué pasa con ella?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">Es un <strong>entregable rechazado</strong>: no se acepta ni se suma a la velocidad. El equipo la corrige, y el Product Owner decide cuándo se retoma, por ejemplo regresándola al Product Backlog y priorizándola de nuevo.</div></details></li>
+      <li><p class="qt">Para la Retrospectiva: ¿qué dos cosas seguirían haciendo, cuál dejarían de hacer y cuál sería la mejora acordada concreta para el próximo sprint?</p>
+        <details><summary>Ver nota</summary><div class="ans">Pregunta abierta. En la Retrospectiva se revisa el <strong>proceso</strong>, no el producto. Lo que se mantiene son las buenas prácticas; lo que se deja son los problemas y cuellos de botella. Pista para esta historia: ¿escribieron los criterios de aceptación <em>antes</em> del sprint? ¿Era razonable una historia de 8 puntos?</div></details></li>
+    </ol>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Dos preguntas tipo certificación</h2>
+    <p class="text-muted" style="margin-top:0">Con el estilo y el vocabulario del examen Scrum Fundamentals Certified (SBOK®), basadas en el mismo caso.</p>
+    <div id="certBox"></div>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Unidad 1 · Daily Scrum n.º 11 · Miércoles 28 de octubre de 2026</span>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
+  var QS = [
+    { q: 'Durante la Demonstrate and Validate Sprint, el Product Owner decide si acepta o rechaza los entregables del sprint. ¿Cuáles son dos de las entradas obligatorias que usa para decidirlo?',
+      o: ['Los Done Criteria y los criterios de aceptación de las historias (User Story Acceptance Criteria).', 'Las épicas y las personas (Personas).', 'El registro de impedimentos y el burndown chart.', 'El calendario de lanzamientos y la duración del sprint.'], c: 0,
+      e: 'Para decidir si acepta o rechaza un entregable, el Product Owner se apoya en los Done Criteria y en los criterios de aceptación de cada historia. Las salidas del proceso son los entregables aceptados (Accepted Deliverables) y los rechazados (Rejected Deliverables).' },
+    { q: 'Al final del sprint, el equipo se reúne para analizar cómo trabajó y qué puede mejorar en el siguiente sprint. ¿Cuál es la salida obligatoria del proceso Retrospect Sprint?',
+      o: ['Las mejoras acordadas y accionables (Agreed Actionable Improvements).', 'Los entregables aceptados (Accepted Deliverables).', 'El acuerdo de entregables funcionales (Working Deliverables Agreement).', 'Los Done Criteria.'], c: 0,
+      e: 'La Retrospect Sprint revisa el proceso: qué seguir haciendo (buenas prácticas) y qué dejar de hacer (problemas y cuellos de botella). Su salida obligatoria son las mejoras acordadas y accionables. Los entregables aceptados salen de la Sprint Review y el acuerdo de entregables funcionales, de Ship Deliverables.' }
+  ];
+  var box = document.getElementById('certBox');
+  QS.forEach(function (it, qi) {
+    var wrap = document.createElement('div'); wrap.className = 'cert';
+    var n = document.createElement('div'); n.className = 'cn'; n.textContent = 'Pregunta de certificación ' + (qi + 1) + ' de ' + QS.length; wrap.appendChild(n);
+    var t = document.createElement('div'); t.className = 'ct'; t.textContent = it.q; wrap.appendChild(t);
+    var opts = shuffle(it.o.map(function (x, i) { return { t: x, ok: i === it.c }; })), btns = [];
+    opts.forEach(function (op) {
+      var b = document.createElement('button'); b.className = 'opt'; b.textContent = op.t; btns.push(b);
+      b.addEventListener('click', function () {
+        if (wrap.classList.contains('done')) return; wrap.classList.add('done');
+        btns.forEach(function (x, i) { x.disabled = true; if (opts[i].ok) x.classList.add('good'); });
+        if (!op.ok) b.classList.add('bad');
+      });
+      wrap.appendChild(b);
+    });
+    var e = document.createElement('div'); e.className = 'exp'; var s = document.createElement('strong'); s.textContent = 'Explicación: '; e.appendChild(s); e.appendChild(document.createTextNode(it.e)); wrap.appendChild(e);
+    box.appendChild(wrap);
+  });
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  var S = [
+    { n: 'Compartir una tarea con un compañero', p: 5, acc: [true, 'Cumplidos'], dn: [true, 'Cumplidos'], a: 'A', w: 'Cumple ambas listas: se acepta.' },
+    { n: 'Elegir si el compañero solo ve o también edita', p: 3, acc: [false, 'No cumple: un compañero con permiso «solo ver» todavía puede editar'], dn: [true, 'Cumplidos'], a: 'R', w: 'Cumple los Done Criteria, pero falla un criterio de aceptación: se rechaza, y el equipo lo corrige.' },
+    { n: 'Recibir un aviso cuando me comparten una tarea', p: 3, acc: [true, 'Cumplidos'], dn: [true, 'Cumplidos'], a: 'A', w: 'Cumple ambas listas: se acepta.' },
+    { n: 'Recibir un recordatorio un día antes', p: 8, acc: [true, 'Cumplidos en lo programado'], dn: [false, 'No cumple: faltan las pruebas y la revisión del código'], a: 'R', w: 'No cumple los Done Criteria: no está terminada y no se muestra como aceptada.' }
+  ];
+  var box = document.getElementById('rvBox'), decided = 0, accepted = 0;
+  function summary() {
+    if (decided < S.length) { document.getElementById('kAcc').textContent = accepted + ''; return; }
+    document.getElementById('kAcc').textContent = accepted + '';
+    var m = document.getElementById('rvMsg'); m.className = 'msg bad';
+    m.textContent = 'Se aceptaron ' + accepted + ' de 19 puntos. La velocidad de este sprint es de ' + accepted + ' puntos: solo cuenta lo terminado. Hay material de sobra para la Retrospectiva.';
+  }
+  S.forEach(function (s) {
+    var d = document.createElement('div'); d.className = 'rv';
+    var hd = document.createElement('div'); hd.className = 'hd'; hd.innerHTML = '<b></b><span class="pt"></span>'; hd.firstChild.textContent = s.n; hd.lastChild.textContent = s.p + ' pts'; d.appendChild(hd);
+    var st = document.createElement('div'); st.className = 'st';
+    function line(lbl, o) { var x = document.createElement('div'); var e = document.createElement('em'); e.className = o[0] ? 'yes' : 'not'; e.textContent = (o[0] ? '✓ ' : '✗ ') + lbl + ': '; x.appendChild(e); x.appendChild(document.createTextNode(o[1])); st.appendChild(x); }
+    line('Criterios de aceptación', s.acc); line('Done Criteria', s.dn); d.appendChild(st);
+    var r = document.createElement('div'); r.className = 'row'; var fb = document.createElement('div'); fb.className = 'fb';
+    [['A', 'Aceptar'], ['R', 'Rechazar']].forEach(function (o) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = o[1];
+      b.addEventListener('click', function () {
+        if (o[0] === s.a) {
+          d.className = 'rv ok'; fb.className = 'fb ok'; fb.textContent = 'Correcto. ' + s.w;
+          Array.prototype.forEach.call(r.children, function (x) { x.disabled = true; });
+          decided++; if (s.a === 'A') accepted += s.p; summary();
+        } else { d.className = 'rv no'; fb.className = 'fb no'; fb.textContent = 'Todavía no. Revisa las dos listas: para aceptar, tienen que cumplirse ambas.'; }
+      });
+      r.appendChild(b);
+    });
+    d.appendChild(r); d.appendChild(fb); box.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>
