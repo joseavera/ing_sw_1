@@ -1,0 +1,1047 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Simulador de Scrum y SBOK</title>
+<style>
+:root{
+  color-scheme:light dark;
+  --bg:#faf6f7; --surface:#ffffff; --ink:#261a1e; --muted:#6a5860; --line:#e7dde0;
+  --accent:#7b1034; --accent-ink:#ffffff; --accent-text:#7b1034; --accent-soft:#f7e7ed;
+  --ok:#1b6e45; --ok-soft:#e3f4ea; --bad:#b3261e; --bad-soft:#fcebe8;
+  --warn:#8a5a00; --warn-soft:#fff3d1; --shadow:0 1px 2px rgba(38,26,30,.06),0 8px 24px rgba(38,26,30,.06);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --bg:#151012; --surface:#211a1d; --ink:#f4ebee; --muted:#bcaab1; --line:#3b2e33;
+    --accent:#a3224b; --accent-ink:#ffffff; --accent-text:#f2a6bc; --accent-soft:#3a1e29;
+    --ok:#6fd2a0; --ok-soft:#183427; --bad:#ff9a90; --bad-soft:#40201e;
+    --warn:#f2c56b; --warn-soft:#3a2f14; --shadow:none;
+  }
+}
+:root[data-theme="dark"]{
+  color-scheme:dark;
+  --bg:#151012; --surface:#211a1d; --ink:#f4ebee; --muted:#bcaab1; --line:#3b2e33;
+  --accent:#a3224b; --accent-ink:#ffffff; --accent-text:#f2a6bc; --accent-soft:#3a1e29;
+  --ok:#6fd2a0; --ok-soft:#183427; --bad:#ff9a90; --bad-soft:#40201e;
+  --warn:#f2c56b; --warn-soft:#3a2f14; --shadow:none;
+}
+:root[data-theme="light"]{color-scheme:light}
+
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{
+  margin:0; min-height:100vh; background:var(--bg); color:var(--ink);
+  font:16px/1.55 "Segoe UI",system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;
+  -webkit-user-select:none; user-select:none; -webkit-touch-callout:none;
+}
+input{-webkit-user-select:text;user-select:text}
+h1,h2,h3{line-height:1.25;margin:0}
+p{margin:0}
+button{font:inherit;color:inherit}
+:focus-visible{outline:3px solid var(--accent-text);outline-offset:2px;border-radius:6px}
+
+.wrap{max-width:880px;margin:0 auto;padding:0 16px 56px}
+.appbar{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:18px 0 14px}
+.brand{display:flex;align-items:center;gap:12px;min-width:0}
+.brand-mark{flex:0 0 40px;width:40px;height:40px;border-radius:11px;background:var(--accent);color:var(--accent-ink);display:grid;place-items:center;font-weight:800;letter-spacing:.5px}
+.brand h1{font-size:1.15rem}
+.brand small{display:block;color:var(--muted);font-size:.82rem}
+.icon-btn{border:1px solid var(--line);background:var(--surface);border-radius:10px;width:40px;height:40px;display:grid;place-items:center;cursor:pointer}
+.icon-btn:hover{border-color:var(--accent)}
+
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:22px;box-shadow:var(--shadow)}
+.card + .card{margin-top:16px}
+.lead{color:var(--muted);margin-top:6px}
+.field{margin-top:20px}
+.field > label,.field > .lbl{display:block;font-weight:700;margin-bottom:8px}
+.hint{color:var(--muted);font-size:.88rem;margin-top:6px}
+input[type=text]{width:100%;padding:12px 14px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+input[type=text]:focus{border-color:var(--accent);outline:none;box-shadow:0 0 0 3px var(--accent-soft)}
+select{padding:11px 12px;border:1.5px solid var(--line);border-radius:10px;background:var(--bg);color:var(--ink);font:inherit}
+
+.modes{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.mode{border:1.5px solid var(--line);border-radius:12px;padding:14px 16px;cursor:pointer;background:var(--surface);text-align:left}
+.mode b{display:block}
+.mode span{display:block;color:var(--muted);font-size:.88rem;margin-top:4px}
+.mode[aria-checked="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:7px 14px;font-size:.9rem;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.row{display:flex;flex-wrap:wrap;gap:16px;align-items:center}
+.check{display:flex;align-items:center;gap:8px;cursor:pointer}
+.check input{width:18px;height:18px;accent-color:var(--accent)}
+.summary{margin-top:20px;padding:14px 16px;border-radius:12px;background:var(--accent-soft);color:var(--ink);font-size:.95rem}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:22px}
+
+.btn{border:1.5px solid var(--line);background:var(--surface);border-radius:11px;padding:11px 18px;font-weight:600;cursor:pointer}
+.btn:hover{border-color:var(--accent)}
+.btn.primary{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.btn.primary:hover{filter:brightness(1.08)}
+.btn:disabled{opacity:.45;cursor:not-allowed;filter:none}
+.btn.small{padding:7px 12px;font-size:.88rem}
+
+.hud{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.hud .left{font-weight:700}
+.pills{display:flex;flex-wrap:wrap;gap:8px}
+.pill{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:.9rem;font-variant-numeric:tabular-nums}
+.pill.warn{background:var(--warn-soft);border-color:var(--warn);color:var(--warn)}
+.pill.bad{background:var(--bad-soft);border-color:var(--bad);color:var(--bad)}
+.bar{height:8px;border-radius:99px;background:var(--line);overflow:hidden;margin-bottom:16px}
+.bar i{display:block;height:100%;background:var(--accent);width:0;transition:width .25s ease}
+.topic{display:inline-block;font-size:.8rem;font-weight:700;letter-spacing:.3px;color:var(--accent-text);background:var(--accent-soft);border-radius:999px;padding:3px 11px;margin-bottom:12px}
+.case{margin:0 0 14px;padding:12px 14px;border-left:4px solid var(--accent);background:var(--bg);border-radius:0 10px 10px 0;font-size:.95rem;color:var(--muted)}
+.stem{font-size:1.08rem;font-weight:600;margin-bottom:14px}
+.qlist{margin:0 0 14px;padding:12px 16px 12px 18px;list-style:none;background:var(--bg);border-radius:10px;border:1px solid var(--line)}
+.qlist li{padding:2px 0}
+.qtable{width:100%;border-collapse:collapse;margin:0 0 16px;font-size:.92rem}
+.qtable th,.qtable td{border:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+.qtable th{background:var(--accent-soft);color:var(--accent-text)}
+.scroll-x{overflow-x:auto}
+
+.opt{display:flex;gap:12px;align-items:flex-start;width:100%;text-align:left;padding:13px 15px;margin-bottom:10px;border:1.5px solid var(--line);border-radius:12px;background:var(--surface);cursor:pointer}
+.opt:hover{border-color:var(--accent)}
+.opt .let{flex:0 0 28px;height:28px;border-radius:8px;display:grid;place-items:center;font-weight:800;font-size:.9rem;background:var(--accent-soft);color:var(--accent-text)}
+.opt .txt{flex:1;min-width:0}
+.opt .tag{flex:0 0 auto;font-size:.76rem;font-weight:800;border-radius:6px;padding:2px 8px;align-self:center;white-space:nowrap}
+.opt.sel{border-color:var(--accent);background:var(--accent-soft)}
+.opt.sel .let{background:var(--accent);color:var(--accent-ink)}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.ok .let{background:var(--ok);color:var(--bg)}
+.opt.ok .tag{background:var(--ok);color:var(--bg)}
+.opt.bad{border-color:var(--bad);background:var(--bad-soft)}
+.opt.bad .let{background:var(--bad);color:var(--bg)}
+.opt.bad .tag{background:var(--bad);color:var(--bg)}
+.opt.lock{cursor:default}
+.opt.lock:hover{border-color:inherit}
+
+.fb{margin-top:6px;padding:14px 16px;border-radius:12px;border:1.5px solid var(--line);background:var(--bg)}
+.fb.ok{border-color:var(--ok);background:var(--ok-soft)}
+.fb.bad{border-color:var(--bad);background:var(--bad-soft)}
+.fb h3{font-size:1rem;margin-bottom:6px}
+.fb.ok h3{color:var(--ok)}
+.fb.bad h3{color:var(--bad)}
+.vnote{margin-top:10px;padding:9px 12px;border-radius:9px;background:var(--warn-soft);color:var(--warn);font-size:.88rem;border:1px solid var(--warn)}
+.navrow{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;align-items:center;margin-top:18px}
+.navrow .grp{display:flex;flex-wrap:wrap;gap:10px}
+
+.navgrid{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px;padding-top:16px;border-top:1px solid var(--line)}
+.navgrid button{width:36px;height:36px;border-radius:9px;border:1.5px solid var(--line);background:var(--surface);cursor:pointer;font-weight:700;font-size:.85rem;position:relative}
+.navgrid button.done{background:var(--accent-soft);border-color:var(--accent)}
+.navgrid button.cur{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.navgrid button.flag::after{content:"";position:absolute;top:-4px;right:-4px;width:11px;height:11px;border-radius:50%;background:var(--warn);border:2px solid var(--surface)}
+.legend{display:flex;flex-wrap:wrap;gap:14px;font-size:.82rem;color:var(--muted);margin-top:10px}
+
+.score{display:grid;grid-template-columns:160px 1fr;gap:22px;align-items:center}
+.ring{position:relative;width:150px;height:150px}
+.ring svg{width:150px;height:150px;transform:rotate(-90deg)}
+.ring .num{position:absolute;inset:0;display:grid;place-items:center;text-align:center}
+.ring .num b{font-size:2rem;line-height:1}
+.ring .num span{display:block;font-size:.8rem;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:10px;margin-top:12px}
+.stat{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--bg)}
+.stat b{display:block;font-size:1.3rem;font-variant-numeric:tabular-nums}
+.stat span{font-size:.82rem;color:var(--muted)}
+.tb{margin-top:8px}
+.tb .line{display:grid;grid-template-columns:minmax(120px,230px) 1fr 64px;gap:10px;align-items:center;margin:8px 0;font-size:.92rem}
+.tb .track{height:10px;border-radius:99px;background:var(--line);overflow:hidden}
+.tb .track i{display:block;height:100%;background:var(--accent)}
+.tb .pct{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0}
+.tab{border:1.5px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;cursor:pointer;font-size:.9rem}
+.tab[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.rev-item{border:1px solid var(--line);border-radius:14px;padding:16px;margin-bottom:12px;background:var(--surface)}
+.rev-item.hid{display:none}
+.rev-head{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-bottom:8px}
+.badge{font-size:.78rem;font-weight:800;border-radius:6px;padding:2px 9px}
+.badge.ok{background:var(--ok-soft);color:var(--ok);border:1px solid var(--ok)}
+.badge.bad{background:var(--bad-soft);color:var(--bad);border:1px solid var(--bad)}
+.badge.na{background:var(--warn-soft);color:var(--warn);border:1px solid var(--warn)}
+.rev-item .stem{font-size:1rem}
+
+.modal-back{position:fixed;inset:0;background:rgba(10,5,7,.55);display:none;align-items:center;justify-content:center;padding:16px;z-index:100}
+.modal-back.on{display:flex}
+.modal{max-width:440px;width:100%}
+.toast{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;z-index:120;max-width:90vw;display:none;font-weight:600;box-shadow:0 8px 24px rgba(0,0,0,.3)}
+.toast.on{display:block}
+#wm{position:fixed;inset:0;pointer-events:none;z-index:60;opacity:.16;background-repeat:repeat;display:none;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.foot{margin-top:28px;text-align:center;color:var(--muted);font-size:.84rem}
+.hidden{display:none !important}
+.print-head{display:none}
+
+@media (max-width:620px){
+  .modes{grid-template-columns:1fr}
+  .score{grid-template-columns:1fr;justify-items:center}
+  .tb .line{grid-template-columns:1fr 64px}
+  .tb .line .track{grid-column:1 / -1;order:3}
+  .card{padding:16px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+@media print{
+  body{background:#fff;color:#000}
+  .noprint,.appbar .icon-btn,.tabs,.actions{display:none !important}
+  .print-head{display:block;margin-bottom:14px;border-bottom:2px solid #7b1034;padding-bottom:8px}
+  .rev-item.hid{display:block !important}
+  .rev-item,.card{break-inside:avoid;box-shadow:none}
+  #wm{opacity:.12}
+}
+</style>
+</head>
+<body>
+<div id="wm" aria-hidden="true"></div>
+<div class="wrap">
+
+  <header class="appbar noprint-keep">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">SB</div>
+      <div>
+        <h1>Simulador de Scrum y SBOK</h1>
+        <small>Banco de <span id="totalQ">37</span> reactivos con retroalimentación</small>
+      </div>
+    </div>
+    <button class="icon-btn noprint" id="themeBtn" type="button" aria-label="Cambiar entre tema claro y oscuro" title="Cambiar tema">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+    </button>
+  </header>
+
+  <!-- INICIO -->
+  <main id="s-start">
+    <section class="card">
+      <h2>Configura tu simulacro</h2>
+      <p class="lead">Practica con retroalimentación inmediata o presenta un examen cronometrado. Al terminar verás tu puntaje por tema y podrás exportar el resultado a PDF.</p>
+
+      <div class="field">
+        <label for="name">Nombre del estudiante</label>
+        <input type="text" id="name" maxlength="60" autocomplete="off" placeholder="Escribe tu nombre completo">
+        <p class="hint">Aparece como marca de agua en pantalla y en el PDF.</p>
+      </div>
+
+      <div class="field">
+        <span class="lbl" id="modeLbl">Modo</span>
+        <div class="modes" role="radiogroup" aria-labelledby="modeLbl">
+          <button type="button" class="mode" role="radio" aria-checked="true" data-mode="practice">
+            <b>Práctica</b><span>Respuesta y explicación al instante. Sin límite de tiempo.</span>
+          </button>
+          <button type="button" class="mode" role="radio" aria-checked="false" data-mode="exam">
+            <b>Examen</b><span>Cronómetro regresivo, navegación libre, resultados al final y control de cambio de pestaña.</span>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <span class="lbl" id="topLbl">Temas</span>
+        <div class="chips" id="topicChips" role="group" aria-labelledby="topLbl"></div>
+      </div>
+
+      <div class="field row">
+        <div>
+          <label for="count" style="display:block;font-weight:700;margin-bottom:8px">Número de preguntas</label>
+          <select id="count"></select>
+        </div>
+        <label class="check"><input type="checkbox" id="shufQ" checked> Mezclar preguntas</label>
+        <label class="check"><input type="checkbox" id="shufO" checked> Mezclar opciones</label>
+      </div>
+
+      <div class="summary" id="cfgSummary" aria-live="polite"></div>
+
+      <div class="actions">
+        <button type="button" class="btn primary" id="startBtn" disabled>Comenzar</button>
+      </div>
+      <p class="hint" id="startHint">Escribe tu nombre para habilitar el botón.</p>
+    </section>
+  </main>
+
+  <!-- PREGUNTAS -->
+  <main id="s-quiz" class="hidden">
+    <div class="hud">
+      <div class="left" id="qCounter">Pregunta 1 de 1</div>
+      <div class="pills">
+        <span class="pill" id="pScore"></span>
+        <span class="pill" id="pInf"></span>
+        <span class="pill" id="pTime">00:00</span>
+      </div>
+    </div>
+    <div class="bar" aria-hidden="true"><i id="barFill"></i></div>
+    <section class="card" id="qCard" aria-live="polite"></section>
+    <div id="examNav" class="hidden">
+      <div class="navgrid" id="navGrid" role="group" aria-label="Navegador de preguntas"></div>
+      <div class="legend">
+        <span>Rosa claro: respondida</span><span>Punto amarillo: marcada para revisar</span><span>Color sólido: pregunta actual</span>
+      </div>
+    </div>
+  </main>
+
+  <!-- RESULTADOS -->
+  <main id="s-result" class="hidden">
+    <div class="print-head" id="printHead"></div>
+    <section class="card">
+      <div class="score">
+        <div class="ring">
+          <svg viewBox="0 0 120 120" aria-hidden="true">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="var(--line)" stroke-width="12"/>
+            <circle id="ringArc" cx="60" cy="60" r="52" fill="none" stroke="var(--accent)" stroke-width="12" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+          </svg>
+          <div class="num"><div><b id="resPct">0%</b><span>de aciertos</span></div></div>
+        </div>
+        <div>
+          <h2 id="resTitle">Resultado</h2>
+          <p class="lead" id="resMsg"></p>
+          <div class="stats" id="resStats"></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Desempeño por tema</h2>
+      <div class="tb" id="topicBars"></div>
+    </section>
+
+    <section class="card">
+      <h2>Revisión de reactivos</h2>
+      <div class="tabs noprint" id="revTabs" role="group" aria-label="Filtrar revisión">
+        <button type="button" class="tab" aria-pressed="true" data-f="all">Todas</button>
+        <button type="button" class="tab" aria-pressed="false" data-f="bad">Incorrectas</button>
+        <button type="button" class="tab" aria-pressed="false" data-f="ok">Correctas</button>
+        <button type="button" class="tab" aria-pressed="false" data-f="na">Sin responder</button>
+      </div>
+      <div id="revList"></div>
+      <div class="actions noprint">
+        <button type="button" class="btn primary" id="btnRetryBad">Repetir solo las incorrectas</button>
+        <button type="button" class="btn" id="btnAgain">Nuevo intento con la misma configuración</button>
+        <button type="button" class="btn" id="btnPdf">Exportar a PDF</button>
+        <button type="button" class="btn" id="btnHome">Cambiar configuración</button>
+      </div>
+    </section>
+  </main>
+
+  <p class="foot">Material de apoyo para el estudio de Scrum y la Guía SBOK. Elaborado por Mtro. José Armando Vera Rodríguez.</p>
+</div>
+
+<div class="modal-back" id="modal" role="dialog" aria-modal="true" aria-labelledby="mTitle">
+  <div class="card modal">
+    <h2 id="mTitle">Finalizar</h2>
+    <p class="lead" id="mBody"></p>
+    <div class="actions">
+      <button type="button" class="btn" id="mCancel">Seguir respondiendo</button>
+      <button type="button" class="btn primary" id="mOk">Finalizar y ver resultados</button>
+    </div>
+  </div>
+</div>
+<div class="toast" id="toast" role="status"></div>
+
+<script>
+/* ===== BANCO DE REACTIVOS =====
+   t: tema | q: enunciado | o: opciones | ok: índices (base 0) de respuestas válidas
+   e: explicación | v: 1 = respuesta deducida/ambigua, conviene contrastar con el material del curso
+   ctx: contexto del caso | list: lista de incisos | tbl: tabla | ns: 1 = no mezclar opciones */
+const Q = [
+{id:1,t:"Flujo, roles y escalado",
+ ctx:"Caso VMfoods: cadena nacional de supermercados con 10 sucursales. Para aumentar su cuota de mercado, la gerencia decide ofrecer entregas a domicilio y encarga al equipo de TI (18 personas, dos equipos Scrum de 9 integrantes) un sitio web donde los clientes preparen y paguen su pedido en línea. Usted forma parte del Equipo Scrum 1.",
+ q:"¿Cuál es la entrada obligatoria del proceso Crear la visión del proyecto?",
+ o:["Caso de negocio","Declaración de la visión del proyecto","Backlog priorizado del producto","Cronograma de planificación de la liberación"],
+ ok:[0],
+ e:"El Caso de negocio justifica el proyecto (aquí, las entregas a domicilio de VMfoods) y es la entrada obligatoria de Crear la visión del proyecto. La Declaración de la visión es la salida principal de ese proceso, no su entrada. Nota: la pregunta original no traía opciones; los distractores fueron redactados para este simulador."},
+
+{id:2,t:"Autoorganización",
+ q:"¿Cuál de las siguientes opciones NO es un resultado de la autoorganización?",
+ o:["La entrega de resultados tangibles","El compromiso del equipo","Propiedad individual","Propiedad colectiva"],
+ ok:[2],
+ e:"La autoorganización produce compromiso del equipo, propiedad colectiva (compartida) y resultados tangibles. La propiedad individual es lo contrario: nadie es dueño exclusivo del trabajo, el equipo comparte la responsabilidad."},
+
+{id:3,t:"Fundamentos y principios",v:1,
+ q:"¿Cuál de los siguientes pares está incorrectamente relacionado?",
+ o:["Entrega priorizada: Enfoque único en el valor de negocio","Apropiación: Adaptar la tecnología a la situación propia","Adaptación: La identificación de riesgos se lleva a cabo en forma iterativa a lo largo del proyecto","Colaboración: Los interesados del negocio y el equipo de desarrollo interactúan constantemente"],
+ ok:[0],
+ e:"Apropiación (dimensión de la Colaboración) sí es adaptar la tecnología a la situación propia, y la Colaboración sí implica interacción constante entre interesados y equipo. En cambio, la priorización basada en el valor considera varios factores a la vez (valor de negocio, riesgo o incertidumbre y dependencias), por lo que no es un «enfoque único» en el valor de negocio. La redacción de este reactivo es ambigua: contrástalo con tu material."},
+
+{id:4,t:"Colaboración",
+ q:"¿Cuál de las siguientes opciones NO es un resultado de la coubicación en Scrum?",
+ o:["Las preguntas se responden rápidamente","Los problemas se solucionan en el momento","Mayor desconfianza, ya que los miembros de un equipo co-ubicado tienen mayor proximidad entre sí","Hay menor fricción entre las interacciones"],
+ ok:[2],
+ e:"Trabajar en un mismo espacio físico aumenta la confianza, no la desconfianza. La coubicación agiliza las respuestas, resuelve problemas en el momento y reduce la fricción entre las personas."},
+
+{id:5,t:"Valor y gestión tradicional",v:1,
+ q:"¿Cuál de los siguientes enunciados es verdadero sobre la Entrega basada en valor y la gestión tradicional de proyectos?",
+ o:["En ambos, los conceptos y los requerimientos se priorizan con base en el valor de negocio","En ambos, los conceptos y cambios en los requerimientos están permitidos","En ambos, se realizan los conceptos y valores","En ambos hay una entrega incremental"],
+ ok:[1],
+ e:"En ambos enfoques se admiten cambios en los requerimientos, aunque en la gestión tradicional solo mediante un proceso formal de control de cambios, lento y costoso. Priorizar por valor de negocio y entregar de forma incremental (valor temprano y continuo) son rasgos de Scrum; en el enfoque tradicional el valor se obtiene al final del proyecto."},
+
+{id:6,t:"Autoorganización",
+ q:"Todas las siguientes son metas de un equipo autoorganizado, EXCEPTO:",
+ o:["Aumento constante del conocimiento","Buscan entregar el máximo valor de negocio en el menor tiempo posible","Eliminan los impedimentos del desarrollo","Crear y gestionan las tareas en forma independiente"],
+ ok:[2],
+ e:"Remover impedimentos es una responsabilidad del Scrum Master, no una meta propia del equipo autoorganizado. El equipo busca aprender continuamente, entregar el máximo valor en el menor tiempo y crear y gestionar sus tareas de forma independiente."},
+
+{id:7,t:"Time-boxing y reuniones",
+ q:"El Time-boxing es un importante principio de Scrum. Identifique el enunciado incorrecto.",
+ o:["Un sprint tiene un Time-box de 1 a 6 semanas; una Reunión de planificación del sprint tiene un Time-box de 8 horas por un sprint de un mes; un Daily Standup tiene un Time-box de 15 minutos","Un Daily Standup tiene un Time-box de 15 minutos; una Reunión de revisión del sprint tiene un Time-box de 4 horas por un sprint de un mes; un sprint tiene un Time-box de 1 a 6 semanas","Una Reunión de revisión del sprint tiene un Time-box de 6 horas por un sprint de un mes; una Reunión de retrospectiva del sprint tiene un Time-box de 8 horas por un sprint de un mes; una Reunión de planificación del sprint tiene un Time-box de 8 horas por un sprint de una semana","Una Reunión de retrospectiva del sprint tiene un Time-box de 4 horas por un sprint de un mes; un Daily Standup tiene un Time-box de 15 minutos; un sprint tiene un Time-box de 1 a 6 semanas"],
+ ok:[2],
+ e:"Referencia para un sprint de un mes: planificación 8 h (2 h por semana), revisión 4 h (1 h por semana), retrospectiva 4 h (1 h por semana) y Daily Standup 15 min. La opción 3 tiene tres errores: revisión de 6 h, retrospectiva de 8 h y planificación de 8 h para un sprint de una semana (serían 2 h)."},
+
+{id:8,t:"Time-boxing y reuniones",v:1,
+ q:"¿Cuál de las siguientes reuniones no tiene Time-box y se puede hacer de forma virtual?",
+ o:["Reunión de planificación del sprint","Reunión de retrospectiva de la liberación","Reunión de revisión del sprint","Reuniones de planificación de tareas"],
+ ok:[3],
+ e:"La planificación del sprint, la revisión y la retrospectiva tienen Time-boxes formales según la duración del sprint. Las reuniones de planificación de tareas (proceso Crear tareas) no tienen un Time-box formal definido. Se marca para contrastar porque la fuente consultada no indica explícitamente la parte «virtual»."},
+
+{id:9,t:"Autoorganización",ns:1,
+ q:"A continuación se muestran algunas de las principales metas de un equipo autoorganizado. Identifique la opción incorrecta:",
+ list:["A. Estimar historias de usuario y asignarse tareas a sí mismo.","B. Crear tareas independientemente","C. Actualizar conocimientos y habilidades con frecuencia","D. Agregar a nuevos miembros al equipo cuando sea necesaria una nueva habilidad","E. Aplicar al trabajo actual el conocimiento previamente obtenido, así como la experiencia al ser un equipo multidisciplinario."],
+ o:["A y B","D","B y C","E"],
+ ok:[1],
+ e:"Una meta real del equipo autoorganizado es mantener la estabilidad de sus miembros durante el proyecto, evitando cambios salvo que sean inevitables. Agregar gente cada vez que falta una habilidad contradice esa meta; el equipo debe actualizar sus conocimientos y habilidades de forma continua."},
+
+{id:10,t:"Time-boxing y reuniones",
+ q:"¿Cuál de las siguientes opciones NO es verdadera sobre el Time-boxing?",
+ o:["Es uno de los seis principios de Scrum","Una Reunión de planificación del sprint generalmente tiene un Time-box de ocho horas","Reduce la velocidad del equipo","La Reunión de revisión del sprint generalmente tiene un Time-box de cuatro horas"],
+ ok:[2],
+ e:"El Time-boxing mejora la eficiencia: reduce el desperdicio, evita el exceso de refinamiento innecesario y ayuda a que el equipo mantenga su ritmo. No reduce la velocidad. Las demás afirmaciones son correctas para un sprint de un mes."},
+
+{id:11,t:"Proceso empírico y transparencia",v:1,
+ q:"Scrum promueve un flujo fácil y transparente de información en toda la organización. ¿Mediante cuál de las siguientes prácticas de Scrum se demuestra la transparencia?",
+ o:["Planning Poker","Cronograma de planificación de la liberación","Estimar tareas","Reunión de retrospectiva del sprint"],
+ ok:[1],
+ e:"El Cronograma de planificación de la liberación se comparte con los interesados del negocio, lo que lo convierte en la práctica que mejor ejemplifica un flujo abierto de información. Planning Poker y Estimar tareas son técnicas de estimación; la retrospectiva se relaciona más con inspección y adaptación."},
+
+{id:12,t:"Flujo, roles y escalado",v:1,
+ q:"La empresa de desarrollo de software Zeal Solutions ha decidido implementar Scrum en uno de sus proyectos. ¿Cuál sería el primer paso en el ciclo de Scrum?",
+ o:["Reunión de refinamiento del backlog priorizado del producto","Reunión de los interesados del negocio","Reunión de planificación del sprint","Reunión de planificación de la liberación"],
+ ok:[3],
+ e:"En el flujo del SBOK, la planificación de la liberación es el último proceso de la fase Iniciar y se realiza una vez, antes de los sprints. La planificación del sprint abre cada sprint y el refinamiento del backlog ocurre durante la fase Implementar. Se marca para contrastar porque la opción de «reunión de los interesados» no es un proceso formal con ese nombre."},
+
+{id:13,t:"Fundamentos y principios",v:1,
+ q:"La empresa NexGen ABC enfrenta varios problemas y obstáculos mientras trabaja en su proyecto. En Scrum, todo lo siguiente incluye obstáculos que pudieran enfrentarse al implementar un proyecto, EXCEPTO:",
+ o:["Tiempo, Calidad, Entregables","Costo, Visión, Entregables","Personas, Visión, Alcance","Costo, Calidad, Alcance"],
+ ok:[1],
+ e:"El SBOK indica que los proyectos se ven afectados por restricciones de tiempo, costo, alcance, calidad, personas y capacidades organizativas. La Visión y los Entregables no son restricciones. La opción 2 es la que reúne más elementos ajenos (dos de tres). Reactivo ambiguo: las opciones 1 y 3 también incluyen un término ajeno; contrástalo con tu material."},
+
+{id:14,t:"Colaboración",
+ q:"¿Cuál de las siguientes opciones NO es un beneficio de la colaboración en los proyectos de Scrum?",
+ o:["La mejora continua, que lleva a mejores procesos","El aumento en la competencia, lo cual aumenta la motivación del equipo","La minimización de solicitudes de cambio, lo cual reduce la necesidad de reelaboración","Los riesgos mitigados, lo cual aumenta la eficiencia"],
+ ok:[1],
+ e:"La colaboración fomenta el trabajo en equipo, no la competencia entre sus miembros. Sus beneficios son la mejora continua, menos solicitudes de cambio (requerimientos mejor aclarados) y riesgos identificados y atendidos con eficiencia."},
+
+{id:15,t:"Valor y gestión tradicional",
+ q:"¿Cuál de las siguientes opciones es algo típico de la gestión tradicional de proyectos?",
+ o:["La gestión se asegura de que exista un ambiente agradable para que trabajen los empleados","El tiempo dedicado en el papeleo del proyecto se reduce ampliamente","Los miembros del equipo estaban emocionados al saber que podían seleccionar las tareas en las que querían trabajar","Los miembros del equipo fueron recompensados por terminar a tiempo el trabajo planificado"],
+ ok:[3],
+ e:"En la gestión tradicional el éxito se mide por cumplir el plan y el cronograma predefinidos. Reducir papeleo y elegir tareas libremente son rasgos del enfoque ágil y de la autoorganización."},
+
+{id:16,t:"Flujo, roles y escalado",
+ q:"¿Cuál de los siguientes enunciados NO es verdadero sobre Scrum?",
+ o:["En Scrum es preferible tener equipos co-ubicados","El Product Owner representa la “voz del cliente”","Al Equipo Scrum en ocasiones se le denomina “equipo de desarrollo”","El Chief Scrum Master debe estar presente durante el Daily Standup del Equipo Scrum"],
+ ok:[3],
+ e:"El rol de «Chief Scrum Master» no existe en Scrum. Los roles principales son Product Owner, Scrum Master y Equipo Scrum."},
+
+{id:17,t:"Proceso empírico y transparencia",
+ q:"El control del proceso empírico se basa en tres ideas principales. ¿Cuál de las siguientes NO es una idea principal en el Control del proceso empírico?",
+ o:["Transparencia","Inspección","Asociación","Adaptación"],
+ ok:[2],
+ e:"Las tres ideas son Transparencia, Inspección y Adaptación. «Asociación» no pertenece a este principio."},
+
+{id:18,t:"Time-boxing y reuniones",
+ q:"La reunión de retrospectiva del sprint se lleva a cabo el último día de un sprint. En este contexto, ¿cuál de las siguientes opciones NO es una meta de dicha reunión?",
+ o:["Identificar las cosas que el equipo debe seguir haciendo que sirven de mejores prácticas","Identificar las cosas que el equipo debe dejar de hacer para procesar problemas y embotellamientos","Identificar a los miembros del equipo que fueron fundamentales para el éxito del sprint","Identificar las cosas que el equipo debe empezar a hacer"],
+ ok:[2],
+ e:"La retrospectiva se centra en el proceso del equipo con el formato empezar / dejar de hacer / continuar. No busca señalar individuos: Scrum enfatiza la propiedad colectiva."},
+
+{id:19,t:"Valor y gestión tradicional",ns:1,
+ q:"La siguiente tabla muestra las diferencias entre Scrum y la gestión tradicional de proyectos. Identifique los errores en las columnas B y C de la tabla y seleccione la opción que enumere correctamente tales errores.",
+ tbl:{h:["Columna A (Criterios)","Columna B - Scrum","Columna C - Tradicional"],
+      r:[["Planificación por adelantado","I. Alta","V. Alta"],
+         ["Garantía de calidad","II. Centrado en el Proyecto/Programa/Portafolio","VI. Centrado en procesos"],
+         ["Liderazgo","III. Liderazgo de apoyo; colaborativo","VII. Cooperación y trabajo en equipo"],
+         ["Participación del cliente","IV. Alta a lo largo del proyecto","VIII. Alta a lo largo del proyecto"]]},
+ o:["III – VI","III – V – VI","I – II – VII – VIII","III – IV – VI"],
+ ok:[2],
+ e:"Valores correctos: planificación por adelantado Baja en Scrum y Alta en tradicional; calidad centrada en el cliente (Scrum) y en procesos (tradicional); liderazgo de apoyo y colaborativo (Scrum) frente a mando y control (tradicional); participación del cliente alta durante el proyecto (Scrum) frente a variable según el ciclo de vida (tradicional). Errores: I, II, VII y VIII."},
+
+{id:20,t:"Time-boxing y reuniones",
+ q:"¿Cuál de las siguientes reuniones de Scrum generalmente no tiene Time-box?",
+ o:["Daily Standup","Reunión de Scrum de Scrums","Reunión de planificación del sprint","Reunión de revisión del sprint"],
+ ok:[1],
+ e:"El Daily Standup (15 min), la planificación del sprint y la revisión del sprint tienen Time-boxes formales. La reunión de Scrum de Scrums no tiene un Time-box formalmente definido."},
+
+{id:21,t:"Proceso empírico y transparencia",
+ q:"El principio de Scrum del Control del proceso empírico se basa en tres ideas principales. ¿Cuál de las siguientes NO es una idea en el Control del proceso empírico?",
+ o:["Adaptación","Inspección","Transparencia","Velocidad"],
+ ok:[3],
+ e:"Los tres pilares son Transparencia, Inspección y Adaptación. La velocidad es una métrica de trabajo completado por sprint, no un pilar."},
+
+{id:22,t:"Valor y gestión tradicional",
+ q:"La empresa QueenSuit Designers está diseñando un sitio web para sus clientes y quiere utilizar la entrega basada en valor. ¿Cuál de los siguientes enunciados sobre la entrega basada en valor NO es verdadero?",
+ o:["Priorizar requerimientos de alto valor en la parte superior del backlog priorizado del producto","Identificar incertidumbres y atenderlas solamente durante la Reunión de retrospectiva del sprint","Trabajar estrechamente con los interesados del proyecto y mostrarles los incrementos del producto a medida que se desarrolla cada uno","Crear entregables con base en las prioridades determinadas a fin de permitir la producción de incrementos del producto potencialmente enviables durante cada sprint"],
+ ok:[1],
+ e:"Las incertidumbres (riesgos) se identifican y atienden de forma continua durante todo el proyecto, no solo en la retrospectiva. Las demás opciones describen prácticas de entrega basada en valor."},
+
+{id:23,t:"Time-boxing y reuniones",
+ q:"La empresa Terson Technologies trabaja en un proyecto de desarrollo de software para una aerolínea, y el proyecto tiene una duración de un mes. El Time-boxing es un importante principio de Scrum. ¿Cuál de los siguientes pares está incorrectamente relacionado según la práctica general de Scrum?",
+ o:["Daily Standup: 15 minutos","Reunión de retrospectiva del sprint: 8 horas","Reunión de planificación del sprint: 8 horas","Reunión de revisión del sprint: 4 horas"],
+ ok:[1],
+ e:"Para un sprint de un mes, la retrospectiva dura 4 horas (1 hora por semana), no 8. Las 8 horas corresponden a la planificación del sprint."},
+
+{id:24,t:"Proceso empírico y transparencia",
+ q:"De ser verdadero, ¿cuál de las siguientes opciones NO fomenta la transparencia en los proyectos de Scrum?",
+ o:["La declaración de la visión del proyecto puede ser vista por todos los interesados del negocio y el Equipo Scrum","El backlog priorizado del producto con las historias de usuario priorizadas que puede ser visto dentro y fuera del Equipo Scrum","El cronograma de planificación de la liberación puede ser coordinado con varios Equipos Scrum","Los Burndown Charts pueden ser vistos solamente por el Equipo Scrum y el Scrum Master"],
+ ok:[3],
+ e:"Los Burndown Charts son «radiadores de información»: deben ser visibles para todos los interesados. Restringirlos al Equipo Scrum y al Scrum Master va contra la transparencia."},
+
+{id:25,t:"Proceso empírico y transparencia",ns:1,
+ q:"¿Qué garantiza la transparencia en Scrum?",
+ list:["A. Scrumboard","B. Lista de impedimentos","C. Daily Standup","D. Desarrollo del producto en silos"],
+ o:["A, B y C","A, C y D","A, B, C y D","Solo A"],
+ ok:[0],
+ e:"El Scrumboard, la lista de impedimentos y el Daily Standup mantienen visible el trabajo, los obstáculos y el avance. El desarrollo en silos aísla la información y es lo opuesto a la transparencia."},
+
+{id:26,t:"Fundamentos y principios",
+ q:"¿Cuál de los siguientes NO es un principio de Scrum?",
+ o:["Control del proceso empírico","Autoorganización","Priorización basada en riesgo","Colaboración"],
+ ok:[2],
+ e:"Los seis principios son: control del proceso empírico, autoorganización, colaboración, priorización basada en el valor, Time-boxing y desarrollo iterativo. El principio se basa en el valor, no en el riesgo (el riesgo es solo uno de los factores al priorizar)."},
+
+{id:27,t:"Fundamentos y principios",
+ q:"Según la Guía del SBOK, ¿cuál de las siguientes opciones NO es un principio de Scrum?",
+ o:["Colaboración","Desarrollo iterativo","Gestión por etapas","Priorización basada en valor"],
+ ok:[2],
+ e:"La gestión por etapas pertenece a enfoques tradicionales. Los seis principios de Scrum son control del proceso empírico, autoorganización, colaboración, priorización basada en el valor, Time-boxing y desarrollo iterativo."},
+
+{id:28,t:"Flujo, roles y escalado",
+ q:"El director de operaciones de su compañía tiene una noción de Scrum y le pregunta a usted sobre qué opina sobre la posibilidad de implementar Scrum en varios proyectos de la organización. ¿Cuál de los siguientes enunciados del director de operaciones NO es verdadero?",
+ o:["Los equipos de Scrum deben de ser preferentemente de 6 a 10 miembros","En un solo proyecto pueden trabajar múltiples equipos de Scrum","Scrum no se puede usar para grandes proyectos","Scrum se puede implementar al nivel del programa"],
+ ok:[2],
+ e:"Scrum escala a proyectos grandes con varios Equipos Scrum coordinados (por ejemplo, mediante Scrum de Scrums) y puede implementarse a nivel de programa o portafolio."},
+
+{id:29,t:"Time-boxing y reuniones",v:1,
+ q:"¿Cuál de las siguientes opciones NO es una ventaja del Time-boxing en proyectos de Scrum?",
+ o:["El Time-boxing ayuda a motivar al equipo para mejorar el desempeño","El Time-boxing proporciona la estructura de los proyectos de Scrum","El Time-boxing ayuda a los equipos a evaluar y llevar a cabo las capacitaciones necesarias","El Time-boxing proporciona un elemento de certidumbre en proyectos de Scrum, que generalmente son volátiles y dinámicos"],
+ ok:[2],
+ e:"Motivar al equipo, dar estructura y aportar certidumbre en entornos volátiles son ventajas atribuibles al Time-boxing. Evaluar y ejecutar capacitaciones no se deriva de limitar el tiempo de las actividades. No se encontró una fuente que liste textualmente estas ventajas, así que conviene contrastarlo con tu material."},
+
+{id:30,t:"Autoorganización",v:1,
+ q:"¿Cuál de los siguientes es un beneficio de la autoorganización en Scrum?",
+ o:["El compromiso del equipo y la propiedad compartida","Se minimiza la necesidad de cambios debido a requerimientos mal aclarados","Motivación, la cual lleva a mejores niveles de desempeño en el equipo","El ambiente innovador y creativo que lleva al crecimiento"],
+ ok:[0,2,3],
+ e:"Tal como está redactada, tres opciones son válidas: los beneficios de la autoorganización son compromiso y propiedad compartida, motivación que mejora el desempeño y un entorno innovador y creativo. La opción 2 (menos cambios por requerimientos mal aclarados) es un beneficio de la Colaboración. En el banco original la pregunta suele formularse con «NO es un beneficio», cuya respuesta sería la opción 2. Este simulador acepta cualquiera de las tres válidas."},
+
+{id:31,t:"Colaboración",
+ q:"En Scrum, la colaboración se refiere al trabajo conjunto del equipo principal de Scrum con los interesados del negocio para crear y validar los entregables del proyecto con el fin de cumplir las metas plasmadas en la visión del proyecto. ¿Cuáles son las tres dimensiones de este principio?",
+ o:["Conocimiento, articulación y apropiación","Transparencia, precisión y coordinación","Perfección, cooperación y comprensión","Honestidad, capacidad de respuesta y adaptabilidad"],
+ ok:[0],
+ e:"Las tres dimensiones son conciencia (awareness), articulación y apropiación. Aquí «conocimiento» equivale a conciencia; las demás opciones no corresponden a las dimensiones del SBOK."},
+
+{id:32,t:"Colaboración",
+ q:"Existen tres dimensiones centrales del trabajo colaborativo en Scrum. ¿Cuál de las siguientes opciones representa estas tres dimensiones?",
+ o:["Conciencia, articulación y apropiación","Aspectos, articulación y garantía","Conciencia, adaptación y apropiación","Aspectos, adaptación y artefactos"],
+ ok:[0],
+ e:"Conciencia: conocer el trabajo de los demás. Articulación: dividir el trabajo en unidades, repartirlas y reintegrarlas. Apropiación: adaptar la tecnología a la situación propia."},
+
+{id:33,t:"Valor y gestión tradicional",
+ q:"Lucas ha sido nombrado Product Owner para la construcción de un sistema de monorriel en la ciudad de Lowenham. En este contexto, ¿cuál de las siguientes NO le ayudará a Lucas a asegurar que los entregables del proyecto sean entregados en forma iterativa?",
+ o:["Asegurar que las épicas sean desarrolladas en la fase de Inicio y no se modifican después durante el proceso","Asegurar que cada historia de usuario compleja se divida mediante una elaboración progresiva durante procesos posteriores","Enfocarse en el valor y en su entrega constante con cada sprint","Asegurar que el Equipo Scrum entienda claramente las historias de usuario en el backlog del sprint"],
+ ok:[0],
+ e:"El desarrollo iterativo se apoya en la elaboración progresiva: las épicas se refinan y dividen en historias de usuario a lo largo del proyecto. Congelarlas desde el inicio contradice ese enfoque."},
+
+{id:34,t:"Proceso empírico y transparencia",v:1,
+ q:"¿Cuál de las siguientes opciones no es un artefacto que se utiliza en Scrum para facilitar la transparencia en un proyecto?",
+ o:["Declaración de la visión del proyecto","Épicas","Backlog priorizado del producto","Cronograma de planificación de la liberación"],
+ ok:[1],
+ e:"La visión, el backlog priorizado y el cronograma de liberación se comparten con interesados y equipos. Las épicas son historias de usuario de gran tamaño que sirven de insumo intermedio y no se citan como artefacto de transparencia. Se marca para contrastar con tu material."},
+
+{id:35,t:"Colaboración",
+ q:"En un proyecto de Scrum, uno de los equipos sigue todas las dimensiones centrales de la colaboración. Los integrantes del equipo son amigables y generalmente la pasan bien entre ellos. ¿Cuál de las siguientes técnicas no contribuye a aumentar el conocimiento sobre los componentes, las actividades y la secuencia de los productos del proyecto que se desarrollarán en el proyecto?",
+ o:["Estructura de desglose del producto","Análisis del valor ganado","Estructura de desglose del trabajo","Diagrama de flujo del producto"],
+ ok:[1],
+ e:"El análisis del valor ganado mide el desempeño de costo y cronograma. La estructura de desglose del producto, la del trabajo y el diagrama de flujo del producto ayudan a entender componentes, actividades y secuencia (dimensión de conciencia)."},
+
+{id:36,t:"Fundamentos y principios",
+ q:"Una empresa exitosa ha estado entregando consistentemente a los clientes incrementos de un producto complejo, incluso cuando el mercado es altamente competitivo, volátil e incierto. La clave del éxito de los proyectos radica en la implementación de Scrum, que es un marco de trabajo adaptativo ágil. ¿Cuál es la verdadera fortaleza de Scrum?",
+ o:["El uso de un coach en forma de un Scrum Master quien guía y enseña constantemente al equipo durante la fase de desarrollo y es el único punto de contacto para cualquier comunicación entre el equipo y el Product Owner","El uso de un Product Owner quien es el único(a) responsable de la entrega del proyecto, en vez de involucrar a varios administradores responsables del proyecto","El uso de equipos multidisciplinarios, autoorganizados y empoderados","El uso de artefactos tales como el backlog del producto y gráficas para mantener alerta a los desarrolladores a fin de acelerar el proceso de desarrollo"],
+ ok:[2],
+ e:"La fortaleza de Scrum son los equipos multidisciplinarios, autoorganizados y empoderados, capaces de adaptarse a mercados volátiles. El Scrum Master no es el único canal de comunicación con el Product Owner, y los artefactos buscan transparencia, no solo velocidad."},
+
+{id:37,t:"Autoorganización",
+ q:"¿Cuál de los siguientes NO es una de las principales metas de un equipos de Scrum autoorganizados?",
+ o:["Estimar historias de usuario y asignarse tareas a sí mismo durante el proceso de Actualizar el backlog del sprint","Aplicar y aprovechar su experiencia de ser un equipo inter-funcional para trabajar en las tareas","Asegurar que el equipo funcione sin problemas y solicite la reasignación de miembros del equipo en caso de un conflicto","Aclarar cualquier discrepancia o duda y estar abierto al aprendizaje de nuevas cosas"],
+ ok:[2],
+ e:"Una meta del equipo autoorganizado es mantener estables a sus miembros durante todo el proyecto y resolver internamente sus conflictos, en lugar de pedir reasignaciones."}
+];
+
+/* ===== LÓGICA DEL SIMULADOR ===== */
+(function () {
+  'use strict';
+
+  var LIMIT = 3;          // infracciones permitidas en modo examen (cambio de pestaña)
+  var SEC_PER_Q = 90;     // segundos por pregunta en modo examen
+  var LET = ['A', 'B', 'C', 'D', 'E'];
+
+  var $ = function (s) { return document.querySelector(s); };
+  var $$ = function (s) { return Array.prototype.slice.call(document.querySelectorAll(s)); };
+  var esc = function (s) {
+    return String(s).replace(/[&<>"']/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+    });
+  };
+  var TOPICS = Q.map(function (q) { return q.t; }).filter(function (t, i, a) { return a.indexOf(t) === i; });
+
+  var cfg = { mode: 'practice', topics: new Set(TOPICS), count: 'all' };
+  var lastCfg = null;
+  var S = null;
+  var timerId = null;
+  var modalOnOk = null;
+  var toastId = null;
+
+  function shuffle(a) {
+    for (var i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(Math.random() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+  function fmt(sec) {
+    sec = Math.max(0, Math.floor(sec));
+    var h = Math.floor(sec / 3600), m = Math.floor((sec % 3600) / 60), s = sec % 60;
+    var mm = (h ? String(m).padStart(2, '0') : String(m).padStart(2, '0')), ss = String(s).padStart(2, '0');
+    return h ? h + ':' + mm + ':' + ss : mm + ':' + ss;
+  }
+  function show(id) {
+    ['s-start', 's-quiz', 's-result'].forEach(function (s) {
+      $('#' + s).classList.toggle('hidden', s !== id);
+    });
+    window.scrollTo(0, 0);
+  }
+  function toast(msg) {
+    var t = $('#toast');
+    t.textContent = msg; t.classList.add('on');
+    clearTimeout(toastId);
+    toastId = setTimeout(function () { t.classList.remove('on'); }, 4200);
+  }
+  function openModal(title, body, okText, cancelText, onOk) {
+    $('#mTitle').textContent = title;
+    $('#mBody').textContent = body;
+    $('#mOk').textContent = okText;
+    $('#mCancel').textContent = cancelText;
+    modalOnOk = onOk;
+    $('#modal').classList.add('on');
+    $('#mOk').focus();
+  }
+  function closeModal() { $('#modal').classList.remove('on'); modalOnOk = null; }
+  function modalOpen() { return $('#modal').classList.contains('on'); }
+
+  /* ---------- Marca de agua ---------- */
+  function setWatermark(name) {
+    var size = Math.max(11, Math.min(19, Math.round(300 / Math.max(name.length, 1) * 1.9)));
+    var safe = name.replace(/[&<>'"]/g, function (c) {
+      return { '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&apos;', '"': '&quot;' }[c];
+    });
+    var svg = "<svg xmlns='http://www.w3.org/2000/svg' width='360' height='210'>" +
+      "<text x='180' y='105' text-anchor='middle' font-family='Arial,sans-serif' font-size='" + size +
+      "' font-weight='700' fill='#808080' transform='rotate(-24 180 105)'>" + safe + "</text></svg>";
+    var wm = $('#wm');
+    wm.style.backgroundImage = 'url("data:image/svg+xml,' + encodeURIComponent(svg) + '")';
+    wm.style.display = 'block';
+  }
+
+  /* ---------- Pantalla de configuración ---------- */
+  function pool() { return Q.filter(function (q) { return cfg.topics.has(q.t); }); }
+
+  function renderChips() {
+    var all = cfg.topics.size === TOPICS.length;
+    var h = '<button type="button" class="chip" data-t="__all" aria-pressed="' + all + '">Todos (' + Q.length + ')</button>';
+    TOPICS.forEach(function (t) {
+      var n = Q.filter(function (q) { return q.t === t; }).length;
+      h += '<button type="button" class="chip" data-t="' + esc(t) + '" aria-pressed="' + cfg.topics.has(t) + '">' + esc(t) + ' (' + n + ')</button>';
+    });
+    $('#topicChips').innerHTML = h;
+  }
+  function renderCount() {
+    var n = pool().length, sel = $('#count'), prev = cfg.count, h = '';
+    [10, 20, 30].forEach(function (k) { if (k < n) h += '<option value="' + k + '">' + k + ' preguntas</option>'; });
+    h += '<option value="all">Todas (' + n + ')</option>';
+    sel.innerHTML = h;
+    var ok = Array.prototype.some.call(sel.options, function (o) { return o.value === String(prev); });
+    sel.value = ok ? String(prev) : 'all';
+    cfg.count = sel.value;
+  }
+  function updateSummary() {
+    var n = pool().length;
+    var k = cfg.count === 'all' ? n : Math.min(+cfg.count, n);
+    var txt;
+    if (n === 0) {
+      txt = 'Selecciona al menos un tema.';
+    } else if (cfg.mode === 'exam') {
+      var min = Math.ceil(k * SEC_PER_Q / 60);
+      txt = k + ' preguntas · tiempo límite de ' + min + ' min · ' + LIMIT + ' cambios de pestaña como máximo (al llegar al límite el examen se cierra y se califica).';
+    } else {
+      txt = k + ' preguntas · sin límite de tiempo · retroalimentación después de cada respuesta.';
+    }
+    $('#cfgSummary').textContent = txt;
+    var okName = $('#name').value.trim().length >= 3;
+    $('#startBtn').disabled = !(okName && n > 0);
+    $('#startHint').textContent = okName ? '' : 'Escribe tu nombre (mínimo 3 letras) para habilitar el botón.';
+  }
+
+  function initStart() {
+    $('#totalQ').textContent = Q.length;
+    renderChips(); renderCount(); updateSummary();
+
+    $('#topicChips').addEventListener('click', function (e) {
+      var b = e.target.closest('.chip'); if (!b) return;
+      var t = b.getAttribute('data-t');
+      if (t === '__all') {
+        cfg.topics = (cfg.topics.size === TOPICS.length) ? new Set() : new Set(TOPICS);
+      } else if (cfg.topics.has(t)) { cfg.topics.delete(t); } else { cfg.topics.add(t); }
+      renderChips(); renderCount(); updateSummary();
+    });
+    $('#count').addEventListener('change', function () { cfg.count = this.value; updateSummary(); });
+    $('#name').addEventListener('input', updateSummary);
+    $$('.mode').forEach(function (b) {
+      b.addEventListener('click', function () {
+        cfg.mode = b.getAttribute('data-mode');
+        $$('.mode').forEach(function (x) { x.setAttribute('aria-checked', String(x === b)); });
+        updateSummary();
+      });
+    });
+    $('#startBtn').addEventListener('click', startFromUI);
+    $('#name').addEventListener('keydown', function (e) { if (e.key === 'Enter' && !$('#startBtn').disabled) startFromUI(); });
+  }
+
+  /* ---------- Construcción del intento ---------- */
+  function buildPool(c) {
+    var p = Q.filter(function (q) { return c.topics.has(q.t); });
+    if (c.shufQ) shuffle(p);
+    var n = c.count === 'all' ? p.length : Math.min(+c.count, p.length);
+    return p.slice(0, n);
+  }
+  function startFromUI() {
+    lastCfg = {
+      mode: cfg.mode, topics: new Set(cfg.topics), count: cfg.count,
+      shufQ: $('#shufQ').checked, shufO: $('#shufO').checked, name: $('#name').value.trim()
+    };
+    run(buildPool(lastCfg));
+  }
+  function run(list) {
+    var items = list.map(function (q) {
+      var order = q.o.map(function (_, i) { return i; });
+      if (lastCfg.shufO && !q.ns) shuffle(order);
+      return { q: q, order: order, sel: null, flag: false, done: false, res: 'na' };
+    });
+    S = {
+      items: items, i: 0, mode: lastCfg.mode, name: lastCfg.name,
+      start: Date.now(), end: null, total: items.length * SEC_PER_Q,
+      inf: 0, away: false, finished: false, reason: ''
+    };
+    setWatermark(S.name);
+    $('#examNav').classList.toggle('hidden', S.mode !== 'exam');
+    $('#pInf').classList.toggle('hidden', S.mode !== 'exam');
+    $('#pScore').classList.toggle('hidden', S.mode !== 'practice');
+    clearInterval(timerId);
+    timerId = setInterval(tick, 500);
+    show('s-quiz');
+    renderQ(); tick();
+  }
+
+  function tick() {
+    if (!S || S.finished) return;
+    var el = (Date.now() - S.start) / 1000, p = $('#pTime');
+    if (S.mode === 'exam') {
+      var rem = Math.max(0, S.total - el);
+      p.textContent = 'Tiempo restante ' + fmt(rem);
+      p.classList.toggle('warn', rem <= 60 && rem > 20);
+      p.classList.toggle('bad', rem <= 20);
+      if (rem <= 0) finish('tiempo');
+    } else {
+      p.textContent = 'Tiempo ' + fmt(el);
+    }
+  }
+
+  /* ---------- Pregunta ---------- */
+  function isRight(it) { return it.sel !== null && it.q.ok.indexOf(it.order[it.sel]) !== -1; }
+  function correctPositions(it) {
+    var r = [];
+    it.order.forEach(function (oi, di) { if (it.q.ok.indexOf(oi) !== -1) r.push(di); });
+    return r;
+  }
+  function tableHTML(t) {
+    return '<div class="scroll-x"><table class="qtable"><thead><tr>' +
+      t.h.map(function (c) { return '<th scope="col">' + esc(c) + '</th>'; }).join('') +
+      '</tr></thead><tbody>' +
+      t.r.map(function (row) { return '<tr>' + row.map(function (c) { return '<td>' + esc(c) + '</td>'; }).join('') + '</tr>'; }).join('') +
+      '</tbody></table></div>';
+  }
+  function stemBlock(q) {
+    var h = '';
+    if (q.ctx) h += '<div class="case">' + esc(q.ctx) + '</div>';
+    h += '<h2 class="stem">' + esc(q.q) + '</h2>';
+    if (q.list) h += '<ul class="qlist">' + q.list.map(function (x) { return '<li>' + esc(x) + '</li>'; }).join('') + '</ul>';
+    if (q.tbl) h += tableHTML(q.tbl);
+    return h;
+  }
+  var VNOTE = '<div class="vnote"><b>Contrástala con tu material.</b> La clave de esta pregunta se dedujo del SBOK y de bancos de práctica, y su redacción puede ser ambigua.</div>';
+
+  function renderQ() {
+    var it = S.items[S.i], q = it.q, n = S.items.length;
+    var answered = S.items.filter(function (x) { return x.sel !== null; }).length;
+    $('#qCounter').textContent = 'Pregunta ' + (S.i + 1) + ' de ' + n;
+    $('#barFill').style.width = (answered / n * 100) + '%';
+
+    if (S.mode === 'practice') {
+      var okc = S.items.filter(function (x) { return x.done && isRight(x); }).length;
+      $('#pScore').textContent = 'Aciertos ' + okc + ' de ' + answered;
+    } else {
+      $('#pInf').textContent = 'Infracciones ' + S.inf + ' de ' + LIMIT;
+      $('#pInf').classList.toggle('bad', S.inf > 0);
+    }
+
+    var locked = S.mode === 'practice' && it.done;
+    var cp = correctPositions(it);
+    var h = '<span class="topic">' + esc(q.t) + '</span>' + stemBlock(q);
+    h += '<div role="radiogroup" aria-label="Opciones de respuesta">';
+    it.order.forEach(function (oi, di) {
+      var cls = 'opt', tag = '';
+      if (locked) {
+        cls += ' lock';
+        if (cp.indexOf(di) !== -1) { cls += ' ok'; tag = '<span class="tag">Correcta</span>'; }
+        else if (it.sel === di) { cls += ' bad'; tag = '<span class="tag">Tu respuesta</span>'; }
+      } else if (it.sel === di) { cls += ' sel'; }
+      h += '<button type="button" class="' + cls + '" role="radio" aria-checked="' + (it.sel === di) + '" data-i="' + di + '"' + (locked ? ' aria-disabled="true"' : '') + '>' +
+        '<span class="let">' + LET[di] + '</span><span class="txt">' + esc(q.o[oi]) + '</span>' + tag + '</button>';
+    });
+    h += '</div>';
+
+    if (locked) {
+      var good = isRight(it);
+      var ans = cp.map(function (d) { return LET[d]; }).join(', ');
+      h += '<div class="fb ' + (good ? 'ok' : 'bad') + '" role="status"><h3>' + (good ? 'Correcto' : 'Incorrecto') + '</h3>' +
+        '<p><b>' + (cp.length > 1 ? 'Respuestas válidas: ' : 'Respuesta correcta: ') + esc(ans) + '.</b> ' + esc(q.e) + '</p>' +
+        (q.v ? VNOTE : '') + '</div>';
+    }
+
+    var last = S.i === n - 1;
+    if (S.mode === 'practice') {
+      h += '<div class="navrow"><div class="grp"><button type="button" class="btn small" data-act="finish">Terminar ahora</button></div>' +
+        '<div class="grp"><button type="button" class="btn primary" data-act="next">' +
+        (it.done ? (last ? 'Ver resultados' : 'Siguiente') : (last ? 'Saltar y finalizar' : 'Saltar')) + '</button></div></div>';
+    } else {
+      h += '<div class="navrow"><div class="grp">' +
+        '<button type="button" class="btn" data-act="prev"' + (S.i === 0 ? ' disabled' : '') + '>Anterior</button>' +
+        '<button type="button" class="btn" data-act="flag">' + (it.flag ? 'Quitar marca' : 'Marcar para revisar') + '</button>' +
+        '<button type="button" class="btn" data-act="clear"' + (it.sel === null ? ' disabled' : '') + '>Limpiar respuesta</button></div>' +
+        '<div class="grp"><button type="button" class="btn" data-act="next"' + (last ? ' disabled' : '') + '>Siguiente</button>' +
+        '<button type="button" class="btn primary" data-act="finish">Finalizar examen</button></div></div>';
+    }
+    $('#qCard').innerHTML = h;
+    if (S.mode === 'exam') renderNav();
+  }
+
+  function renderNav() {
+    var h = '';
+    S.items.forEach(function (it, i) {
+      var c = '';
+      if (i === S.i) c += ' cur'; else if (it.sel !== null) c += ' done';
+      if (it.flag) c += ' flag';
+      h += '<button type="button" class="' + c.trim() + '" data-go="' + i + '" aria-label="Ir a la pregunta ' + (i + 1) +
+        (it.sel !== null ? ', respondida' : ', sin responder') + (it.flag ? ', marcada' : '') + '">' + (i + 1) + '</button>';
+    });
+    $('#navGrid').innerHTML = h;
+  }
+
+  function pick(di) {
+    var it = S.items[S.i];
+    if (di < 0 || di >= it.order.length) return;
+    if (S.mode === 'practice') {
+      if (it.done) return;
+      it.sel = di; it.done = true;
+      renderQ();
+      var nx = $('[data-act="next"]'); if (nx) nx.focus();
+    } else {
+      it.sel = di;
+      renderQ();
+      var s = $('.opt.sel'); if (s) s.focus();
+    }
+  }
+  function go(i) {
+    if (i < 0 || i >= S.items.length) return;
+    S.i = i; renderQ();
+    $('#qCard').scrollIntoView({ block: 'nearest' });
+  }
+
+  function askFinish() {
+    var un = S.items.filter(function (x) { return x.sel === null; }).length;
+    if (S.mode === 'practice' && un === 0) { finish('manual'); return; }
+    var body = un > 0
+      ? 'Tienes ' + un + (un === 1 ? ' pregunta sin responder' : ' preguntas sin responder') + '. Las que no respondas contarán como incorrectas.'
+      : 'Ya respondiste todas las preguntas. Una vez finalizado no podrás cambiar tus respuestas.';
+    openModal(S.mode === 'exam' ? 'Finalizar examen' : 'Terminar práctica', body, 'Finalizar y ver resultados', 'Seguir respondiendo', function () { finish('manual'); });
+  }
+
+  /* ---------- Eventos de la pregunta ---------- */
+  $('#qCard').addEventListener('click', function (e) {
+    var o = e.target.closest('.opt');
+    if (o && o.hasAttribute('data-i')) { pick(+o.getAttribute('data-i')); return; }
+    var b = e.target.closest('[data-act]'); if (!b || b.disabled) return;
+    var act = b.getAttribute('data-act'), it = S.items[S.i], last = S.i === S.items.length - 1;
+    if (act === 'next') { if (last) askFinish(); else go(S.i + 1); }
+    else if (act === 'prev') go(S.i - 1);
+    else if (act === 'flag') { it.flag = !it.flag; renderQ(); }
+    else if (act === 'clear') { it.sel = null; renderQ(); }
+    else if (act === 'finish') askFinish();
+  });
+  $('#navGrid').addEventListener('click', function (e) {
+    var b = e.target.closest('[data-go]'); if (b) go(+b.getAttribute('data-go'));
+  });
+  $('#mCancel').addEventListener('click', closeModal);
+  $('#mOk').addEventListener('click', function () { var f = modalOnOk; closeModal(); if (f) f(); });
+
+  /* ---------- Resultados ---------- */
+  function finish(reason) {
+    if (!S || S.finished) return;
+    S.finished = true; S.end = Date.now(); S.reason = reason;
+    clearInterval(timerId);
+    closeModal();
+    S.items.forEach(function (it) { it.res = it.sel === null ? 'na' : (isRight(it) ? 'ok' : 'bad'); });
+    renderResults();
+    show('s-result');
+    if (reason === 'tiempo') toast('Se agotó el tiempo: el examen se calificó con lo respondido.');
+    if (reason === 'infracciones') toast('Se alcanzó el límite de infracciones: el examen se cerró.');
+  }
+
+  function renderResults() {
+    var n = S.items.length;
+    var ok = S.items.filter(function (x) { return x.res === 'ok'; }).length;
+    var bad = S.items.filter(function (x) { return x.res === 'bad'; }).length;
+    var na = n - ok - bad;
+    var pct = n ? Math.round(ok / n * 100) : 0;
+    var secs = (S.end - S.start) / 1000;
+
+    $('#resPct').textContent = pct + '%';
+    $('#ringArc').setAttribute('stroke-dashoffset', String(326.7 * (1 - pct / 100)));
+    $('#resTitle').textContent = (S.mode === 'exam' ? 'Resultado del examen' : 'Resultado de la práctica') + ' — ' + S.name;
+    var msg = pct >= 90 ? 'Dominio sobresaliente de los conceptos.'
+      : pct >= 70 ? 'Buen nivel. Repasa los temas con menor porcentaje.'
+      : pct >= 50 ? 'Nivel en desarrollo. Revisa las explicaciones de las preguntas incorrectas.'
+      : 'Conviene reforzar los fundamentos. Repasa y vuelve a intentarlo.';
+    if (S.reason === 'tiempo') msg += ' El examen terminó por tiempo agotado.';
+    if (S.reason === 'infracciones') msg += ' El examen se cerró por alcanzar el límite de infracciones.';
+    $('#resMsg').textContent = msg;
+
+    var st = '<div class="stat"><b>' + ok + '</b><span>Correctas</span></div>' +
+      '<div class="stat"><b>' + bad + '</b><span>Incorrectas</span></div>' +
+      '<div class="stat"><b>' + na + '</b><span>Sin responder</span></div>' +
+      '<div class="stat"><b>' + fmt(secs) + '</b><span>Tiempo utilizado</span></div>';
+    if (S.mode === 'exam') st += '<div class="stat"><b>' + S.inf + ' / ' + LIMIT + '</b><span>Infracciones</span></div>';
+    $('#resStats').innerHTML = st;
+
+    var by = {};
+    S.items.forEach(function (it) {
+      var t = it.q.t; by[t] = by[t] || { ok: 0, tot: 0 };
+      by[t].tot++; if (it.res === 'ok') by[t].ok++;
+    });
+    var tb = '';
+    Object.keys(by).forEach(function (t) {
+      var p = Math.round(by[t].ok / by[t].tot * 100);
+      tb += '<div class="line"><span>' + esc(t) + '</span><div class="track" role="img" aria-label="' + p + ' por ciento"><i style="width:' + p + '%"></i></div><span class="pct">' + by[t].ok + '/' + by[t].tot + '</span></div>';
+    });
+    $('#topicBars').innerHTML = tb;
+
+    var rv = '';
+    S.items.forEach(function (it, idx) {
+      var q = it.q, cp = correctPositions(it);
+      var badge = it.res === 'ok' ? '<span class="badge ok">Correcta</span>' : it.res === 'bad' ? '<span class="badge bad">Incorrecta</span>' : '<span class="badge na">Sin responder</span>';
+      rv += '<article class="rev-item" data-r="' + it.res + '"><div class="rev-head">' + badge +
+        '<span class="topic" style="margin:0">' + esc(q.t) + '</span><span style="color:var(--muted);font-size:.85rem">Reactivo ' + (idx + 1) + '</span></div>' +
+        stemBlock(q);
+      it.order.forEach(function (oi, di) {
+        var cls = 'opt lock', tag = '';
+        var isC = cp.indexOf(di) !== -1;
+        if (isC && it.sel === di) { cls += ' ok'; tag = '<span class="tag">Correcta · tu respuesta</span>'; }
+        else if (isC) { cls += ' ok'; tag = '<span class="tag">Correcta</span>'; }
+        else if (it.sel === di) { cls += ' bad'; tag = '<span class="tag">Tu respuesta</span>'; }
+        rv += '<div class="' + cls + '"><span class="let">' + LET[di] + '</span><span class="txt">' + esc(q.o[oi]) + '</span>' + tag + '</div>';
+      });
+      rv += '<div class="fb"><p><b>Explicación.</b> ' + esc(q.e) + '</p>' + (q.v ? VNOTE : '') + '</div></article>';
+    });
+    $('#revList').innerHTML = rv;
+    $$('#revTabs .tab').forEach(function (t) { t.setAttribute('aria-pressed', String(t.getAttribute('data-f') === 'all')); });
+    $('#btnRetryBad').disabled = (bad + na) === 0;
+
+    $('#printHead').innerHTML = '<h2>Simulador de Scrum y SBOK — Resultados</h2><p>Estudiante: ' + esc(S.name) +
+      ' · ' + (S.mode === 'exam' ? 'Modo examen' : 'Modo práctica') + ' · ' + new Date().toLocaleString('es-MX') +
+      ' · Calificación: ' + ok + ' de ' + n + ' (' + pct + '%)' + (S.mode === 'exam' ? ' · Infracciones: ' + S.inf : '') + '</p>';
+  }
+
+  $('#revTabs').addEventListener('click', function (e) {
+    var b = e.target.closest('.tab'); if (!b) return;
+    var f = b.getAttribute('data-f');
+    $$('#revTabs .tab').forEach(function (t) { t.setAttribute('aria-pressed', String(t === b)); });
+    $$('.rev-item').forEach(function (r) { r.classList.toggle('hid', f !== 'all' && r.getAttribute('data-r') !== f); });
+  });
+  $('#btnRetryBad').addEventListener('click', function () {
+    var list = S.items.filter(function (x) { return x.res !== 'ok'; }).map(function (x) { return x.q; });
+    if (lastCfg.shufQ) shuffle(list);
+    if (list.length) run(list);
+  });
+  $('#btnAgain').addEventListener('click', function () { run(buildPool(lastCfg)); });
+  $('#btnHome').addEventListener('click', function () { show('s-start'); });
+  $('#btnPdf').addEventListener('click', function () {
+    var prev = document.title;
+    document.title = 'Resultados Scrum - ' + S.name;
+    var restore = function () { document.title = prev; window.removeEventListener('afterprint', restore); };
+    window.addEventListener('afterprint', restore);
+    try { window.print(); } catch (err) { restore(); toast('No se pudo abrir la impresión en este visor. Abre el archivo en tu navegador.'); }
+  });
+
+  /* ---------- Teclado ---------- */
+  document.addEventListener('keydown', function (e) {
+    var tag = e.target && e.target.tagName, inField = tag === 'INPUT' || tag === 'SELECT';
+    var k = e.key.toLowerCase();
+    // anti-copia
+    if ((e.ctrlKey || e.metaKey) && ['c', 'x', 'a', 'u', 's'].indexOf(k) !== -1 && !inField) { e.preventDefault(); return; }
+    if (e.key === 'Escape' && modalOpen()) { closeModal(); return; }
+    if (!S || S.finished || $('#s-quiz').classList.contains('hidden') || modalOpen() || inField) return;
+    if (e.ctrlKey || e.metaKey || e.altKey) return;
+    var it = S.items[S.i];
+    if (/^[1-5]$/.test(e.key)) { pick(+e.key - 1); }
+    else if (['a', 'b', 'c', 'd', 'e'].indexOf(k) !== -1) { pick(k.charCodeAt(0) - 97); }
+    else if (e.key === 'ArrowRight') {
+      if (S.mode === 'exam') go(S.i + 1);
+      else if (it.done) { if (S.i === S.items.length - 1) askFinish(); else go(S.i + 1); }
+    } else if (e.key === 'ArrowLeft' && S.mode === 'exam') go(S.i - 1);
+  });
+
+  /* ---------- Anti-copia ---------- */
+  ['contextmenu', 'copy', 'cut', 'paste', 'dragstart', 'selectstart'].forEach(function (ev) {
+    document.addEventListener(ev, function (e) {
+      var inField = e.target && e.target.closest && e.target.closest('input');
+      if (inField && ev !== 'contextmenu' && ev !== 'dragstart') return;
+      e.preventDefault();
+    }, true);
+  });
+
+  /* ---------- Detección de cambio de pestaña (modo examen) ---------- */
+  function infraction() {
+    if (!S || S.mode !== 'exam' || S.finished || S.away) return;
+    S.away = true; S.inf++;
+    $('#pInf').textContent = 'Infracciones ' + S.inf + ' de ' + LIMIT;
+    $('#pInf').classList.add('bad');
+    if (S.inf >= LIMIT) { finish('infracciones'); }
+    else toast('Saliste de la pestaña del examen. Infracción ' + S.inf + ' de ' + LIMIT + '.');
+  }
+  document.addEventListener('visibilitychange', function () {
+    if (document.hidden) infraction(); else if (S) S.away = false;
+  });
+  window.addEventListener('blur', infraction);
+  window.addEventListener('focus', function () { if (S) S.away = false; });
+
+  /* ---------- Tema ---------- */
+  $('#themeBtn').addEventListener('click', function () {
+    var root = document.documentElement;
+    var cur = root.getAttribute('data-theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+    root.setAttribute('data-theme', cur === 'dark' ? 'light' : 'dark');
+  });
+
+  initStart();
+})();
+</script>
+</body>
+</html>
