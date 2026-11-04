@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Daily 13 — Arrancamos el proyecto real en Jira</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .support-logo { height: 58px; width: auto; float: right; margin-left: 1rem; }
+  figure svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: .7rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--guinda); color: var(--white); border-radius: var(--radius-lg); padding: .8rem 1rem; text-align: center; }
+  .kpi .n { font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; line-height: 1; }
+  .kpi .l { font-family: var(--font-ui); font-size: .76rem; opacity: .85; display: block; margin-top: .3rem; }
+  .kpi.alt { background: #8a3a74; }
+
+  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .board { grid-template-columns: 1fr; } }
+  .col { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem; }
+  .col h4 { margin: 0 0 .6rem; font-family: var(--font-ui); font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-dark); }
+  .col.done { border-top: 4px solid #2e7d4f; } .col.prog { border-top: 4px solid #e0a400; } .col.todo { border-top: 4px solid var(--border-strong); }
+  .tk { background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--guinda); border-radius: var(--radius-md); padding: .65rem .8rem; margin-bottom: .5rem; font-size: .88rem; line-height: 1.45; box-shadow: var(--shadow-sm); }
+  .tk b { display: block; color: var(--ink); }
+  .tk .pt { display: inline-block; margin-top: .3rem; background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .1rem .6rem; font-family: var(--font-ui); font-size: .74rem; font-weight: 700; color: var(--guinda-dark); }
+  .tk .st { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); display: block; margin-top: .2rem; }
+  .epic { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: var(--radius-md); padding: .6rem 1rem; font-family: var(--font-ui); font-size: .88rem; color: var(--guinda-dark); margin-bottom: .8rem; }
+  .epic strong { text-transform: uppercase; letter-spacing: .1em; font-size: .72rem; margin-right: .5rem; color: var(--guinda-mid); }
+
+  .qs { list-style: none; padding: 0; margin: 1rem 0; counter-reset: q; }
+  .qs > li { counter-increment: q; background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.2rem 1rem 3.6rem; margin-bottom: .8rem; position: relative; box-shadow: var(--shadow-sm); }
+  .qs > li::before { content: counter(q); position: absolute; left: 1rem; top: 1rem; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--guinda); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-ui); font-weight: 700; }
+  .qs .qt { font-size: 1rem; line-height: 1.55; color: var(--ink); margin: 0 0 .6rem; }
+  .qs details summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: .85rem; color: var(--guinda); }
+  .qs details .ans { margin-top: .5rem; padding: .7rem 1rem; background: var(--white); border-left: 4px solid var(--guinda); border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: .93rem; line-height: 1.55; color: var(--ink-secondary); }
+
+  .cert { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.2rem 1.4rem; margin-bottom: 1rem; }
+  .cert .cn { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .cert .ct { font-size: 1.02rem; line-height: 1.6; margin: .3rem 0 .8rem; color: var(--ink); }
+  .cert .opt { display: block; width: 100%; text-align: left; background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: .7rem .95rem; margin-bottom: .45rem; font-size: .95rem; line-height: 1.5; cursor: pointer; font-family: var(--font-body); color: var(--ink); }
+  .cert .opt:hover:not(:disabled) { border-color: var(--guinda-rule); }
+  .cert .opt.good { border-color: #2e7d4f; background: #e9f7ee; }
+  .cert .opt.bad { border-color: #c0392b; background: #fdecec; }
+  .cert .exp { display: none; margin-top: .5rem; font-size: .9rem; line-height: 1.6; color: var(--ink-secondary); background: var(--white); border-left: 4px solid var(--guinda); padding: .7rem 1rem; border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+  .cert.done .exp { display: block; }
+
+  .req { background: var(--white); border: 2px dashed var(--guinda); border-radius: var(--radius-lg); padding: .9rem 1.2rem; margin: 1rem 0; }
+  .req .who { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .req p { margin: .3rem 0 0; font-size: .98rem; line-height: 1.55; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .two { grid-template-columns: 1fr; } }
+  .pb .tk { display: flex; gap: .7rem; align-items: flex-start; }
+  .pb .rk { flex: none; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--guinda); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-ui); font-weight: 700; font-size: .8rem; }
+  .col.lock { border-top: 4px solid var(--guinda); }
+  .col.free { border-top: 4px solid #e0a400; }
+  .col .sub { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); margin: -.3rem 0 .6rem; display: block; }
+
+  .notes { margin: .5rem 0 0; padding-left: 1.2rem; font-size: .93rem; line-height: 1.6; }
+  .story b { font-weight: 400; font-style: italic; }
+  .story .ttl { display: block; font-family: var(--font-ui); font-style: normal; font-weight: 700; font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-mid); margin-bottom: .25rem; }
+
+  .plan { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .9rem 1.1rem; margin: 1rem 0; }
+  .plan .it { display: flex; align-items: center; gap: .7rem; background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--guinda); border-radius: var(--radius-md); padding: .55rem .8rem; margin-bottom: .45rem; font-size: .92rem; cursor: pointer; }
+  .plan .it input { accent-color: var(--guinda); width: 1.1rem; height: 1.1rem; flex: none; }
+  .plan .it .nm { flex: 1; line-height: 1.4; }
+  .plan .it .nm small { display: block; font-family: var(--font-ui); font-size: .74rem; color: var(--ink-muted); }
+  .plan .it .pt { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .1rem .65rem; font-family: var(--font-ui); font-size: .76rem; font-weight: 700; color: var(--guinda-dark); }
+  .meter { height: 18px; background: var(--white); border: 1px solid var(--border-strong); border-radius: 999px; overflow: hidden; margin: .7rem 0 .4rem; position: relative; }
+  .meter .fill { height: 100%; width: 0; background: #2e7d4f; transition: width .25s, background .25s; }
+  .meter .line { position: absolute; top: 0; bottom: 0; width: 3px; background: var(--ink); }
+  .plan .msg { font-family: var(--font-ui); font-size: .88rem; font-weight: 700; padding: .5rem .85rem; border-radius: var(--radius-md); }
+  .plan .msg.ok { background: #e9f7ee; color: #1f6b3d; border: 1px solid #2e7d4f; } .plan .msg.warn { background: #fff4d6; color: #7a5600; border: 1px solid #e0a400; } .plan .msg.bad { background: #fdecec; color: #a52a1f; border: 1px solid #c0392b; }
+
+  .sortq { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem 1.1rem; margin-bottom: .6rem; }
+  .sortq p { margin: 0 0 .5rem; font-size: .95rem; line-height: 1.55; }
+  .sortq .row { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .sortq button { font-family: var(--font-ui); font-size: .82rem; font-weight: 600; background: var(--white); border: 1.5px solid var(--border-strong); border-radius: 999px; padding: .4rem .9rem; cursor: pointer; color: var(--ink-secondary); }
+  .sortq button:hover:not(:disabled) { border-color: var(--guinda-rule); }
+  .sortq .fb { font-family: var(--font-ui); font-size: .84rem; margin-top: .45rem; }
+  .sortq.ok { border-color: #2e7d4f; background: #e9f7ee; } .sortq.no { border-color: #c0392b; background: #fdecec; }
+  .sortq .fb.ok { color: #1f6b3d; } .sortq .fb.no { color: #a52a1f; }
+  .storycard { background: var(--white); border: 2px dashed var(--guinda); border-radius: var(--radius-lg); padding: .8rem 1.2rem; margin: 1rem 0 .6rem; font-size: .98rem; line-height: 1.55; }
+  .storycard .who { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .plan h5 { margin: 0 0 .5rem; font-family: var(--font-ui); font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-dark); }
+  .plan h5 span { display: block; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--ink-muted); font-size: .76rem; margin-top: .1rem; }
+
+  .rv { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem 1.1rem; margin-bottom: .6rem; }
+  .rv .hd { display: flex; justify-content: space-between; align-items: baseline; gap: .6rem; margin-bottom: .4rem; }
+  .rv .hd b { font-size: .98rem; }
+  .rv .hd .pt { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .1rem .65rem; font-family: var(--font-ui); font-size: .76rem; font-weight: 700; color: var(--guinda-dark); white-space: nowrap; }
+  .rv .st { font-size: .88rem; line-height: 1.5; color: var(--ink-secondary); }
+  .rv .st em { font-style: normal; font-weight: 700; font-family: var(--font-ui); font-size: .78rem; }
+  .rv .yes { color: #1f6b3d; } .rv .not { color: #a52a1f; }
+  .rv .row { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .6rem; }
+  .rv button { font-family: var(--font-ui); font-size: .82rem; font-weight: 600; background: var(--white); border: 1.5px solid var(--border-strong); border-radius: 999px; padding: .4rem .9rem; cursor: pointer; color: var(--ink-secondary); }
+  .rv button:hover:not(:disabled) { border-color: var(--guinda-rule); }
+  .rv .fb { font-family: var(--font-ui); font-size: .84rem; margin-top: .45rem; }
+  .rv.ok { border-color: #2e7d4f; background: #e9f7ee; } .rv.no { border-color: #c0392b; background: #fdecec; }
+  .rv .fb.ok { color: #1f6b3d; } .rv .fb.no { color: #a52a1f; }
+
+  .track { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .track { grid-template-columns: repeat(2, 1fr); } }
+  .track .s { background: var(--white); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: .6rem .7rem; font-size: .86rem; line-height: 1.4; text-align: center; }
+  .track .s b { display: block; color: var(--guinda-dark); font-family: var(--font-ui); font-size: .84rem; }
+  .track .s .tg { display: inline-block; margin-top: .3rem; font-family: var(--font-ui); font-size: .7rem; font-weight: 700; letter-spacing: .06em; border-radius: 999px; padding: 0 .55rem; background: var(--guinda-light); border: 1px solid #D8A8BA; color: var(--guinda-dark); }
+  .track .s.now { background: var(--guinda); border-color: var(--guinda); color: var(--white); }
+  .track .s.now b { color: var(--white); } .track .s.now .tg { background: var(--white); }
+  .src { font-family: var(--font-ui); font-size: .74rem; color: var(--ink-muted); line-height: 1.5; margin-top: .4rem; }
+
+  .proc { display: grid; grid-template-columns: repeat(6, 1fr); gap: .4rem; margin: 1rem 0 .6rem; }
+  @media (max-width: 800px) { .proc { grid-template-columns: repeat(2, 1fr); } }
+  .proc button { font-family: var(--font-ui); font-size: .76rem; font-weight: 600; line-height: 1.3; background: var(--off-white); border: 1.5px solid var(--border-strong); border-radius: var(--radius-md); padding: .55rem .4rem; cursor: pointer; color: var(--ink-secondary); text-align: center; }
+  .proc button .n { display: block; font-size: 1.1rem; color: var(--guinda); font-weight: 700; }
+  .proc button.on { background: var(--guinda); color: var(--white); border-color: var(--guinda); }
+  .proc button.on .n { color: var(--white); }
+  .panel { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.3rem; }
+  .panel h4 { margin: 0 0 .3rem; font-family: var(--font-display); font-size: 1.25rem; color: var(--guinda); }
+  .panel .en { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .08em; }
+  .io { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-top: .6rem; }
+  @media (max-width: 700px) { .io { grid-template-columns: 1fr; } }
+  .io div { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: .6rem .8rem; font-size: .88rem; line-height: 1.5; }
+  .io b { display: block; font-family: var(--font-ui); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--guinda-mid); margin-bottom: .2rem; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-wrap"><img src="imagen1.png" alt="Mixtle, mascota del IEDEP"></div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Daily Scrum — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<section class="class-hero">
+  <span class="class-label">Unidad 1 · Daily Scrum n.º 13 · 15 minutos</span>
+  <h1>Arrancamos el proyecto real en Jira</h1>
+  <span class="class-subtitle">Las bases del proyecto real y cómo se enmarcan en Jira: de la fase Iniciar del SBOK a un proyecto Scrum listo para el primer sprint.</span>
+  <div class="meta-row">
+    <div class="meta-item">Programa educativo<span>Lic. en Sistemas Computacionales</span></div>
+    <div class="meta-item">Asignatura<span>Ingeniería de Software I</span></div>
+    <div class="meta-item">Fecha<span>Miércoles 4 de noviembre de 2026</span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <section class="section">
+    <h2 class="section-title">Contexto</h2>
+    <div class="concept-box">
+      <img class="support-logo" src="imagen2.png" alt="Mixtle, mascota de apoyo del IEDEP">
+      <span class="concept-title">Cómo iniciamos</span>
+      <p>Antes de escribir una sola línea de código, se arma la <strong>base del proyecto</strong>. En Scrum, eso es la fase <strong>Iniciar</strong> del SBOK: la visión, las personas, las épicas y un backlog ordenado. <strong>Jira</strong> no reemplaza esas decisiones: las hace visibles y ordenadas. La regla de hoy: <strong>primero se acuerda, después se captura en Jira</strong>.</p>
+    </div>
+
+    <div class="kpis">
+      <div class="kpi"><div class="n">6</div><span class="l">procesos de la fase Iniciar</span></div>
+      <div class="kpi"><div class="n">1</div><span class="l">proyecto Scrum en Jira</span></div>
+      <div class="kpi"><div class="n">5</div><span class="l">integrantes en el equipo</span></div>
+      <div class="kpi alt"><div class="n">10</div><span class="l">usuarios máximos en el plan gratuito de Jira</span></div>
+    </div>
+    <p class="src">Fuente: Atlassian, Jira Cloud plans (plan gratuito, hasta 10 usuarios) y Atlassian, «Learn scrum with Jira». Verifiquen en su propia cuenta las opciones disponibles, porque la interfaz de Jira cambia con frecuencia.</p>
+
+    <h3 style="font-family:var(--font-display);color:var(--guinda);margin:1.4rem 0 .4rem">De la fase Iniciar a Jira, paso a paso</h3>
+    <p>Toca cada paso para ver qué se decide y qué se hace en Jira.</p>
+    <div class="proc" id="procBtns"></div>
+    <div class="panel" id="procPanel"></div>
+
+    <h3 style="font-family:var(--font-display);color:var(--guinda);margin:1.4rem 0 .4rem">Reto: ¿dónde va esto en Jira?</h3>
+    <div id="sortBox"></div>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Preguntas para la Daily</h2>
+    <p class="text-muted" style="margin-top:0">Se responden en voz alta, cada quien desde su rol. Al final de cada una se puede abrir la respuesta esperada.</p>
+    <ol class="qs">
+      <li><p class="qt">¿Por qué empezamos por la visión y los roles, y no por crear tareas en Jira o programar?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">Porque Jira solo refleja lo que el equipo ya acordó. Sin una <strong>visión</strong> y sin un <strong>Product Owner</strong> que ordene, el tablero se llena de tareas sin propósito. Así lo plantea la fase <strong>Iniciar</strong>: primero el para qué y el quién, luego el qué y el cuándo.</div></details></li>
+      <li><p class="qt">¿Qué tipo de proyecto crearían en Jira y qué pasa con la plantilla?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">Un proyecto con la plantilla <strong>Scrum</strong>. Atlassian recomienda el tipo <strong>team-managed</strong> cuando el equipo quiere controlar su propio proceso, que es nuestro caso. Con ella se obtienen de entrada el <strong>Backlog</strong>, los sprints y los reportes.</div></details></li>
+      <li><p class="qt">Escriban la primera historia del cliente real y digan dónde van sus criterios de aceptación.</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">Se crea en el <strong>Backlog</strong> con el formato «Como…, quiero…, para…». Los <strong>criterios de aceptación</strong> se escriben en la <strong>descripción</strong> de la historia, como condiciones que el Product Owner pueda comprobar con «sí» o «no».</div></details></li>
+      <li><p class="qt">¿Cómo deciden cuántos puntos comprometer en el primer sprint si todavía no tienen velocidad con este proyecto?</p>
+        <details><summary>Ver respuesta esperada</summary><div class="ans">Estiman con <strong>Planning Poker</strong>, parten de la velocidad que tuvieron en sus prácticas y comprometen con prudencia. Después del primer sprint, su <strong>velocidad real</strong> sustituye a la supuesta.</div></details></li>
+      <li><p class="qt">Para su proyecto real: ¿quién será el Product Owner, quién el Scrum Master, quién es el cliente y a qué hora fija será su Daily?</p>
+        <details><summary>Ver nota</summary><div class="ans">Pregunta abierta. Pista: el cliente real es un <strong>Stakeholder</strong>; el Product Owner debe tener acceso directo a él, y la Daily dura 15 minutos o menos, con el tablero abierto.</div></details></li>
+    </ol>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Dos preguntas de aplicación</h2>
+    <p class="text-muted" style="margin-top:0">Con el vocabulario del SBOK®, ligadas a lo que haremos en Jira.</p>
+    <div id="certBox"></div>
+  </section>
+
+</div>
+
+<footer class="site-footer">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Unidad 1 · Daily Scrum n.º 13 · Miércoles 4 de noviembre de 2026</span>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  function shuffle(a) { a = a.slice(); for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var x = a[i]; a[i] = a[j]; a[j] = x; } return a; }
+  var QS = [
+    { q: 'En Jira, el equipo ya escribió la visión y se identificó al Product Owner. Antes de identificar al Scrum Master y a los Stakeholders, ¿cuáles son las entradas obligatorias del proceso Identify Scrum Master and Stakeholder(s)?',
+      o: ['El Product Owner y la declaración de visión del proyecto (Project Vision Statement).', 'Las épicas y las personas (Personas).', 'El Prioritized Product Backlog y los Done Criteria.', 'El calendario de lanzamientos y la duración del sprint.'], c: 0,
+      e: 'Identify Scrum Master and Stakeholder(s) necesita, de forma obligatoria, el Product Owner y la Project Vision Statement; por eso la visión y el Product Owner se definen primero. Sus salidas obligatorias son el Scrum Master y los Stakeholders identificados.' },
+    { q: 'Durante el sprint, el equipo consulta el Burndown Chart de Jira frente al tablero. En el SBOK, ¿en qué reunión se actualiza el Sprint Burndown Chart?',
+      o: ['En la Daily Standup Meeting.', 'En la Project Vision Meeting.', 'En la Retrospect Sprint Meeting.', 'En las sesiones de Release Planning.'], c: 0,
+      e: 'El Sprint Burndown Chart se actualiza en la Daily Standup Meeting (proceso Conduct Daily Standup), donde el equipo responde qué terminó, qué terminará y qué impedimentos tiene. Por eso la Daily se hace con el tablero y los reportes de Jira abiertos.' }
+  ];
+  var box = document.getElementById('certBox');
+  QS.forEach(function (it, qi) {
+    var wrap = document.createElement('div'); wrap.className = 'cert';
+    var n = document.createElement('div'); n.className = 'cn'; n.textContent = 'Pregunta de aplicación ' + (qi + 1) + ' de ' + QS.length; wrap.appendChild(n);
+    var t = document.createElement('div'); t.className = 'ct'; t.textContent = it.q; wrap.appendChild(t);
+    var opts = shuffle(it.o.map(function (x, i) { return { t: x, ok: i === it.c }; })), btns = [];
+    opts.forEach(function (op) {
+      var b = document.createElement('button'); b.className = 'opt'; b.textContent = op.t; btns.push(b);
+      b.addEventListener('click', function () {
+        if (wrap.classList.contains('done')) return; wrap.classList.add('done');
+        btns.forEach(function (x, i) { x.disabled = true; if (opts[i].ok) x.classList.add('good'); });
+        if (!op.ok) b.classList.add('bad');
+      });
+      wrap.appendChild(b);
+    });
+    var e = document.createElement('div'); e.className = 'exp'; var s = document.createElement('strong'); s.textContent = 'Explicación: '; e.appendChild(s); e.appendChild(document.createTextNode(it.e)); wrap.appendChild(e);
+    box.appendChild(wrap);
+  });
+})();
+</script>
+<script>
+(function () {
+  'use strict';
+  function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+  var PROC = [
+    { n: 'Create Project Vision', es: 'Crear la visión del proyecto',
+      a: 'Se acuerda con el cliente el para qué del proyecto y se identifica al Product Owner.',
+      j: 'Crear el proyecto con la plantilla Scrum (tipo team-managed), ponerle nombre y clave, y escribir la visión en su descripción.',
+      r: 'Proyecto creado, visión visible para todos.' },
+    { n: 'Identify Scrum Master and Stakeholder(s)', es: 'Identificar al Scrum Master y a los interesados',
+      a: 'Se nombra al Scrum Master y se identifica al cliente, los usuarios y quienes influyen en el proyecto.',
+      j: 'Invitar a las personas al proyecto, anotar quién es Product Owner y Scrum Master, y dar al cliente acceso de consulta si el plan lo permite.',
+      r: 'Roles claros y personas con acceso.' },
+    { n: 'Form Scrum Team', es: 'Formar el equipo Scrum',
+      a: 'Se define quiénes forman el Scrum Team y con qué habilidades.',
+      j: 'Agregar a los integrantes como miembros del proyecto para que puedan tomar y mover historias.',
+      r: 'Equipo con acceso para trabajar en el tablero.' },
+    { n: 'Develop Epic(s)', es: 'Desarrollar las épicas',
+      a: 'Se conversa con el cliente y los usuarios para obtener las grandes metas del producto.',
+      j: 'Crear las épicas (dos o tres para empezar) en el Backlog.',
+      r: 'Grandes metas visibles, listas para dividirse.' },
+    { n: 'Create Prioritized Product Backlog', es: 'Crear el Product Backlog priorizado',
+      a: 'Se dividen las épicas en historias, se ordenan por valor y se acuerdan los Done Criteria.',
+      j: 'Crear historias con «Como…, quiero…, para…», escribir los criterios de aceptación en la descripción, ordenarlas arrastrando y anotar los Done Criteria en un lugar visible, como una página o una lista que se pega en cada historia.',
+      r: 'Backlog ordenado, con criterios de aceptación y Done Criteria.' },
+    { n: 'Conduct Release Planning', es: 'Realizar la planeación de lanzamientos',
+      a: 'Se decide cuándo se liberará y cuánto durarán los sprints.',
+      j: 'Estimar con story points, crear el primer sprint, arrastrar lo que se compromete, fijar duración, fechas y objetivo, y pulsar Start sprint.',
+      r: 'Primer sprint en marcha y tablero activo.' }
+  ];
+  var pb = document.getElementById('procBtns'), pp = document.getElementById('procPanel');
+  function show(i) {
+    var p = PROC[i];
+    pp.innerHTML = '<span class="en">' + esc(p.es) + '</span><h4>' + esc(p.n) + '</h4>' +
+      '<div class="io"><div><b>Se decide (Scrum)</b>' + esc(p.a) + '</div><div><b>Se hace en Jira</b>' + esc(p.j) + '</div><div><b>Resultado</b>' + esc(p.r) + '</div></div>';
+    Array.prototype.forEach.call(pb.children, function (b, k) { b.classList.toggle('on', k === i); });
+  }
+  PROC.forEach(function (p, i) { var b = document.createElement('button'); b.type = 'button'; b.innerHTML = '<span class="n">' + (i + 1) + '</span>' + esc(p.n); b.addEventListener('click', function () { show(i); }); pb.appendChild(b); });
+  show(0);
+
+  var OPTS = ['Backlog', 'Sprint', 'Descripción de la historia', 'Reports'];
+  var ITEMS = [
+    { t: 'El orden en que se atenderán las historias.', a: 0, w: 'En el Backlog se ordenan arrastrando; el orden lo decide el Product Owner.' },
+    { t: 'Los criterios de aceptación de una historia.', a: 2, w: 'Se escriben en la descripción de la historia, para que cualquiera los vea al abrirla.' },
+    { t: 'Las historias con las que el equipo se compromete en esta iteración.', a: 1, w: 'Lo que se arrastra al sprint forma el Sprint Backlog.' },
+    { t: 'Cuánto trabajo falta por terminar en el sprint, día por día.', a: 3, w: 'En Reports se consulta el Burndown Chart.' },
+    { t: 'Las historias completadas, incompletas y agregadas durante el sprint.', a: 3, w: 'Eso lo muestra el Sprint Report, dentro de Reports.' }
+  ];
+  var box = document.getElementById('sortBox');
+  ITEMS.forEach(function (it) {
+    var d = document.createElement('div'); d.className = 'sortq';
+    var p = document.createElement('p'); p.textContent = it.t; d.appendChild(p);
+    var r = document.createElement('div'); r.className = 'row'; var fb = document.createElement('div'); fb.className = 'fb';
+    OPTS.forEach(function (o, i) {
+      var b = document.createElement('button'); b.type = 'button'; b.textContent = o;
+      b.addEventListener('click', function () {
+        if (i === it.a) { d.className = 'sortq ok'; fb.className = 'fb ok'; fb.textContent = 'Correcto. ' + it.w; Array.prototype.forEach.call(r.children, function (x) { x.disabled = true; }); }
+        else { d.className = 'sortq no'; fb.className = 'fb no'; fb.textContent = 'Todavía no. Piensa en qué momento del trabajo se usa.'; }
+      });
+      r.appendChild(b);
+    });
+    d.appendChild(r); d.appendChild(fb); box.appendChild(d);
+  });
+})();
+</script>
+</body>
+</html>

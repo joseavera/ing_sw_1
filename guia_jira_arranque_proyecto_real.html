@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guía práctica — Arrancar el proyecto real en Jira</title>
+<link rel="stylesheet" href="base.css">
+<style>
+  .support-logo { height: 58px; width: auto; float: right; margin-left: 1rem; }
+  figure svg { max-width: 100%; height: auto; display: block; margin: 0 auto; }
+
+  .kpis { display: grid; grid-template-columns: repeat(4, 1fr); gap: .7rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .kpis { grid-template-columns: repeat(2, 1fr); } }
+  .kpi { background: var(--guinda); color: var(--white); border-radius: var(--radius-lg); padding: .8rem 1rem; text-align: center; }
+  .kpi .n { font-family: var(--font-display); font-size: 2.2rem; font-weight: 700; line-height: 1; }
+  .kpi .l { font-family: var(--font-ui); font-size: .76rem; opacity: .85; display: block; margin-top: .3rem; }
+  .kpi.alt { background: #8a3a74; }
+
+  .board { display: grid; grid-template-columns: repeat(3, 1fr); gap: .8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .board { grid-template-columns: 1fr; } }
+  .col { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem; }
+  .col h4 { margin: 0 0 .6rem; font-family: var(--font-ui); font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-dark); }
+  .col.done { border-top: 4px solid #2e7d4f; } .col.prog { border-top: 4px solid #e0a400; } .col.todo { border-top: 4px solid var(--border-strong); }
+  .tk { background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--guinda); border-radius: var(--radius-md); padding: .65rem .8rem; margin-bottom: .5rem; font-size: .88rem; line-height: 1.45; box-shadow: var(--shadow-sm); }
+  .tk b { display: block; color: var(--ink); }
+  .tk .pt { display: inline-block; margin-top: .3rem; background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .1rem .6rem; font-family: var(--font-ui); font-size: .74rem; font-weight: 700; color: var(--guinda-dark); }
+  .tk .st { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); display: block; margin-top: .2rem; }
+  .epic { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: var(--radius-md); padding: .6rem 1rem; font-family: var(--font-ui); font-size: .88rem; color: var(--guinda-dark); margin-bottom: .8rem; }
+  .epic strong { text-transform: uppercase; letter-spacing: .1em; font-size: .72rem; margin-right: .5rem; color: var(--guinda-mid); }
+
+  .qs { list-style: none; padding: 0; margin: 1rem 0; counter-reset: q; }
+  .qs > li { counter-increment: q; background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.2rem 1rem 3.6rem; margin-bottom: .8rem; position: relative; box-shadow: var(--shadow-sm); }
+  .qs > li::before { content: counter(q); position: absolute; left: 1rem; top: 1rem; width: 1.9rem; height: 1.9rem; border-radius: 50%; background: var(--guinda); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-ui); font-weight: 700; }
+  .qs .qt { font-size: 1rem; line-height: 1.55; color: var(--ink); margin: 0 0 .6rem; }
+  .qs details summary { cursor: pointer; font-family: var(--font-ui); font-weight: 600; font-size: .85rem; color: var(--guinda); }
+  .qs details .ans { margin-top: .5rem; padding: .7rem 1rem; background: var(--white); border-left: 4px solid var(--guinda); border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: .93rem; line-height: 1.55; color: var(--ink-secondary); }
+
+  .cert { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1.2rem 1.4rem; margin-bottom: 1rem; }
+  .cert .cn { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .cert .ct { font-size: 1.02rem; line-height: 1.6; margin: .3rem 0 .8rem; color: var(--ink); }
+  .cert .opt { display: block; width: 100%; text-align: left; background: var(--white); border: 1.5px solid var(--border); border-radius: var(--radius-md); padding: .7rem .95rem; margin-bottom: .45rem; font-size: .95rem; line-height: 1.5; cursor: pointer; font-family: var(--font-body); color: var(--ink); }
+  .cert .opt:hover:not(:disabled) { border-color: var(--guinda-rule); }
+  .cert .opt.good { border-color: #2e7d4f; background: #e9f7ee; }
+  .cert .opt.bad { border-color: #c0392b; background: #fdecec; }
+  .cert .exp { display: none; margin-top: .5rem; font-size: .9rem; line-height: 1.6; color: var(--ink-secondary); background: var(--white); border-left: 4px solid var(--guinda); padding: .7rem 1rem; border-radius: 0 var(--radius-md) var(--radius-md) 0; }
+  .cert.done .exp { display: block; }
+
+  .req { background: var(--white); border: 2px dashed var(--guinda); border-radius: var(--radius-lg); padding: .9rem 1.2rem; margin: 1rem 0; }
+  .req .who { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .req p { margin: .3rem 0 0; font-size: .98rem; line-height: 1.55; }
+  .two { display: grid; grid-template-columns: 1fr 1fr; gap: .8rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .two { grid-template-columns: 1fr; } }
+  .pb .tk { display: flex; gap: .7rem; align-items: flex-start; }
+  .pb .rk { flex: none; width: 1.7rem; height: 1.7rem; border-radius: 50%; background: var(--guinda); color: var(--white); display: flex; align-items: center; justify-content: center; font-family: var(--font-ui); font-weight: 700; font-size: .8rem; }
+  .col.lock { border-top: 4px solid var(--guinda); }
+  .col.free { border-top: 4px solid #e0a400; }
+  .col .sub { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); margin: -.3rem 0 .6rem; display: block; }
+
+  .notes { margin: .5rem 0 0; padding-left: 1.2rem; font-size: .93rem; line-height: 1.6; }
+  .story b { font-weight: 400; font-style: italic; }
+  .story .ttl { display: block; font-family: var(--font-ui); font-style: normal; font-weight: 700; font-size: .74rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-mid); margin-bottom: .25rem; }
+
+  .plan { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .9rem 1.1rem; margin: 1rem 0; }
+  .plan .it { display: flex; align-items: center; gap: .7rem; background: var(--white); border: 1px solid var(--border); border-left: 4px solid var(--guinda); border-radius: var(--radius-md); padding: .55rem .8rem; margin-bottom: .45rem; font-size: .92rem; cursor: pointer; }
+  .plan .it input { accent-color: var(--guinda); width: 1.1rem; height: 1.1rem; flex: none; }
+  .plan .it .nm { flex: 1; line-height: 1.4; }
+  .plan .it .nm small { display: block; font-family: var(--font-ui); font-size: .74rem; color: var(--ink-muted); }
+  .plan .it .pt { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .1rem .65rem; font-family: var(--font-ui); font-size: .76rem; font-weight: 700; color: var(--guinda-dark); }
+  .meter { height: 18px; background: var(--white); border: 1px solid var(--border-strong); border-radius: 999px; overflow: hidden; margin: .7rem 0 .4rem; position: relative; }
+  .meter .fill { height: 100%; width: 0; background: #2e7d4f; transition: width .25s, background .25s; }
+  .meter .line { position: absolute; top: 0; bottom: 0; width: 3px; background: var(--ink); }
+  .plan .msg { font-family: var(--font-ui); font-size: .88rem; font-weight: 700; padding: .5rem .85rem; border-radius: var(--radius-md); }
+  .plan .msg.ok { background: #e9f7ee; color: #1f6b3d; border: 1px solid #2e7d4f; } .plan .msg.warn { background: #fff4d6; color: #7a5600; border: 1px solid #e0a400; } .plan .msg.bad { background: #fdecec; color: #a52a1f; border: 1px solid #c0392b; }
+
+  .sortq { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem 1.1rem; margin-bottom: .6rem; }
+  .sortq p { margin: 0 0 .5rem; font-size: .95rem; line-height: 1.55; }
+  .sortq .row { display: flex; gap: .5rem; flex-wrap: wrap; }
+  .sortq button { font-family: var(--font-ui); font-size: .82rem; font-weight: 600; background: var(--white); border: 1.5px solid var(--border-strong); border-radius: 999px; padding: .4rem .9rem; cursor: pointer; color: var(--ink-secondary); }
+  .sortq button:hover:not(:disabled) { border-color: var(--guinda-rule); }
+  .sortq .fb { font-family: var(--font-ui); font-size: .84rem; margin-top: .45rem; }
+  .sortq.ok { border-color: #2e7d4f; background: #e9f7ee; } .sortq.no { border-color: #c0392b; background: #fdecec; }
+  .sortq .fb.ok { color: #1f6b3d; } .sortq .fb.no { color: #a52a1f; }
+  .storycard { background: var(--white); border: 2px dashed var(--guinda); border-radius: var(--radius-lg); padding: .8rem 1.2rem; margin: 1rem 0 .6rem; font-size: .98rem; line-height: 1.55; }
+  .storycard .who { font-family: var(--font-ui); font-size: .74rem; text-transform: uppercase; letter-spacing: .12em; color: var(--guinda-mid); font-weight: 700; }
+  .plan h5 { margin: 0 0 .5rem; font-family: var(--font-ui); font-size: .78rem; text-transform: uppercase; letter-spacing: .1em; color: var(--guinda-dark); }
+  .plan h5 span { display: block; font-weight: 500; text-transform: none; letter-spacing: 0; color: var(--ink-muted); font-size: .76rem; margin-top: .1rem; }
+
+  .rv { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: .8rem 1.1rem; margin-bottom: .6rem; }
+  .rv .hd { display: flex; justify-content: space-between; align-items: baseline; gap: .6rem; margin-bottom: .4rem; }
+  .rv .hd b { font-size: .98rem; }
+  .rv .hd .pt { background: var(--guinda-light); border: 1px solid #D8A8BA; border-radius: 999px; padding: .1rem .65rem; font-family: var(--font-ui); font-size: .76rem; font-weight: 700; color: var(--guinda-dark); white-space: nowrap; }
+  .rv .st { font-size: .88rem; line-height: 1.5; color: var(--ink-secondary); }
+  .rv .st em { font-style: normal; font-weight: 700; font-family: var(--font-ui); font-size: .78rem; }
+  .rv .yes { color: #1f6b3d; } .rv .not { color: #a52a1f; }
+  .rv .row { display: flex; gap: .5rem; flex-wrap: wrap; margin-top: .6rem; }
+  .rv button { font-family: var(--font-ui); font-size: .82rem; font-weight: 600; background: var(--white); border: 1.5px solid var(--border-strong); border-radius: 999px; padding: .4rem .9rem; cursor: pointer; color: var(--ink-secondary); }
+  .rv button:hover:not(:disabled) { border-color: var(--guinda-rule); }
+  .rv .fb { font-family: var(--font-ui); font-size: .84rem; margin-top: .45rem; }
+  .rv.ok { border-color: #2e7d4f; background: #e9f7ee; } .rv.no { border-color: #c0392b; background: #fdecec; }
+  .rv .fb.ok { color: #1f6b3d; } .rv .fb.no { color: #a52a1f; }
+
+  .track { display: grid; grid-template-columns: repeat(4, 1fr); gap: .5rem; margin: 1rem 0; }
+  @media (max-width: 700px) { .track { grid-template-columns: repeat(2, 1fr); } }
+  .track .s { background: var(--white); border: 1px solid var(--border-strong); border-radius: var(--radius-md); padding: .6rem .7rem; font-size: .86rem; line-height: 1.4; text-align: center; }
+  .track .s b { display: block; color: var(--guinda-dark); font-family: var(--font-ui); font-size: .84rem; }
+  .track .s .tg { display: inline-block; margin-top: .3rem; font-family: var(--font-ui); font-size: .7rem; font-weight: 700; letter-spacing: .06em; border-radius: 999px; padding: 0 .55rem; background: var(--guinda-light); border: 1px solid #D8A8BA; color: var(--guinda-dark); }
+  .track .s.now { background: var(--guinda); border-color: var(--guinda); color: var(--white); }
+  .track .s.now b { color: var(--white); } .track .s.now .tg { background: var(--white); }
+  .src { font-family: var(--font-ui); font-size: .74rem; color: var(--ink-muted); line-height: 1.5; margin-top: .4rem; }
+
+  .proc { display: grid; grid-template-columns: repeat(6, 1fr); gap: .4rem; margin: 1rem 0 .6rem; }
+  @media (max-width: 800px) { .proc { grid-template-columns: repeat(2, 1fr); } }
+  .proc button { font-family: var(--font-ui); font-size: .76rem; font-weight: 600; line-height: 1.3; background: var(--off-white); border: 1.5px solid var(--border-strong); border-radius: var(--radius-md); padding: .55rem .4rem; cursor: pointer; color: var(--ink-secondary); text-align: center; }
+  .proc button .n { display: block; font-size: 1.1rem; color: var(--guinda); font-weight: 700; }
+  .proc button.on { background: var(--guinda); color: var(--white); border-color: var(--guinda); }
+  .proc button.on .n { color: var(--white); }
+  .panel { background: var(--off-white); border: 1px solid var(--border); border-radius: var(--radius-lg); padding: 1rem 1.3rem; }
+  .panel h4 { margin: 0 0 .3rem; font-family: var(--font-display); font-size: 1.25rem; color: var(--guinda); }
+  .panel .en { font-family: var(--font-ui); font-size: .76rem; color: var(--ink-muted); text-transform: uppercase; letter-spacing: .08em; }
+  .io { display: grid; grid-template-columns: repeat(3, 1fr); gap: .6rem; margin-top: .6rem; }
+  @media (max-width: 700px) { .io { grid-template-columns: 1fr; } }
+  .io div { background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: .6rem .8rem; font-size: .88rem; line-height: 1.5; }
+  .io b { display: block; font-family: var(--font-ui); font-size: .72rem; letter-spacing: .1em; text-transform: uppercase; color: var(--guinda-mid); margin-bottom: .2rem; }
+
+  .prog { position: sticky; top: 0; z-index: 5; background: var(--white); border: 1px solid var(--border); border-radius: var(--radius-md); padding: .6rem .9rem; margin: 1rem 0; font-family: var(--font-ui); font-size: .85rem; color: var(--ink-secondary); }
+  .prog .bar { height: 8px; background: var(--off-white); border-radius: 99px; margin-top: .4rem; overflow: hidden; border: 1px solid var(--border); }
+  .prog .bar i { display: block; height: 100%; width: 0; background: var(--guinda); transition: width .25s; }
+  .step { border: 1px solid var(--border); border-radius: var(--radius-lg); background: var(--white); margin: .9rem 0; overflow: hidden; }
+  .step.done { border-color: #2e7d4f; background: #f3faf5; }
+  .step > header { display: flex; gap: .8rem; align-items: flex-start; padding: .9rem 1.1rem; }
+  .step .num { flex: none; width: 2.1rem; height: 2.1rem; border-radius: 50%; background: var(--guinda); color: var(--white); font-family: var(--font-ui); font-weight: 700; display: flex; align-items: center; justify-content: center; }
+  .step.done .num { background: #2e7d4f; }
+  .step h3 { margin: 0; font-family: var(--font-display); font-size: 1.2rem; color: var(--guinda); line-height: 1.25; }
+  .tags { display: flex; flex-wrap: wrap; gap: .35rem; margin-top: .35rem; }
+  .tag { font-family: var(--font-ui); font-size: .7rem; letter-spacing: .05em; text-transform: uppercase; border: 1px solid var(--border-strong); border-radius: 99px; padding: .1rem .55rem; color: var(--ink-secondary); background: var(--off-white); }
+  .tag.ok { border-color: #2e7d4f; color: #1f6a3d; background: #eaf6ee; }
+  .tag.chk { border-color: #b7791f; color: #8a5a10; background: #fdf4e3; }
+  .step .inner { padding: 0 1.1rem 1rem 4rem; }
+  @media (max-width: 600px) { .step .inner { padding-left: 1.1rem; } }
+  .step ol, .step ul { margin: .3rem 0 .6rem; padding-left: 1.2rem; line-height: 1.6; }
+  .step .goal { font-size: .92rem; color: var(--ink-secondary); margin: 0 0 .5rem; }
+  .step .ex { background: var(--off-white); border-left: 3px solid var(--guinda); padding: .55rem .8rem; border-radius: 0 var(--radius-md) var(--radius-md) 0; font-size: .9rem; margin: .5rem 0; line-height: 1.5; }
+  .step label.mk { display: inline-flex; align-items: center; gap: .5rem; font-family: var(--font-ui); font-size: .85rem; font-weight: 600; color: var(--guinda); cursor: pointer; margin-top: .3rem; }
+  .step label.mk input { width: 1.1rem; height: 1.1rem; accent-color: #2e7d4f; }
+  .rol { width: 100%; border-collapse: collapse; font-size: .9rem; margin: .6rem 0; }
+  .rol th, .rol td { border: 1px solid var(--border); padding: .45rem .6rem; text-align: left; vertical-align: top; }
+  .rol th { background: var(--off-white); font-family: var(--font-ui); font-size: .78rem; letter-spacing: .05em; text-transform: uppercase; color: var(--guinda); }
+  @media (max-width: 600px) { .rol th, .rol td { padding: .35rem .4rem; font-size: .82rem; } }
+  .tpl { white-space: pre-wrap; font-family: ui-monospace, Menlo, Consolas, monospace; font-size: .82rem; background: var(--off-white); border: 1px dashed var(--border-strong); border-radius: var(--radius-md); padding: .6rem .8rem; margin: .4rem 0; overflow-wrap: anywhere; }
+</style>
+</head>
+<body>
+
+<header class="site-header">
+  <div class="logo-wrap"><img src="imagen1.png" alt="Mixtle, mascota del IEDEP"></div>
+  <div class="header-text">
+    <span class="inst-name">Instituto de Educación Digital del Estado de Puebla</span>
+    <span class="doc-title">Guía práctica — Licenciatura en Sistemas Computacionales</span>
+  </div>
+</header>
+
+<section class="class-hero">
+  <span class="class-label">Unidad 1 · Guía práctica · Miércoles 4 de noviembre de 2026</span>
+  <h1>Paso a paso: arrancar el proyecto real en Jira</h1>
+  <span class="class-subtitle">De cero a un proyecto Scrum con épicas, historias, Done Criteria y el primer sprint en marcha. Cada paso dice quién lo hace y a qué proceso del SBOK corresponde.</span>
+  <div class="meta-row">
+    <div class="meta-item">Programa educativo<span>Lic. en Sistemas Computacionales</span></div>
+    <div class="meta-item">Asignatura<span>Ingeniería de Software I</span></div>
+    <div class="meta-item">Fecha<span>Miércoles 4 de noviembre de 2026</span></div>
+  </div>
+</section>
+
+<div class="page-wrapper">
+
+  <section class="section">
+    <h2 class="section-title">Cómo usar esta guía</h2>
+    <div class="concept-box">
+      <img class="support-logo" src="imagen2.png" alt="Mixtle, mascota de apoyo del IEDEP">
+      <span class="concept-title">Ruta de arranque</span>
+      <p>Son <strong>14 pasos</strong>, del 0 al 13. Los pasos 0 a 8 se pueden hacer en una sola sesión de trabajo de unas dos horas. Marquen cada paso al terminarlo. Una etiqueta verde indica que el paso coincide con la documentación de Atlassian que revisamos; una ámbar indica que el nombre exacto del menú puede variar, así que <strong>confírmenlo en su pantalla</strong>, porque Jira cambia su interfaz con frecuencia.</p>
+    </div>
+    <div class="prog" id="prog"><span id="progT">0 de 14 pasos</span><div class="bar"><i id="progB"></i></div></div>
+    <article class="step" data-s="0"><header><div class="num">0</div><div><h3>Antes de abrir Jira: lo que se acuerda en equipo</h3><div class="tags"><span class="tag ">Equipo completo</span><span class="tag ">SBOK: Create Project Vision</span></div></div></header><div class="inner"><p class="goal">Jira solo captura lo que ya se acordó. Con el cliente real, resuelvan esto en una conversación de 20 a 30 minutos.</p><ul><li><strong>Nombre del proyecto</strong> y una <strong>clave</strong> corta de 3 a 4 letras (por ejemplo, «TAR» para un sistema de tareas). La clave aparecerá en cada historia: TAR-1, TAR-2…</li>
+ <li><strong>Visión</strong> en una o dos frases: para quién es, qué problema resuelve y qué valor da.</li>
+ <li><strong>Roles:</strong> quién es Product Owner, quién Scrum Master y quiénes forman el equipo de desarrollo. El cliente real es un Stakeholder.</li>
+ <li><strong>Cómo y cuándo habla el Product Owner con el cliente</strong> (día y hora fijos).</li></ul>
+ <div class="ex"><strong>Plantilla de visión:</strong> «Para [quién usará el sistema], que necesita [problema], el [nombre] es un [tipo de producto] que [beneficio principal]. A diferencia de [alternativa actual], nuestro producto [diferenciador].»</div>
+ <table class="rol"><tr><th>Rol</th><th>Quién</th><th>Qué cuida</th></tr>
+ <tr><td>Product Owner</td><td>1 integrante</td><td>El valor y el orden del Product Backlog; habla con el cliente.</td></tr>
+ <tr><td>Scrum Master</td><td>1 integrante</td><td>Que el equipo siga Scrum, quite impedimentos y proteja el sprint.</td></tr>
+ <tr><td>Equipo de desarrollo</td><td>3 integrantes</td><td>Estimar, comprometerse y terminar el trabajo con calidad.</td></tr>
+ <tr><td>Stakeholder (cliente)</td><td>Cliente real</td><td>Aporta necesidades y valida lo entregado en la Sprint Review.</td></tr></table><label class="mk"><input type="checkbox"> Paso completado</label></div></article>
+    <article class="step" data-s="1"><header><div class="num">1</div><div><h3>Crear la cuenta y el sitio de Jira</h3><div class="tags"><span class="tag ">Quién: Scrum Master</span><span class="tag ">SBOK: Identify Scrum Master and Stakeholder(s)</span><span class="tag chk">Confirmar nombre en pantalla</span></div></div></header><div class="inner"><p class="goal">Una sola persona crea el sitio y luego invita al resto, para no terminar con cinco sitios distintos.</p><ol><li>Entrar a <strong>atlassian.com/software/jira</strong> y elegir la opción de empezar gratis.</li>
+ <li>Crear la cuenta de Atlassian con un correo y darle nombre al sitio, por ejemplo <strong>iedep-lsc-proyecto</strong>.</li>
+ <li>Confirmar que el plan es <strong>Free</strong>: según Atlassian admite hasta 10 usuarios, y un equipo de 5 personas más el docente cabe sin problema.</li></ol>
+ <div class="ex">Si el cliente va a consultar el tablero, cuenta como un usuario más. Con 5 alumnos, el docente y el cliente son 7 de 10.</div><label class="mk"><input type="checkbox"> Paso completado</label></div></article>
+    <article class="step" data-s="2"><header><div class="num">2</div><div><h3>Crear el proyecto con la plantilla Scrum</h3><div class="tags"><span class="tag ">Quién: Scrum Master, con el equipo mirando</span><span class="tag ">SBOK: Create Project Vision</span><span class="tag ok">Verificado en documentación de Atlassian</span></div></div></header><div class="inner"><p class="goal">Aquí nace el espacio de trabajo. Elijan bien el tipo, porque es difícil cambiarlo después.</p><ol><li>En la barra lateral, pulsar el ícono <strong>+</strong> para crear un proyecto (en versiones nuevas Jira lo llama <em>space</em>, «espacio»).</li>
+ <li>Elegir la plantilla <strong>Scrum</strong>.</li>
+ <li>Elegir el tipo <strong>team-managed</strong> (administrado por el equipo): el equipo controla su propio proceso sin depender de un administrador. <em>Company-managed</em> es para organizaciones que comparten un mismo flujo entre equipos.</li>
+ <li>Escribir el <strong>nombre</strong> y la <strong>clave</strong> acordados en el paso 0, y crear.</li></ol><label class="mk"><input type="checkbox"> Paso completado</label></div></article>
+    <article class="step" data-s="3"><header><div class="num">3</div><div><h3>Invitar al equipo y asignar roles</h3><div class="tags"><span class="tag ">Quién: Scrum Master</span><span class="tag ">SBOK: Form Scrum Team</span><span class="tag chk">Confirmar nombre en pantalla</span></div></div></header><div class="inner"><p class="goal">Que cada integrante entre con su propia cuenta, para que Jira registre quién hizo cada cosa.</p><ol><li>Buscar en el proyecto la opción de <strong>personas, acceso o invitar</strong> (suele estar en la configuración del proyecto o en el botón de compartir).</li>
+ <li>Invitar por correo a los 4 compañeros y al docente.</li>
+ <li>Al cliente, darle acceso de <strong>solo consulta</strong> si el plan lo permite; si no, mostrarle el tablero en las revisiones.</li>
+ <li>Anotar en la descripción del proyecto quién es el Product Owner y quién el Scrum Master.</li></ol><label class="mk"><input type="checkbox"> Paso completado</label></div></article>
+    <article class="step" data-s="4"><header><div class="num">4</div><div><h3>Poner la visión y las reglas del equipo a la vista</h3><div class="tags"><span class="tag ">Quién: Product Owner</span><span class="tag ">SBOK: Create Project Vision</span><span class="tag chk">Confirmar nombre en pantalla</span></div></div></header><div class="inner"><p class="goal">Lo que no está visible, se olvida. Dejen la visión donde todos la vean al entrar.</p><ol><li>Pegar la declaración de visión en la <strong>descripción del proyecto</strong> o en una página del espacio, según lo que ofrezca su pantalla.</li>
+ <li>Escribir debajo los roles, el horario de la Daily y el día de la Sprint Review.</li></ol>
+ <div class="tpl">Visión: Para ______ que necesita ______, el ______ es un ______ que ______.
+Product Owner: ______   Scrum Master: ______
+Daily: lunes a viernes, ____ h, máximo 15 min, con el tablero abierto.
+Sprint Review y Retrospectiva: último día del sprint.</div><label class="mk"><input type="checkbox"> Paso completado</label></div></article>
+    <article class="step" data-s="5"><header><div class="num">5</div><div><h3>Definir las columnas del tablero</h3><div class="tags"><span class="tag ">Quién: equipo</span><span class="tag ">SBOK: Done Criteria</span><span class="tag ok">Verificado en documentación de Atlassian</span></div></div></header><div class="inner"><p class="goal">Las columnas cuentan la historia de una tarea. La última, «Hecho», solo se alcanza cuando se cumplen los Done Criteria.</p><ol><li>En un proyecto team-managed, editar las columnas directamente en el tablero. Para más control, abrir el menú de más acciones junto al tablero y elegir <strong>Configure columns</strong>.</li>
+ <li>Sugerencia de columnas: <strong>Por hacer → En progreso → En revisión → Hecho</strong>.</li>
+ <li>Acordar qué significa cada una; «En revisión» es cuando otro integrante revisa el trabajo.</li></ol><label class="mk"><input type="checkbox"> Paso completado</label></div></article>
+    <article class="step" data-s="6"><header><div class="num">6</div><div><h3>Escribir los Done Criteria del equipo</h3><div class="tags"><span class="tag ">Quién: equipo completo</span><span class="tag ">SBOK: Create Prioritized Product Backlog</span><span class="tag chk">Confirmar nombre en pantalla</span></div></div></header><div class="inner"><p class="goal">Se definen una sola vez y aplican a todas las historias. Son distintos de los criterios de aceptación, que son de cada historia.</p><p>Ejemplo para empezar; ajústenlo con el cliente. Guárdenlo en la descripción del proyecto y pásenlo como lista de comprobación a cada historia.</p>
+ <div class="tpl">Una historia está HECHA cuando:
+[ ] El código está en el repositorio y otro integrante lo revisó.
+[ ] Funciona sin errores en el ambiente de pruebas.
+[ ] Se probaron los criterios de aceptación de la historia.
+[ ] Si usamos código generado con IA, alguien lo leyó, lo entiende y lo probó.
+[ ] El Product Owner la puede demostrar en la Sprint Review.</div><label class="mk"><input type="checkbox"> Paso completado</label></div></article>
+    <article class="step" data-s="7"><header><div class="num">7</div><div><h3>Crear las épicas</h3><div class="tags"><span class="tag ">Quién: Product Owner con el cliente</span><span class="tag ">SBOK: Develop Epic(s)</span><span class="tag ok">Verificado en documentación de Atlassian</span><span class="tag chk">Confirmar nombre en pantalla</span></div></div></header><div class="inner"><p class="goal">Una épica es una meta grande del producto. Empiecen con dos o tres, no con diez.</p><ol><li>Pulsar <strong>+ Create</strong> en la barra superior (o la tecla <strong>C</strong>).</li>
+ <li>En el tipo de trabajo elegir <strong>Epic</strong>.</li>
+ <li>Ponerle un nombre en lenguaje del cliente y una descripción corta del para qué.</li></ol>
+ <div class="ex">Ejemplo de la práctica del grupo: épica «Colaboración entre estudiantes».</div><label class="mk"><input type="checkbox"> Paso completado</label></div></article>
+    <article class="step" data-s="8"><header><div class="num">8</div><div><h3>Crear las historias de usuario en el Backlog</h3><div class="tags"><span class="tag ">Quién: Product Owner; el equipo ayuda</span><span class="tag ">SBOK: Create Prioritized Product Backlog</span><span class="tag ok">Verificado en documentación de Atlassian</span><span class="tag chk">Confirmar nombre en pantalla</span></div></div></header><div class="inner"><p class="goal">Cada historia se divide de una épica y debe poder terminarse dentro de un sprint.</p><ol><li><strong>+ Create</strong> → tipo <strong>Story</strong>.</li>
+ <li>En el título, el formato «Como [usuario], quiero [acción], para [beneficio]».</li>
+ <li>En la <strong>descripción</strong>, escribir los <strong>criterios de aceptación</strong> como condiciones que el Product Owner pueda comprobar con «sí» o «no».</li>
+ <li>Enlazarla a su épica con el campo de épica o padre del trabajo.</li>
+ <li>Las historias nuevas aparecen en el <strong>Backlog</strong>.</li></ol>
+ <div class="tpl">Título: Como estudiante, quiero compartir una tarea con un compañero, para trabajar en equipo.
+Criterios de aceptación:
+- Puedo elegir a un compañero de una lista.
+- El compañero recibe un aviso de que se le compartió.
+- Solo el dueño puede dejar de compartirla.</div><label class="mk"><input type="checkbox"> Paso completado</label></div></article>
+    <article class="step" data-s="9"><header><div class="num">9</div><div><h3>Estimar con Planning Poker</h3><div class="tags"><span class="tag ">Quién: equipo de desarrollo</span><span class="tag ">SBOK: Estimate User Stories</span><span class="tag ok">Verificado en documentación de Atlassian</span></div></div></header><div class="inner"><p class="goal">La estimación la hace el equipo que va a trabajar, no el Product Owner ni el docente.</p><ol><li>Para cada historia del tope del Backlog, el equipo muestra sus cartas a la vez (1, 2, 3, 5, 8…).</li>
+ <li>Si hay mucha diferencia, quien dio el número más alto y el más bajo explican, y se vota de nuevo.</li>
+ <li>Anotar el resultado en el campo <strong>Story point estimate</strong> de la historia.</li></ol><label class="mk"><input type="checkbox"> Paso completado</label></div></article>
+    <article class="step" data-s="10"><header><div class="num">10</div><div><h3>Ordenar el Backlog por valor</h3><div class="tags"><span class="tag ">Quién: Product Owner</span><span class="tag ">SBOK: Create Prioritized Product Backlog</span><span class="tag ok">Verificado en documentación de Atlassian</span></div></div></header><div class="inner"><p class="goal">Lo más valioso, lo más riesgoso y lo que otros necesitan van arriba. El criterio es el valor, no la comodidad del equipo.</p><ol><li>En el <strong>Backlog</strong>, arrastrar cada historia hacia arriba o abajo hasta dejar el orden final.</li>
+ <li>El Product Owner decide el orden, escuchando al equipo y al cliente.</li></ol><label class="mk"><input type="checkbox"> Paso completado</label></div></article>
+    <article class="step" data-s="11"><header><div class="num">11</div><div><h3>Crear el primer sprint y comenzarlo</h3><div class="tags"><span class="tag ">Quién: Scrum Master y equipo</span><span class="tag ">SBOK: Conduct Release Planning y Sprint Planning</span><span class="tag ok">Verificado en documentación de Atlassian</span></div></div></header><div class="inner"><p class="goal">Se compromete solo lo que el equipo cree poder terminar. En el primer sprint aún no hay velocidad propia: sean prudentes.</p><ol><li>En el Backlog, crear un sprint.</li>
+ <li>Arrastrar al sprint las historias que el equipo se compromete a terminar.</li>
+ <li>Escribir el <strong>objetivo del sprint</strong> en una frase.</li>
+ <li>Pulsar <strong>Start sprint</strong>: ponerle nombre, duración y fechas. Para el grupo se recomienda un sprint corto, de una a dos semanas.</li>
+ <li>El trabajo aparece en el tablero activo (Active sprints, o Board en proyectos team-managed).</li></ol><label class="mk"><input type="checkbox"> Paso completado</label></div></article>
+    <article class="step" data-s="12"><header><div class="num">12</div><div><h3>Trabajar el sprint día a día</h3><div class="tags"><span class="tag ">Quién: equipo</span><span class="tag ">SBOK: Conduct Daily Standup</span><span class="tag ok">Verificado en documentación de Atlassian</span></div></div></header><div class="inner"><p class="goal">El tablero se actualiza antes de la Daily, no durante ella.</p><ul><li>Cada quien arrastra su historia entre columnas al avanzar.</li>
+ <li>En la Daily, tres preguntas: ¿qué terminé?, ¿qué haré hoy?, ¿qué me estorba?</li>
+ <li>El Scrum Master atiende los impedimentos.</li>
+ <li>Para ver el avance: <strong>Reports → Burndown Chart</strong>.</li></ul><label class="mk"><input type="checkbox"> Paso completado</label></div></article>
+    <article class="step" data-s="13"><header><div class="num">13</div><div><h3>Cerrar el sprint: Review y Retrospectiva</h3><div class="tags"><span class="tag ">Quién: todos, con el cliente</span><span class="tag ">SBOK: Demonstrate and Validate Sprint; Retrospect Sprint</span><span class="tag ok">Verificado en documentación de Atlassian</span></div></div></header><div class="inner"><p class="goal">Lo que el cliente no acepta no cuenta como terminado, y su velocidad solo suma historias aceptadas.</p><ol><li>En la Sprint Review, el equipo demuestra lo hecho al cliente; el Product Owner acepta o rechaza según criterios de aceptación y Done Criteria.</li>
+ <li>Completar el sprint en Jira: lo incompleto regresa al Backlog o pasa a un sprint futuro.</li>
+ <li>Revisar <strong>Reports → Sprint Report</strong> y anotar la velocidad (puntos aceptados).</li>
+ <li>En la Retrospectiva, acordar mejoras concretas para el siguiente sprint y escribirlas donde todos las vean.</li></ol><label class="mk"><input type="checkbox"> Paso completado</label></div></article>
+  </section>
+
+  <section class="section">
+    <h2 class="section-title">Errores frecuentes al empezar</h2>
+    <ul style="line-height:1.7">
+      <li><strong>Crear tareas técnicas sueltas</strong> («hacer la base de datos») en lugar de historias con valor para el usuario.</li>
+      <li><strong>Que todos creen su propio proyecto.</strong> Hay un solo proyecto y una sola persona lo crea.</li>
+      <li><strong>Historias demasiado grandes</strong> para un sprint: si no cabe, se divide.</li>
+      <li><strong>Meter todo al primer sprint.</strong> Sin velocidad propia, es mejor comprometer poco y cumplir.</li>
+      <li><strong>Mover a «Hecho» sin revisar los Done Criteria</strong>, sobre todo con código generado por IA.</li>
+    </ul>
+    <p class="src">Fuentes: Atlassian, «Get started with Jira» (crear proyecto, plantilla Scrum, team-managed, columnas, crear trabajo); Atlassian, «Learn Scrum with Jira» (backlog, sprint, reportes); Atlassian, «Explore Jira Cloud plans» (plan gratuito: hasta 10 usuarios). El SBOK® Guide es de SCRUMstudy.</p>
+  </section>
+
+  </div>
+
+<footer class="site-footer">
+  <span><strong>Instituto de Educación Digital del Estado de Puebla</strong> — Ingeniería de Software I</span>
+  <span>Unidad 1 · Guía práctica de Jira · Miércoles 4 de noviembre de 2026</span>
+</footer>
+
+<script>
+(function () {
+  'use strict';
+  var steps = document.querySelectorAll('.step');
+  function upd() {
+    var n = 0;
+    Array.prototype.forEach.call(steps, function (s) { var c = s.querySelector('input').checked; s.classList.toggle('done', c); if (c) n++; });
+    document.getElementById('progT').textContent = n + ' de ' + steps.length + ' pasos';
+    document.getElementById('progB').style.width = (100 * n / steps.length) + '%';
+  }
+  Array.prototype.forEach.call(steps, function (s) { s.querySelector('input').addEventListener('change', upd); });
+  upd();
+})();
+</script>
+</body>
+</html>
